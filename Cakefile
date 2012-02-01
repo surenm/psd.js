@@ -48,7 +48,7 @@ task 'docs', 'Generates documentation for the coffee files', ->
   util.log 'Invoking docco on the CoffeeScript source files'
   
   files = coffeeFiles
-  files[i] = "src/#{files[i]}.coffee" for i in [0...files.length]
+  files[i] = "#{csSrcDir}/#{files[i]}.coffee" for i in [0...files.length]
 
   exec "docco #{files.join(' ')}", (err, stdout, stderr) ->
     util.log err if err

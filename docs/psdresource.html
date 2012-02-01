@@ -1,0 +1,74 @@
+<!DOCTYPE html>  <html> <head>   <title>psdresource.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="log.html">                 log.coffee               </a>                                           <a class="source" href="psd.html">                 psd.coffee               </a>                                           <a class="source" href="psdfile.html">                 psdfile.coffee               </a>                                           <a class="source" href="psdheader.html">                 psdheader.coffee               </a>                                           <a class="source" href="psdimage.html">                 psdimage.coffee               </a>                                           <a class="source" href="psdlayer.html">                 psdlayer.coffee               </a>                                           <a class="source" href="psdlayermask.html">                 psdlayermask.coffee               </a>                                           <a class="source" href="psdresource.html">                 psdresource.coffee               </a>                                           <a class="source" href="util.html">                 util.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               psdresource.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">PSDResource</span>
+  <span class="nv">RESOURCE_DESCRIPTIONS =</span>
+    <span class="mi">1000</span><span class="o">:</span> <span class="s1">&#39;PS2.0 mode data&#39;</span>
+    <span class="mi">1001</span><span class="o">:</span> <span class="s1">&#39;Macintosh print record&#39;</span>
+    <span class="mi">1003</span><span class="o">:</span> <span class="s1">&#39;PS2.0 indexed color table&#39;</span>
+    <span class="mi">1005</span><span class="o">:</span> <span class="s1">&#39;ResolutionInfo&#39;</span>
+    <span class="mi">1006</span><span class="o">:</span> <span class="s1">&#39;Names of the alpha channels&#39;</span>
+    <span class="mi">1007</span><span class="o">:</span> <span class="s1">&#39;DisplayInfo&#39;</span>
+    <span class="mi">1008</span><span class="o">:</span> <span class="s1">&#39;Caption&#39;</span>
+    <span class="mi">1009</span><span class="o">:</span> <span class="s1">&#39;Border information&#39;</span>
+    <span class="mi">1010</span><span class="o">:</span> <span class="s1">&#39;Background color&#39;</span>
+    <span class="mi">1011</span><span class="o">:</span> <span class="s1">&#39;Print flags&#39;</span>
+    <span class="mi">1012</span><span class="o">:</span> <span class="s1">&#39;Grayscale/multichannel halftoning info&#39;</span>
+    <span class="mi">1013</span><span class="o">:</span> <span class="s1">&#39;Color halftoning info&#39;</span>
+    <span class="mi">1014</span><span class="o">:</span> <span class="s1">&#39;Duotone halftoning info&#39;</span>
+    <span class="mi">1015</span><span class="o">:</span> <span class="s1">&#39;Grayscale/multichannel transfer function&#39;</span>
+    <span class="mi">1016</span><span class="o">:</span> <span class="s1">&#39;Color transfer functions&#39;</span>
+    <span class="mi">1017</span><span class="o">:</span> <span class="s1">&#39;Duotone transfer functions&#39;</span>
+    <span class="mi">1018</span><span class="o">:</span> <span class="s1">&#39;Duotone image info&#39;</span>
+    <span class="mi">1019</span><span class="o">:</span> <span class="s1">&#39;B&amp;W values for the dot range&#39;</span>
+    <span class="mi">1021</span><span class="o">:</span> <span class="s1">&#39;EPS options&#39;</span>
+    <span class="mi">1022</span><span class="o">:</span> <span class="s1">&#39;Quick Mask info&#39;</span>
+    <span class="mi">1024</span><span class="o">:</span> <span class="s1">&#39;Layer state info&#39;</span>
+    <span class="mi">1025</span><span class="o">:</span> <span class="s1">&#39;Working path&#39;</span>
+    <span class="mi">1026</span><span class="o">:</span> <span class="s1">&#39;Layers group info&#39;</span>
+    <span class="mi">1028</span><span class="o">:</span> <span class="s1">&#39;IPTC-NAA record (File Info)&#39;</span>
+    <span class="mi">1029</span><span class="o">:</span> <span class="s1">&#39;Image mode for raw format files&#39;</span>
+    <span class="mi">1030</span><span class="o">:</span> <span class="s1">&#39;JPEG quality&#39;</span>
+    <span class="mi">1032</span><span class="o">:</span> <span class="s1">&#39;Grid and guides info&#39;</span>
+    <span class="mi">1033</span><span class="o">:</span> <span class="s1">&#39;Thumbnail resource&#39;</span>
+    <span class="mi">1034</span><span class="o">:</span> <span class="s1">&#39;Copyright flag&#39;</span>
+    <span class="mi">1035</span><span class="o">:</span> <span class="s1">&#39;URL&#39;</span>
+    <span class="mi">1036</span><span class="o">:</span> <span class="s1">&#39;Thumbnail resource&#39;</span>
+    <span class="mi">1037</span><span class="o">:</span> <span class="s1">&#39;Global Angle&#39;</span>
+    <span class="mi">1038</span><span class="o">:</span> <span class="s1">&#39;Color samplers resource&#39;</span>
+    <span class="mi">1039</span><span class="o">:</span> <span class="s1">&#39;ICC Profile&#39;</span>
+    <span class="mi">1040</span><span class="o">:</span> <span class="s1">&#39;Watermark&#39;</span>
+    <span class="mi">1041</span><span class="o">:</span> <span class="s1">&#39;ICC Untagged&#39;</span>
+    <span class="mi">1042</span><span class="o">:</span> <span class="s1">&#39;Effects visible&#39;</span>
+    <span class="mi">1043</span><span class="o">:</span> <span class="s1">&#39;Spot Halftone&#39;</span>
+    <span class="mi">1044</span><span class="o">:</span> <span class="s1">&#39;Document specific IDs&#39;</span>
+    <span class="mi">1045</span><span class="o">:</span> <span class="s1">&#39;Unicode Alpha Names&#39;</span>
+    <span class="mi">1046</span><span class="o">:</span> <span class="s1">&#39;Indexed Color Table Count&#39;</span>
+    <span class="mi">1047</span><span class="o">:</span> <span class="s1">&#39;Transparent Index&#39;</span>
+    <span class="mi">1049</span><span class="o">:</span> <span class="s1">&#39;Global Altitude&#39;</span>
+    <span class="mi">1050</span><span class="o">:</span> <span class="s1">&#39;Slices&#39;</span>
+    <span class="mi">1051</span><span class="o">:</span> <span class="s1">&#39;Workflow URL&#39;</span>
+    <span class="mi">1052</span><span class="o">:</span> <span class="s1">&#39;Jump To XPEP&#39;</span>
+    <span class="mi">1053</span><span class="o">:</span> <span class="s1">&#39;Alpha Identifiers&#39;</span>
+    <span class="mi">1054</span><span class="o">:</span> <span class="s1">&#39;URL List&#39;</span>
+    <span class="mi">1057</span><span class="o">:</span> <span class="s1">&#39;Version Info&#39;</span>
+    <span class="mi">2999</span><span class="o">:</span> <span class="s1">&#39;Name of clipping path&#39;</span>
+    <span class="mi">10000</span><span class="o">:</span> <span class="s1">&#39;Print flags info&#39;</span>
+
+  <span class="nv">constructor: </span><span class="nf">(@file) -&gt;</span>
+
+  <span class="nv">parse: </span><span class="o">-&gt;</span>
+    <span class="vi">@at = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">tell</span><span class="p">()</span>
+
+    <span class="p">[</span><span class="nx">@type</span><span class="p">,</span> <span class="nx">@id</span><span class="p">,</span> <span class="nx">@namelen</span><span class="p">]</span> <span class="o">=</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">readf</span> <span class="s2">&quot;&gt;4s H B&quot;</span>
+
+    <span class="nv">n = </span><span class="nx">Util</span><span class="p">.</span><span class="nx">pad2</span><span class="p">(</span><span class="nx">@namelen</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="p">[</span><span class="nx">@name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">readf</span> <span class="s2">&quot;&gt;#{n}s&quot;</span>
+    <span class="vi">@name = </span><span class="nx">@name</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">@name</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="vi">@short = </span><span class="nx">@name</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+
+    <span class="p">[</span><span class="nx">@size</span><span class="p">]</span> <span class="o">=</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">readf</span> <span class="s2">&quot;&gt;L&quot;</span>
+    <span class="nx">@file</span><span class="p">.</span><span class="nx">seek</span> <span class="nx">Util</span><span class="p">.</span><span class="nx">pad2</span><span class="p">(</span><span class="nx">@size</span><span class="p">)</span>
+
+    <span class="vi">@rdesc = </span><span class="s2">&quot;[#{RESOURCE_DESCRIPTIONS[@id]}]&quot;</span>
+
+    <span class="mi">4</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="nx">Util</span><span class="p">.</span><span class="nx">pad2</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="nx">@namelen</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">+</span> <span class="nx">Util</span><span class="p">.</span><span class="nx">pad2</span><span class="p">(</span><span class="nx">@size</span><span class="p">)</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

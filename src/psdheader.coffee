@@ -1,4 +1,8 @@
+# The PSD header describes all kinds of important information pertaining to 
+# the PSD file such as size, color channels, color depth, and so on.
 class PSDHeader
+  # All of the sections that the header contains. These will become properties 
+  # of the instantiated header object once parsed.
   HEADER_SECTIONS = [
     "sig"
     "version"
@@ -15,6 +19,8 @@ class PSDHeader
     "mode"
   ]
 
+  # Common names for various color modes, which are specified by an integer in 
+  # the header.
   MODES =
     0:  'Bitmap'
     1:  'GrayScale'
@@ -36,20 +42,32 @@ class PSDHeader
   constructor: (@file) ->
 
   parse: ->
+    # Read the header section
     data = @file.readf ">4sH 6B HLLHH"
+
+    # Add all of the header sections as properties of this object.
     @[section] = data.shift() for section in HEADER_SECTIONS
+
+    # Store size in an easy to use place for later
     @size = [@rows, @cols]
 
+    # This must be 8BPS according to the spec, or else this is not a valid PSD 
+    # file.
     if @sig isnt "8BPS"
       throw "Not a PSD signature: #{@header['sig']}"
     
+    # The spec only covers version 1 of PSDs. I believe this is the only 
+    # version available at this time, anyways.
     if @version isnt 1
       throw "Can not handle PSD version #{@header['version']}"
 
+    # Store the common mode name
     if 0 <= @mode < 16
       @modename = MODES[@mode]
     else
       @modename = "(#{@mode})"
 
+    # Information about the color mode is a bit complex. We're skipping this 
+    # for now. TODO.
     @colormodepos = @file.pos
     @file.skipBlock "color mode data"
