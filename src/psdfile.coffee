@@ -22,15 +22,34 @@ class PSDFile
     b2 = @data[@pos++]
     b1 | b2
 
+  #
+  # Helper functions so we don't have to remember the unpack
+  # format codes.
+  #
+  
+  # 4 bytes
   readInt: -> @readf(">i")[0]
+  readUInt: -> @readf(">I")[0]
+
+  # 2 bytes
   readShortInt: -> @readf(">h")[0]
+  readShortUInt: -> @readf(">H")[0]
+
+  # 4 bytes
+  readLongInt: -> @readf(">l")[0]
+  readLongUInt: -> @readf(">L")[0]
+
+  # 8 bytes
   readDouble: -> @readf(">d")[0]
+
+  # 1 byte
   readBoolean: -> @read(1)[0] isnt 0
+
   readUnicodeString: ->
     str = ""
-    strlen = @readInt()
+    strlen = @readUInt()
     for i in [0...strlen]
-      charCode = @readShortInt()
+      charCode = @readShortUInt()
       str += chr(Util.i16(charCode)) if charCode > 0
 
     str
@@ -38,7 +57,7 @@ class PSDFile
   readDescriptorStructure: ->
     name = @readUnicodeString()
     classID = @readLengthWithString()
-    items = @readInt()
+    items = @readUInt()
 
     descriptors = {}
     for i in [0...items]
@@ -48,8 +67,10 @@ class PSDFile
     descriptors
 
   readString: (length) -> @readf ">#{length}s"
+
+  # Used for reading Pascal strings
   readLengthWithString: (defaultLen = 4) ->
-    length = @readInt()
+    length = @readUInt()
     if length is 0
       [str] = @readf ">#{defaultLen}s"
     else
@@ -67,7 +88,7 @@ class PSDFile
           typeID: @readLengthWithString()
           enum: @readLengthWithString()
       when "VlLs"
-        listSize = @readInt()
+        listSize = @readUInt()
         value = []
         value.push(@readOsType()) for i in [0...listSize]
       when "doub" then value = @readDouble()
@@ -75,13 +96,13 @@ class PSDFile
         value =
           type: @readString(4)
           value: @readDouble()
-      when "long" then value = @readInt()
+      when "long" then value = @readUInt()
       when "bool" then value = @readBoolean()
       when "alis"
-        length = @readInt()
+        length = @readUInt()
         value = @readString(length)
       when "obj"
-        num = @readInt()
+        num = @readUInt()
         for i in [0...num]
           type = @readString(4)
           switch type
@@ -104,11 +125,11 @@ class PSDFile
               value =
                 name: @readUnicodeString()
                 classID: @readLengthWithString()
-                offsetValue: @readInt()
+                offsetValue: @readUInt()
             when "Idnt", "indx", "name" then value = null
       when "tdta"
         # Skip this
-        length = @readInt()
+        length = @readUInt()
         @seek length
 
     {type: osType, value: value}

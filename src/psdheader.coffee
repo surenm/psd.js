@@ -2,12 +2,15 @@ class PSDHeader
   HEADER_SECTIONS = [
     "sig"
     "version"
+    
+    # These are reserved bytes, always zero
     "r0"
     "r1"
     "r2"
     "r3"
     "r4"
     "r5"
+
     "channels"
     "rows"
     "cols"

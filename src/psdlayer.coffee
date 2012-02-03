@@ -51,6 +51,18 @@ class PSDLayer
     "pLit": "pin light"
     "hMix": "hard mix"
 
+  BLEND_FLAGS =
+    0: "transparency protected"
+    1: "visible"
+    2: "obsolete"
+    3: "bit 4 useful"
+    4: "pixel data irrelevant"
+
+  MASK_FLAGS =
+    0: "position relative"
+    1: "layer mask disabled"
+    2: "invert layer mask"
+
   SAFE_FONTS = [
     "Arial"
     "Courier New"
@@ -72,11 +84,16 @@ class PSDLayer
     @parseInfo(layerIndex)
     @parseBlendModes()
 
-    # remember position for skipping unrecognized data
-    [extralen] = @file.readf ">L"
+    # Remember position for skipping unrecognized data
+    extralen = @file.readUInt()
+
+    # Marking our start point in case we need to bail and recover
     extrastart = @file.tell()
 
     @parseMaskData()
+
+    # Skip blending ranges. TODO.
+    @file.seek @file.readUInt()
 
     while @file.pos - extrastart < extralen
       [signature, key, size] = @file.readf ">4s4s4s"
@@ -131,7 +148,8 @@ class PSDLayer
     @name = "Canvas"
     @layerId = 0
 
-
+  # Parse important information about this layer such as position, size,
+  # and channel info.
   parseInfo: (layerIndex) ->
     @idx = layerIndex
 
@@ -157,7 +175,8 @@ class PSDLayer
       Log.debug "Channel #{i}: id=#{channelID}, #{channelLength} bytes, type=#{CHANNEL_SUFFIXES[channelID]}"
 
       @channelsInfo.push [channelID, channelLength]
-
+    
+  # Parse the blend mode used for this layer including type and opacity
   parseBlendModes: ->
     @blendMode = {}
 
@@ -167,25 +186,48 @@ class PSDLayer
       @blendMode.opacity, 
       @blendMode.clipping, 
       @blendMode.flags, 
-      @blendMode.filler
+      @blendMode.filler # unused data
     ] = @file.readf ">4s4sBBBB"
 
     @blendMode.key = @blendMode.key.trim()
-    @blendMode.opacp = (@blendMode.opacity * 100 + 127) / 255
-    @blendMode.blending = BLEND_MODES[@blendMode.key]
+    @blendMode.opacityPercentage = (@blendMode.opacity * 100) / 255
+    @blendMode.blender = BLEND_MODES[@blendMode.key]
 
     Log.debug "Blending mode:", @blendMode
 
   parseMaskData: ->
-    [@mask.size] = @file.readf ">L"
-    if @mask.size
-      [@mask.top, @mask.left, @mask.bottom, @mask.right, @mask.defaultColor, @mask.flags] = @file.readf ">LLLLBB"
+    @mask.size = @file.readUInt()
 
-      # skip remainder
-      @file.seek @mask.size - 18
-      [@mask.rows, @mask.cols] = [@mask.bottom - @mask.top, @mask.right - @mask.left]
+    # Something wrong, bail.
+    return false if @mask.size not in [36, 20, 0]
 
-    @file.skipBlock "layer blending ranges"
+    # Valid, but this section doesn't exist.
+    return true if @mask.size is 0
+
+    # Parse mask position
+    [
+      @mask.top, 
+      @mask.left, 
+      @mask.bottom, 
+      @mask.right,
+
+      # Either 0 or 255
+      @mask.defaultColor, 
+      @mask.flags
+    ] = @file.readf ">LLLLBB"
+
+    # If the size is 20, then there are 2 bytes of padding
+    if @mask.size is 20
+      @file.seek(2)
+    else
+      # This is weird. Not sure what "real" means in the spec.
+      [
+        @mask.realFlags,
+        @mask.realMaskBackground
+      ] = @file.readf ">BB"
+
+    # For some reason the mask position info is duplicated here? Skip.
+    @file.seek 16
 
   readMetadata: ->
     Log.debug "Parsing layer metadata..."
@@ -205,24 +247,24 @@ class PSDLayer
     @layerType = SECTION_DIVIDER_TYPES[code]
     
   readVectorMask: ->
-    version = @file.readInt()
+    version = @file.readUInt()
     flags = @file.read 4
 
     # TODO read path information
 
   readTypeTool: ->
-    ver = @file.readShortInt()
+    ver = @file.readShortUInt()
     transforms = []
     transforms.push @file.readDouble() for i in [0...6]
 
-    textVer = @file.readShortInt()
-    descrVer = @file.readInt()
+    textVer = @file.readShortUInt()
+    descrVer = @file.readUInt()
     return if ver isnt 1 or textVer isnt 50 or descrVer isnt 16
 
     textData = @file.readDescriptorStructure()
 
-    wrapVer = @readShortInt()
-    descrVer = @readInt()
+    wrapVer = @readShortUInt()
+    descrVer = @readUInt()
     wrapData = @file.readDescriptorStructure()
 
     rectangle = []
@@ -321,14 +363,14 @@ class PSDLayer
     rleEncoded = false
 
     if readPlaneInfo
-      compression = @file.readShortInt()
+      compression = @file.readShortUInt()
       Log.debug "Compression: id=#{compression}, name=#{COMPRESSIONS[compression]}"
 
       rleEncoded = compression is 1
       if rleEncoded
         if not lineLengths
           lineLengths = []
-          lineLengths.push @file.readShortInt() for a in [0...height]
+          lineLengths.push @file.readShortUInt() for a in [0...height]
       else
         Log.debug "ERROR: compression not implemented yet. Skipping."
 

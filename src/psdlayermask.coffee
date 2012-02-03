@@ -1,21 +1,40 @@
 class PSDLayerMask
   constructor: (@file, @header) ->
+    # Array to hold all of the layers
     @layers = []
 
+    # Does the first alpha channel contain the transparency data?
+    @mergedAlpha = false
+
   parse: ->
-    maskSize = @file.readInt()
+    # Read the size of this section. 4 bytes.
+    maskSize = @file.readUInt()
+
+    # Store the current position in case we need to bail
+    # and skip over this section.
     pos = @file.tell()
 
     Log.debug "Layer mask size is #{maskSize}"
 
+    # If the mask size is > 0, then parse the section. Otherwise,
+    # this section doesn't exist and the whole layers/masks data
+    # is 4 bytes (the length we've already read)
     if maskSize > 0
-      layerInfoSize = Util.pad2(@file.readInt())
+      # Size of the layer info section. 4 bytes, rounded up by 2's.
+      layerInfoSize = Util.pad2(@file.readUInt())
 
+      # If the layer info size is > 0, then we have some layers
       if layerInfoSize > 0
+        # Read the number of layers, 2 bytes.
         @numLayers = @file.readShortInt()
 
+        # If the number of layers is negative, the absolute value is
+        # the actual number of layers, and the first alpha channel contains
+        # the transparency data for the merged image.
         if @numLayers < 0
+          Log.debug "Note: first alpha channel contains transparency data"
           @numLayers = Math.abs @numLayers
+          @mergedAlpha = true
 
         if @numLayers * (18 + 6 * @header.channels) > layerInfoSize
           throw "Unlikely number of #{@numLayers} layers for #{@header['channels']} with #{layerInfoSize} layer info size. Giving up."
@@ -35,14 +54,14 @@ class PSDLayerMask
       @file.seek maskSize
 
     baseLayer = new PSDLayer @file, true, @header
-    rle = @file.readShortInt() is 1
+    rle = @file.readShortUInt() is 1
     height = baseLayer.height
 
     if rle
       nLines = height * baseLayer.channelsInfo.length
       lineLengths = []
       for h in [0...nLines]
-        lineLengths.push @readShortInt()
+        lineLengths.push @readShortUInt()
 
       baseLayer.getImageData(false, lineLengths)
     else
