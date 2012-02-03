@@ -77,6 +77,7 @@ class PSDLayer
   constructor: (@file, @baseLayer = false, @header = null) ->
     @images = []
     @mask = {}
+    @blendingRanges = {}
 
   parse: (layerIndex = null) ->
     return @parseBaseLayer() if @baseLayer
@@ -91,9 +92,7 @@ class PSDLayer
     extrastart = @file.tell()
 
     @parseMaskData()
-
-    # Skip blending ranges. TODO.
-    @file.seek @file.readUInt()
+    @parseBlendingRanges()
 
     while @file.pos - extrastart < extralen
       [signature, key, size] = @file.readf ">4s4s4s"
@@ -228,6 +227,28 @@ class PSDLayer
 
     # For some reason the mask position info is duplicated here? Skip.
     @file.seek 16
+
+  parseBlendingRanges: ->
+    length = @file.readUInt()
+
+    # First, the grey blend. This is irrelevant for Lab & Greyscale.
+    @blendingRanges.grey =
+      source:
+        black: @file.readf ">BB"
+        white: @file.readf ">BB"
+      dest:
+        black: @file.readf ">BB"
+        white: @file.readf ">BB"
+
+    pos = @file.tell()
+
+    @blendingRanges.channels = []
+    while @file.tell() < pos + length - 8
+      @blendingRanges.channels.push
+        source: @file.readf ">BB"
+        dest: @file.readf ">BB"
+
+    Log.debug "Blending ranges:", @blendingRanges
 
   readMetadata: ->
     Log.debug "Parsing layer metadata..."
