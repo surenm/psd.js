@@ -1,0 +1,347 @@
+<!DOCTYPE html>  <html> <head>   <title>psdlayer.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="log.html">                 log.coffee               </a>                                           <a class="source" href="psd.html">                 psd.coffee               </a>                                           <a class="source" href="psdfile.html">                 psdfile.coffee               </a>                                           <a class="source" href="psdheader.html">                 psdheader.coffee               </a>                                           <a class="source" href="psdimage.html">                 psdimage.coffee               </a>                                           <a class="source" href="psdlayer.html">                 psdlayer.coffee               </a>                                           <a class="source" href="psdlayermask.html">                 psdlayermask.coffee               </a>                                           <a class="source" href="psdresource.html">                 psdresource.coffee               </a>                                           <a class="source" href="util.html">                 util.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               psdlayer.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">PSDLayer</span>
+  <span class="nv">CHANNEL_SUFFIXES =</span>
+    <span class="s1">&#39;-2&#39;</span><span class="o">:</span> <span class="s1">&#39;layer mask&#39;</span>
+    <span class="s1">&#39;-1&#39;</span><span class="o">:</span> <span class="s1">&#39;A&#39;</span>
+    <span class="mi">0</span><span class="o">:</span> <span class="s1">&#39;R&#39;</span>
+    <span class="mi">1</span><span class="o">:</span> <span class="s1">&#39;G&#39;</span>
+    <span class="mi">2</span><span class="o">:</span> <span class="s1">&#39;B&#39;</span>
+    <span class="mi">3</span><span class="o">:</span> <span class="s1">&#39;RGB&#39;</span>
+    <span class="mi">4</span><span class="o">:</span> <span class="s1">&#39;CMYK&#39;</span>
+    <span class="mi">5</span><span class="o">:</span> <span class="s1">&#39;HSL&#39;</span>
+    <span class="mi">6</span><span class="o">:</span> <span class="s1">&#39;HSB&#39;</span>
+    <span class="mi">9</span><span class="o">:</span> <span class="s1">&#39;Lab&#39;</span>
+    <span class="mi">11</span><span class="o">:</span> <span class="s1">&#39;RGB&#39;</span>
+    <span class="mi">12</span><span class="o">:</span> <span class="s1">&#39;Lab&#39;</span>
+    <span class="mi">13</span><span class="o">:</span> <span class="s1">&#39;CMYK&#39;</span>
+
+  <span class="nv">SECTION_DIVIDER_TYPES =</span>
+    <span class="mi">0</span><span class="o">:</span> <span class="s2">&quot;other&quot;</span>
+    <span class="mi">1</span><span class="o">:</span> <span class="s2">&quot;open folder&quot;</span>
+    <span class="mi">2</span><span class="o">:</span> <span class="s2">&quot;closed folder&quot;</span>
+    <span class="mi">3</span><span class="o">:</span> <span class="s2">&quot;bounding section divider&quot;</span>
+
+  <span class="nv">COMPRESSIONS =</span>
+    <span class="mi">0</span><span class="o">:</span> <span class="s1">&#39;Raw&#39;</span>
+    <span class="mi">1</span><span class="o">:</span> <span class="s1">&#39;RLE&#39;</span>
+    <span class="mi">2</span><span class="o">:</span> <span class="s1">&#39;ZIP&#39;</span>
+    <span class="mi">3</span><span class="o">:</span> <span class="s1">&#39;ZIPPrediction&#39;</span>
+
+  <span class="nv">BLEND_MODES =</span>
+    <span class="s2">&quot;norm&quot;</span><span class="o">:</span> <span class="s2">&quot;normal&quot;</span>
+    <span class="s2">&quot;dark&quot;</span><span class="o">:</span> <span class="s2">&quot;darken&quot;</span>
+    <span class="s2">&quot;lite&quot;</span><span class="o">:</span> <span class="s2">&quot;lighten&quot;</span>
+    <span class="s2">&quot;hue&quot;</span><span class="o">:</span>  <span class="s2">&quot;hue&quot;</span>
+    <span class="s2">&quot;sat&quot;</span><span class="o">:</span>  <span class="s2">&quot;saturation&quot;</span>
+    <span class="s2">&quot;colr&quot;</span><span class="o">:</span> <span class="s2">&quot;color&quot;</span>
+    <span class="s2">&quot;lum&quot;</span><span class="o">:</span>  <span class="s2">&quot;luminosity&quot;</span>
+    <span class="s2">&quot;mul&quot;</span><span class="o">:</span>  <span class="s2">&quot;multiply&quot;</span>
+    <span class="s2">&quot;scrn&quot;</span><span class="o">:</span> <span class="s2">&quot;screen&quot;</span>
+    <span class="s2">&quot;diss&quot;</span><span class="o">:</span> <span class="s2">&quot;dissolve&quot;</span>
+    <span class="s2">&quot;over&quot;</span><span class="o">:</span> <span class="s2">&quot;overlay&quot;</span>
+    <span class="s2">&quot;hLit&quot;</span><span class="o">:</span> <span class="s2">&quot;hard light&quot;</span>
+    <span class="s2">&quot;sLit&quot;</span><span class="o">:</span> <span class="s2">&quot;soft light&quot;</span>
+    <span class="s2">&quot;diff&quot;</span><span class="o">:</span> <span class="s2">&quot;difference&quot;</span>
+    <span class="s2">&quot;smud&quot;</span><span class="o">:</span> <span class="s2">&quot;exclusion&quot;</span>
+    <span class="s2">&quot;div&quot;</span><span class="o">:</span>  <span class="s2">&quot;color dodge&quot;</span>
+    <span class="s2">&quot;idiv&quot;</span><span class="o">:</span> <span class="s2">&quot;color burn&quot;</span>
+    <span class="s2">&quot;lbrn&quot;</span><span class="o">:</span> <span class="s2">&quot;linear burn&quot;</span>
+    <span class="s2">&quot;lddg&quot;</span><span class="o">:</span> <span class="s2">&quot;linear dodge&quot;</span>
+    <span class="s2">&quot;vLit&quot;</span><span class="o">:</span> <span class="s2">&quot;vivid light&quot;</span>
+    <span class="s2">&quot;lLit&quot;</span><span class="o">:</span> <span class="s2">&quot;linear light&quot;</span>
+    <span class="s2">&quot;pLit&quot;</span><span class="o">:</span> <span class="s2">&quot;pin light&quot;</span>
+    <span class="s2">&quot;hMix&quot;</span><span class="o">:</span> <span class="s2">&quot;hard mix&quot;</span>
+
+  <span class="nv">SAFE_FONTS = </span><span class="p">[</span>
+    <span class="s2">&quot;Arial&quot;</span>
+    <span class="s2">&quot;Courier New&quot;</span>
+    <span class="s2">&quot;Georgia&quot;</span>
+    <span class="s2">&quot;Times New Roman&quot;</span>
+    <span class="s2">&quot;Verdana&quot;</span>
+    <span class="s2">&quot;Trebuchet MS&quot;</span>
+    <span class="s2">&quot;Lucida Sans&quot;</span>
+    <span class="s2">&quot;Tahoma&quot;</span>
+  <span class="p">]</span>
+
+  <span class="nv">constructor: </span><span class="nf">(@file, @baseLayer = false, @header = null) -&gt;</span>
+    <span class="vi">@images = </span><span class="p">[]</span>
+    <span class="vi">@mask = </span><span class="p">{}</span>
+
+  <span class="nv">parse: </span><span class="nf">(layerIndex = null) -&gt;</span>
+    <span class="k">return</span> <span class="nx">@parseBaseLayer</span><span class="p">()</span> <span class="k">if</span> <span class="nx">@baseLayer</span>
+
+    <span class="nx">@parseInfo</span><span class="p">(</span><span class="nx">layerIndex</span><span class="p">)</span>
+    <span class="nx">@parseBlendModes</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>remember position for skipping unrecognized data</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="p">[</span><span class="nx">extralen</span><span class="p">]</span> <span class="o">=</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">readf</span> <span class="s2">&quot;&gt;L&quot;</span>
+    <span class="nv">extrastart = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">tell</span><span class="p">()</span>
+
+    <span class="nx">@parseMaskData</span><span class="p">()</span>
+
+    <span class="k">while</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">pos</span> <span class="o">-</span> <span class="nx">extrastart</span> <span class="o">&lt;</span> <span class="nx">extralen</span>
+      <span class="p">[</span><span class="nx">signature</span><span class="p">,</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">size</span><span class="p">]</span> <span class="o">=</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">readf</span> <span class="s2">&quot;&gt;4s4s4s&quot;</span>
+
+      <span class="nv">prevPos = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">tell</span><span class="p">()</span>
+
+      <span class="k">switch</span> <span class="nx">key</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Layer ID</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="k">when</span> <span class="s2">&quot;lyid&quot;</span> <span class="k">then</span> <span class="vi">@id = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readUInt16</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>Metadata setting</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="k">when</span> <span class="s2">&quot;shmd&quot;</span> <span class="k">then</span> <span class="nx">@readMetadata</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>Section divider setting</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="k">when</span> <span class="s2">&quot;lsct&quot;</span> <span class="k">then</span> <span class="nx">@readLayerSectionDivider</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>Unicode name</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="k">when</span> <span class="s2">&quot;luni&quot;</span>
+          <span class="vi">@name = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readUnicodeString</span><span class="p">()</span>
+          <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Layer name: #{@name}&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>Vector mask</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="k">when</span> <span class="s2">&quot;vmsk&quot;</span> <span class="k">then</span> <span class="nx">@readVectorMask</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>Type tool</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="k">when</span> <span class="s2">&quot;TySh&quot;</span> <span class="k">then</span> <span class="nx">@readTypeTool</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>Skip extra data</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">@file</span><span class="p">.</span><span class="nx">seek</span> <span class="nx">extrastart</span> <span class="o">+</span> <span class="nx">extralen</span><span class="p">,</span> <span class="kc">false</span>
+
+  <span class="nv">parseBaseLayer: </span><span class="o">-&gt;</span>
+    <span class="nv">height = </span><span class="nx">@header</span><span class="p">.</span><span class="nx">height</span>
+    <span class="nv">width = </span><span class="nx">@header</span><span class="p">.</span><span class="nx">width</span>
+    <span class="vi">@top = </span><span class="mi">0</span>
+    <span class="vi">@left = </span><span class="mi">0</span>
+    <span class="vi">@bottom = </span><span class="nx">height</span>
+    <span class="vi">@right = </span><span class="nx">width</span>
+    <span class="vi">@width = </span><span class="nx">width</span>
+    <span class="vi">@height = </span><span class="nx">height</span>
+
+    <span class="nv">channels = </span><span class="nx">@header</span><span class="p">.</span><span class="nx">channels</span>
+    <span class="nv">chanDelta = </span><span class="mi">3</span> <span class="o">-</span> <span class="nx">channels</span>
+    <span class="vi">@channelsInfo = </span><span class="p">[]</span>
+    <span class="nx">@channelsInfo</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span><span class="nx">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="nx">chanDelta</span><span class="p">...</span><span class="nx">channels</span><span class="o">+</span><span class="nx">chanDelta</span><span class="p">]</span>
+
+    <span class="vi">@blendMode =</span>
+      <span class="nv">code: </span><span class="s2">&quot;norm&quot;</span>
+      <span class="nv">label: </span><span class="s2">&quot;normal&quot;</span>
+
+    <span class="vi">@opacity = </span><span class="mi">255</span>
+    <span class="vi">@visible = </span><span class="kc">true</span>
+    <span class="vi">@name = </span><span class="s2">&quot;Canvas&quot;</span>
+    <span class="vi">@layerId = </span><span class="mi">0</span>
+
+
+  <span class="nv">parseInfo: </span><span class="nf">(layerIndex) -&gt;</span>
+    <span class="vi">@idx = </span><span class="nx">layerIndex</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <h1>#</h1>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">Layer</span> <span class="nx">Info</span></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <h1>#</h1>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="p">[</span><span class="nx">@top</span><span class="p">,</span> <span class="nx">@left</span><span class="p">,</span> <span class="nx">@bottom</span><span class="p">,</span> <span class="nx">@right</span><span class="p">,</span> <span class="nx">@channels</span><span class="p">]</span> <span class="o">=</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">readf</span> <span class="s2">&quot;&gt;LLLLH&quot;</span>
+    <span class="p">[</span><span class="nx">@rows</span><span class="p">,</span> <span class="nx">@cols</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nx">@bottom</span> <span class="o">-</span> <span class="nx">@top</span><span class="p">,</span> <span class="nx">@right</span> <span class="o">-</span> <span class="nx">@left</span><span class="p">]</span>
+
+    <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Layer #{@idx}:&quot;</span><span class="p">,</span> <span class="err">@</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <p>Sanity check</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">if</span> <span class="nx">@bottom</span> <span class="o">&lt;</span> <span class="nx">@top</span> <span class="o">or</span> <span class="nx">@right</span> <span class="o">&lt;</span> <span class="nx">@left</span> <span class="o">or</span> <span class="nx">@channels</span> <span class="o">&gt;</span> <span class="mi">64</span>
+      <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Somethings not right, attempting to skip layer.&quot;</span>
+      <span class="nx">@file</span><span class="p">.</span><span class="nx">seek</span> <span class="mi">6</span> <span class="o">*</span> <span class="nx">@channels</span> <span class="o">+</span> <span class="mi">12</span>
+      <span class="nx">@file</span><span class="p">.</span><span class="nx">skipBlock</span> <span class="s2">&quot;layer info: extra data&quot;</span>
+      <span class="k">return</span> <span class="c1"># next layer</span></pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <p>Read channel info</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="vi">@channelsInfo = </span><span class="p">[]</span>
+    <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">@channels</span><span class="p">]</span>
+      <span class="p">[</span><span class="nx">channelID</span><span class="p">,</span> <span class="nx">channelLength</span><span class="p">]</span> <span class="o">=</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">readf</span> <span class="s2">&quot;&gt;hL&quot;</span>
+      <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Channel #{i}: id=#{channelID}, #{channelLength} bytes, type=#{CHANNEL_SUFFIXES[channelID]}&quot;</span>
+
+      <span class="nx">@channelsInfo</span><span class="p">.</span><span class="nx">push</span> <span class="p">[</span><span class="nx">channelID</span><span class="p">,</span> <span class="nx">channelLength</span><span class="p">]</span>
+
+  <span class="nv">parseBlendModes: </span><span class="o">-&gt;</span>
+    <span class="vi">@blendMode = </span><span class="p">{}</span>
+
+    <span class="p">[</span>
+      <span class="nx">@blendMode</span><span class="p">.</span><span class="nx">sig</span><span class="p">,</span> 
+      <span class="nx">@blendMode</span><span class="p">.</span><span class="nx">key</span><span class="p">,</span> 
+      <span class="nx">@blendMode</span><span class="p">.</span><span class="nx">opacity</span><span class="p">,</span> 
+      <span class="nx">@blendMode</span><span class="p">.</span><span class="nx">clipping</span><span class="p">,</span> 
+      <span class="nx">@blendMode</span><span class="p">.</span><span class="nx">flags</span><span class="p">,</span> 
+      <span class="nx">@blendMode</span><span class="p">.</span><span class="nx">filler</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">readf</span> <span class="s2">&quot;&gt;4s4sBBBB&quot;</span>
+
+    <span class="vi">@blendMode.key = </span><span class="nx">@blendMode</span><span class="p">.</span><span class="nx">key</span><span class="p">.</span><span class="nx">trim</span><span class="p">()</span>
+    <span class="vi">@blendMode.opacp = </span><span class="p">(</span><span class="nx">@blendMode</span><span class="p">.</span><span class="nx">opacity</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">+</span> <span class="mi">127</span><span class="p">)</span> <span class="o">/</span> <span class="mi">255</span>
+    <span class="vi">@blendMode.blending = </span><span class="nx">BLEND_MODES</span><span class="p">[</span><span class="nx">@blendMode</span><span class="p">.</span><span class="nx">key</span><span class="p">]</span>
+
+    <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Blending mode:&quot;</span><span class="p">,</span> <span class="nx">@blendMode</span>
+
+  <span class="nv">parseMaskData: </span><span class="o">-&gt;</span>
+    <span class="p">[</span><span class="nx">@mask</span><span class="p">.</span><span class="nx">size</span><span class="p">]</span> <span class="o">=</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">readf</span> <span class="s2">&quot;&gt;L&quot;</span>
+    <span class="k">if</span> <span class="nx">@mask</span><span class="p">.</span><span class="nx">size</span>
+      <span class="p">[</span><span class="nx">@mask</span><span class="p">.</span><span class="nx">top</span><span class="p">,</span> <span class="nx">@mask</span><span class="p">.</span><span class="nx">left</span><span class="p">,</span> <span class="nx">@mask</span><span class="p">.</span><span class="nx">bottom</span><span class="p">,</span> <span class="nx">@mask</span><span class="p">.</span><span class="nx">right</span><span class="p">,</span> <span class="nx">@mask</span><span class="p">.</span><span class="nx">defaultColor</span><span class="p">,</span> <span class="nx">@mask</span><span class="p">.</span><span class="nx">flags</span><span class="p">]</span> <span class="o">=</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">readf</span> <span class="s2">&quot;&gt;LLLLBB&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-14">&#182;</a>               </div>               <p>skip remainder</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nx">@file</span><span class="p">.</span><span class="nx">seek</span> <span class="nx">@mask</span><span class="p">.</span><span class="nx">size</span> <span class="o">-</span> <span class="mi">18</span>
+      <span class="p">[</span><span class="nx">@mask</span><span class="p">.</span><span class="nx">rows</span><span class="p">,</span> <span class="nx">@mask</span><span class="p">.</span><span class="nx">cols</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nx">@mask</span><span class="p">.</span><span class="nx">bottom</span> <span class="o">-</span> <span class="nx">@mask</span><span class="p">.</span><span class="nx">top</span><span class="p">,</span> <span class="nx">@mask</span><span class="p">.</span><span class="nx">right</span> <span class="o">-</span> <span class="nx">@mask</span><span class="p">.</span><span class="nx">left</span><span class="p">]</span>
+
+    <span class="nx">@file</span><span class="p">.</span><span class="nx">skipBlock</span> <span class="s2">&quot;layer blending ranges&quot;</span>
+
+  <span class="nv">readMetadata: </span><span class="o">-&gt;</span>
+    <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Parsing layer metadata...&quot;</span>
+
+    <span class="nv">count = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readUInt16</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">count</span><span class="p">]</span>
+      <span class="p">[</span><span class="nx">sig</span><span class="p">,</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">padding</span><span class="p">]</span> <span class="o">=</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">readf</span> <span class="s2">&quot;&gt;4s4s4s&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-15">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-15">&#182;</a>               </div>               <p>if key is "mlst"
+readAnimation. needs research.</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nx">@file</span><span class="p">.</span><span class="nx">skipBlock</span><span class="p">(</span><span class="s2">&quot;image metadata&quot;</span><span class="p">)</span>
+        
+  <span class="nv">readLayerSectionDivider: </span><span class="o">-&gt;</span>
+    <span class="nv">code = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readUInt16</span><span class="p">()</span>
+    <span class="vi">@layerType = </span><span class="nx">SECTION_DIVIDER_TYPES</span><span class="p">[</span><span class="nx">code</span><span class="p">]</span>
+    
+  <span class="nv">readVectorMask: </span><span class="o">-&gt;</span>
+    <span class="nv">version = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readInt</span><span class="p">()</span>
+    <span class="nv">flags = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">read</span> <span class="mi">4</span></pre></div>             </td>           </tr>                               <tr id="section-16">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-16">&#182;</a>               </div>               <p>TODO read path information</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">readTypeTool: </span><span class="o">-&gt;</span>
+    <span class="nv">ver = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readShortInt</span><span class="p">()</span>
+    <span class="nv">transforms = </span><span class="p">[]</span>
+    <span class="nx">transforms</span><span class="p">.</span><span class="nx">push</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">readDouble</span><span class="p">()</span> <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="mi">6</span><span class="p">]</span>
+
+    <span class="nv">textVer = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readShortInt</span><span class="p">()</span>
+    <span class="nv">descrVer = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readInt</span><span class="p">()</span>
+    <span class="k">return</span> <span class="k">if</span> <span class="nx">ver</span> <span class="o">isnt</span> <span class="mi">1</span> <span class="o">or</span> <span class="nx">textVer</span> <span class="o">isnt</span> <span class="mi">50</span> <span class="o">or</span> <span class="nx">descrVer</span> <span class="o">isnt</span> <span class="mi">16</span>
+
+    <span class="nv">textData = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readDescriptorStructure</span><span class="p">()</span>
+
+    <span class="nv">wrapVer = </span><span class="nx">@readShortInt</span><span class="p">()</span>
+    <span class="nv">descrVer = </span><span class="nx">@readInt</span><span class="p">()</span>
+    <span class="nv">wrapData = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readDescriptorStructure</span><span class="p">()</span>
+
+    <span class="nv">rectangle = </span><span class="p">[]</span>
+    <span class="nx">rectangle</span><span class="p">.</span><span class="nx">push</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">readDouble</span><span class="p">()</span> <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="mi">4</span><span class="p">]</span>
+
+    <span class="vi">@textData = </span><span class="nx">textData</span>
+    <span class="vi">@wrapData = </span><span class="nx">wrapData</span>
+
+    <span class="nv">styledText = </span><span class="p">[]</span>
+    <span class="nv">psDict = </span><span class="nx">@textData</span><span class="p">.</span><span class="nx">EngineData</span><span class="p">.</span><span class="nx">value</span>
+    <span class="nv">text = </span><span class="nx">psDict</span><span class="p">.</span><span class="nx">EngineDict</span><span class="p">.</span><span class="nx">Editor</span><span class="p">.</span><span class="nx">Text</span>
+    <span class="nv">styleRun = </span><span class="nx">psDict</span><span class="p">.</span><span class="nx">EngineDict</span><span class="p">.</span><span class="nx">StyleRun</span>
+    <span class="nv">stylesList = </span><span class="nx">styleRun</span><span class="p">.</span><span class="nx">RunArray</span>
+    <span class="nv">stylesRunList = </span><span class="nx">styleRun</span><span class="p">.</span><span class="nx">RunLengthArray</span>
+
+    <span class="nv">fontsList = </span><span class="nx">psDict</span><span class="p">.</span><span class="nx">DocumentResources</span><span class="p">.</span><span class="nx">FontSet</span>
+    <span class="nv">start = </span><span class="mi">0</span>
+    <span class="k">for</span> <span class="nx">own</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">style</span> <span class="k">of</span> <span class="nx">stylesList</span>
+      <span class="nv">st = </span><span class="nx">style</span><span class="p">.</span><span class="nx">StyleSheet</span><span class="p">.</span><span class="nx">StyleSheetData</span>
+      <span class="nv">end = </span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">stylesRunList</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+      <span class="nv">fontI = </span><span class="nx">st</span><span class="p">.</span><span class="nx">Font</span>
+      <span class="nv">fontName = </span><span class="nx">fontsList</span><span class="p">[</span><span class="nx">fontI</span><span class="p">].</span><span class="nx">Name</span>
+      <span class="nv">safeFontName = </span><span class="nx">@getSafeFont</span><span class="p">(</span><span class="nx">fontName</span><span class="p">)</span>
+
+      <span class="nv">color = </span><span class="p">[]</span>
+      <span class="nx">color</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">255</span><span class="o">*</span><span class="nx">j</span><span class="p">)</span> <span class="k">for</span> <span class="nx">j</span> <span class="k">in</span> <span class="nx">st</span><span class="p">.</span><span class="nx">FillColor</span><span class="p">.</span><span class="nx">Values</span><span class="p">[</span><span class="mi">1</span><span class="p">..]</span>
+
+      <span class="nv">lineHeight = </span><span class="k">if</span> <span class="nx">st</span><span class="p">.</span><span class="nx">Leading</span> <span class="o">is</span> <span class="mi">1500</span> <span class="k">then</span> <span class="s2">&quot;Auto&quot;</span> <span class="k">else</span> <span class="nx">st</span><span class="p">.</span><span class="nx">Leading</span>
+      <span class="nv">piece = </span><span class="nx">text</span><span class="p">[</span><span class="nx">start</span><span class="p">...</span><span class="nx">end</span><span class="p">]</span>
+      <span class="nx">styledText</span><span class="p">.</span><span class="nx">push</span>
+        <span class="nv">text: </span><span class="nx">piece</span>
+        <span class="nv">style:</span>
+          <span class="nv">font: </span><span class="nx">safeFontName</span>
+          <span class="nv">size: </span><span class="nx">st</span><span class="p">.</span><span class="nx">FontSize</span>
+          <span class="nv">color: </span><span class="nx">Util</span><span class="p">.</span><span class="nx">rgbToHex</span><span class="p">(</span><span class="s2">&quot;rgb(#{color[0]}, #{color[1]}, #{color[2]})&quot;</span><span class="p">)</span>
+          <span class="nv">underline: </span><span class="nx">st</span><span class="p">.</span><span class="nx">Underline</span>
+          <span class="nv">allCaps: </span><span class="nx">st</span><span class="p">.</span><span class="nx">FontCaps</span>
+          <span class="nv">italic: </span><span class="o">!!~</span> <span class="nx">fontName</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">&quot;Italic&quot;</span><span class="p">)</span> <span class="o">or</span> <span class="nx">st</span><span class="p">.</span><span class="nx">FauxItalic</span>
+          <span class="nv">bold: </span><span class="o">!!~</span> <span class="nx">fontName</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">&quot;Bold&quot;</span><span class="p">)</span> <span class="o">or</span> <span class="nx">st</span><span class="p">.</span><span class="nx">FauxBold</span>
+          <span class="nv">letterSpacing: </span><span class="nx">st</span><span class="p">.</span><span class="nx">Tracking</span> <span class="err">/ 20</span>
+          <span class="nv">lineHeight: </span><span class="nx">lineHeight</span>
+          <span class="nv">paragraphEnds: </span><span class="nx">piece</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">in</span> <span class="p">[</span><span class="s2">&quot;\n&quot;</span><span class="p">,</span> <span class="s2">&quot;\r&quot;</span><span class="p">]</span>
+
+      <span class="nx">start</span> <span class="o">+=</span> <span class="nx">stylesRunList</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+
+    <span class="vi">@styledText = </span><span class="nx">styledText</span>
+
+  <span class="nv">getSafeFont: </span><span class="nf">(font) -&gt;</span>
+    <span class="k">for</span> <span class="nx">safeFont</span> <span class="k">in</span> <span class="nx">SAFE_FONTS</span>
+      <span class="nv">it = </span><span class="kc">true</span>
+      <span class="k">for</span> <span class="nx">word</span> <span class="k">in</span> <span class="nx">safeFont</span><span class="p">.</span><span class="nx">split</span> <span class="s2">&quot; &quot;</span>
+        <span class="nv">it = </span><span class="kc">false</span> <span class="k">if</span> <span class="o">not</span> <span class="o">!!~</span> <span class="nx">font</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">word</span><span class="p">)</span>
+
+      <span class="k">return</span> <span class="nx">safeFont</span> <span class="k">if</span> <span class="nx">it</span>
+
+    <span class="nx">font</span>
+
+  <span class="nv">getImageData: </span><span class="nf">(readPlaneInfo = true, lineLengths = []) -&gt;</span>
+    <span class="vi">@channels =</span>
+      <span class="nv">a: </span><span class="p">[]</span>
+      <span class="nv">r: </span><span class="p">[]</span>
+      <span class="nv">g: </span><span class="p">[]</span>
+      <span class="nv">b: </span><span class="p">[]</span>
+
+    <span class="nv">opacityDivider = </span><span class="nx">@opacity</span> <span class="err">/ 255</span>
+
+    <span class="k">for</span> <span class="nx">own</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">channelTuple</span> <span class="k">of</span> <span class="nx">@channelsInfo</span>
+      <span class="p">[</span><span class="nx">channelId</span><span class="p">,</span> <span class="nx">length</span><span class="p">]</span> <span class="o">=</span> <span class="nx">channelTuple</span>
+      <span class="k">if</span> <span class="nx">channelId</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="nv">width = </span><span class="nx">@mask</span><span class="p">.</span><span class="nx">cols</span>
+        <span class="nv">height = </span><span class="nx">@mask</span><span class="p">.</span><span class="nx">rows</span>
+      <span class="k">else</span>
+        <span class="nv">width = </span><span class="nx">@cols</span>
+        <span class="nv">height = </span><span class="nx">@rows</span>
+
+      <span class="nv">channel = </span><span class="nx">@readColorPlane</span> <span class="nx">readPlaneInfo</span><span class="p">,</span> <span class="nx">lineLengths</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">height</span><span class="p">,</span> <span class="nx">width</span>
+      <span class="k">switch</span> <span class="nx">channelId</span>
+        <span class="k">when</span> <span class="o">-</span><span class="mi">1</span>
+          <span class="vi">@channels.a = </span><span class="p">[]</span>
+          <span class="nx">@channels</span><span class="p">.</span><span class="nx">a</span><span class="p">.</span><span class="nx">push</span> <span class="p">(</span><span class="nx">ch</span> <span class="o">*</span> <span class="nx">opacityDivider</span><span class="p">)</span> <span class="k">for</span> <span class="nx">ch</span> <span class="k">in</span> <span class="nx">channel</span>
+        <span class="k">when</span> <span class="mi">0</span> <span class="k">then</span> <span class="vi">@channels.r = </span><span class="nx">channel</span>
+        <span class="k">when</span> <span class="mi">1</span> <span class="k">then</span> <span class="vi">@channels.g = </span><span class="nx">channel</span>
+        <span class="k">when</span> <span class="mi">2</span> <span class="k">then</span> <span class="vi">@channels.b = </span><span class="nx">channel</span>
+        <span class="k">else</span>
+          <span class="nv">result = </span><span class="p">[]</span>
+          <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">channel</span><span class="p">.</span><span class="nx">length</span><span class="p">]</span>
+            <span class="nx">result</span><span class="p">.</span><span class="nx">push</span> <span class="nx">@channels</span><span class="p">.</span><span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="nx">channel</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">/</span><span class="mi">255</span><span class="p">)</span>
+
+          <span class="vi">@channels.a = </span><span class="nx">result</span>
+
+    <span class="nx">@makeImage</span><span class="p">()</span>
+
+  <span class="nv">readColorPlane: </span><span class="nf">(readPlaneInfo, lineLengths, planeNum, height, width) -&gt;</span>
+    <span class="nv">size = </span><span class="nx">width</span> <span class="o">*</span> <span class="nx">height</span>
+    <span class="nv">imageData = </span><span class="p">[]</span>
+    <span class="nv">rleEncoded = </span><span class="kc">false</span>
+
+    <span class="k">if</span> <span class="nx">readPlaneInfo</span>
+      <span class="nv">compression = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readShortInt</span><span class="p">()</span>
+      <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Compression: id=#{compression}, name=#{COMPRESSIONS[compression]}&quot;</span>
+
+      <span class="nv">rleEncoded = </span><span class="nx">compression</span> <span class="o">is</span> <span class="mi">1</span>
+      <span class="k">if</span> <span class="nx">rleEncoded</span>
+        <span class="k">if</span> <span class="o">not</span> <span class="nx">lineLengths</span>
+          <span class="nv">lineLengths = </span><span class="p">[]</span>
+          <span class="nx">lineLengths</span><span class="p">.</span><span class="nx">push</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">readShortInt</span><span class="p">()</span> <span class="k">for</span> <span class="nx">a</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">height</span><span class="p">]</span>
+      <span class="k">else</span>
+        <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;ERROR: compression not implemented yet. Skipping.&quot;</span>
+
+      <span class="nv">planeNum = </span><span class="mi">0</span>
+    <span class="k">else</span>
+      <span class="nv">rleEncoded = </span><span class="nx">lineLengths</span><span class="p">.</span><span class="nx">length</span> <span class="o">isnt</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="nx">rleEncoded</span>
+      <span class="nv">imageData = </span><span class="nx">@readPlaneCompressed</span> <span class="nx">lineLengths</span><span class="p">,</span> <span class="nx">planeNum</span><span class="p">,</span> <span class="nx">height</span><span class="p">,</span> <span class="nx">width</span>
+    <span class="k">else</span>
+      <span class="nv">imageData = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readBytesList</span><span class="p">(</span><span class="nx">size</span><span class="p">)</span>
+
+    <span class="nx">imageData</span>
+
+  <span class="nv">readPlaneCompressed: </span><span class="nf">(lineLengths, planeNum, height, width) -&gt;</span>
+    <span class="nv">b = </span><span class="p">[]</span>
+    <span class="nx">b</span><span class="p">.</span><span class="nx">push</span> <span class="mi">0</span> <span class="k">for</span> <span class="nx">x</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...(</span><span class="nx">width</span><span class="o">*</span><span class="nx">height</span><span class="p">)]</span>
+    <span class="nv">s = </span><span class="p">[]</span>
+    <span class="nv">pos = </span><span class="mi">0</span>
+    <span class="nv">lineIndex = </span><span class="nx">planeNum</span> <span class="o">*</span> <span class="nx">height</span>
+
+    <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">height</span><span class="p">]</span>
+      <span class="nv">len = </span><span class="nx">lineLengths</span><span class="p">[</span><span class="nx">lineIndex</span><span class="p">]</span>
+      <span class="nx">lineIndex</span><span class="o">++</span>
+      <span class="nv">s = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readBytesList</span><span class="p">(</span><span class="nx">len</span><span class="p">)</span>
+      <span class="nx">@decodeRLE</span> <span class="nx">s</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">len</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">pos</span>
+      <span class="nx">pos</span> <span class="o">+=</span> <span class="nx">width</span>
+
+    <span class="nx">b</span>
+
+  <span class="nv">decodeRLE: </span><span class="nf">(src, sindex, slen, dst, dindex) -&gt;</span>
+    <span class="nv">max = </span><span class="nx">sindex</span> <span class="o">+</span> <span class="nx">slen</span>
+
+    <span class="k">while</span> <span class="nx">sindex</span> <span class="o">&lt;</span> <span class="nx">max</span>
+      <span class="nv">b = </span><span class="nx">src</span><span class="p">[</span><span class="nx">sindex</span><span class="p">]</span>
+      <span class="nx">sindex</span><span class="o">++</span>
+      <span class="nv">n = </span><span class="nx">b</span>
+      <span class="k">if</span> <span class="nx">b</span> <span class="o">&gt;</span> <span class="mi">127</span>
+        <span class="nv">n = </span><span class="mi">255</span> <span class="o">-</span> <span class="nx">n</span> <span class="o">+</span> <span class="mi">2</span>
+        <span class="nv">b = </span><span class="nx">src</span><span class="p">[</span><span class="nx">sindex</span><span class="p">]</span>
+        <span class="nx">sindex</span><span class="o">++</span>
+        <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">n</span><span class="p">]</span>
+          <span class="nx">dst</span><span class="p">[</span><span class="nx">dindex</span><span class="p">]</span> <span class="o">=</span> <span class="nx">b</span>
+          <span class="nx">dindex</span><span class="o">++</span>
+      <span class="k">else</span>
+        <span class="nx">n</span><span class="o">++</span>
+        <span class="nx">dst</span><span class="p">[</span><span class="nx">dindex</span><span class="p">...</span><span class="nx">dindex</span><span class="o">+</span><span class="nx">n</span><span class="p">]</span> <span class="o">=</span> <span class="nx">src</span><span class="p">[</span><span class="nx">sindex</span><span class="p">...</span><span class="nx">sindex</span><span class="o">+</span><span class="nx">n</span><span class="p">]</span>
+        <span class="nx">dindex</span> <span class="o">+=</span> <span class="nx">n</span>
+        <span class="nx">sindex</span> <span class="o">+=</span> <span class="nx">n</span>
+
+  <span class="nv">makeImage: </span><span class="o">-&gt;</span>
+    <span class="k">return</span> <span class="k">if</span> <span class="o">not</span> <span class="nx">@cols</span><span class="o">?</span> <span class="o">or</span> <span class="o">not</span> <span class="nx">@rows</span><span class="o">?</span>
+
+    <span class="nv">type = </span><span class="k">if</span> <span class="nb">isNaN</span><span class="p">(</span><span class="nx">@channels</span><span class="p">.</span><span class="nx">a</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">then</span> <span class="s2">&quot;RGB&quot;</span> <span class="k">else</span> <span class="s2">&quot;RGBA&quot;</span>
+    <span class="nv">image = </span><span class="k">new</span> <span class="nx">PSDImage</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">@cols</span><span class="p">,</span> <span class="nx">@rows</span><span class="p">,</span> <span class="nx">@channels</span><span class="p">)</span>
+    
+    <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Image: type=#{type}, width=#{@cols}, height=#{@rows}&quot;</span>
+
+    <span class="nx">@images</span><span class="p">.</span><span class="nx">push</span> <span class="nx">image</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

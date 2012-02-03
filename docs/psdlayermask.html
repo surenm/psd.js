@@ -1,0 +1,67 @@
+<!DOCTYPE html>  <html> <head>   <title>psdlayermask.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="log.html">                 log.coffee               </a>                                           <a class="source" href="psd.html">                 psd.coffee               </a>                                           <a class="source" href="psdfile.html">                 psdfile.coffee               </a>                                           <a class="source" href="psdheader.html">                 psdheader.coffee               </a>                                           <a class="source" href="psdimage.html">                 psdimage.coffee               </a>                                           <a class="source" href="psdlayer.html">                 psdlayer.coffee               </a>                                           <a class="source" href="psdlayermask.html">                 psdlayermask.coffee               </a>                                           <a class="source" href="psdresource.html">                 psdresource.coffee               </a>                                           <a class="source" href="util.html">                 util.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               psdlayermask.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">PSDLayerMask</span>
+  <span class="nv">constructor: </span><span class="nf">(@file, @header) -&gt;</span>
+    <span class="vi">@layers = </span><span class="p">[]</span>
+
+  <span class="nv">parse: </span><span class="o">-&gt;</span>
+    <span class="nv">maskSize = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readInt</span><span class="p">()</span>
+    <span class="nv">pos = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">tell</span><span class="p">()</span>
+
+    <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Layer mask size is #{maskSize}&quot;</span>
+
+    <span class="k">if</span> <span class="nx">maskSize</span> <span class="o">&gt;</span> <span class="mi">0</span>
+      <span class="nv">layerInfoSize = </span><span class="nx">Util</span><span class="p">.</span><span class="nx">pad2</span><span class="p">(</span><span class="nx">@file</span><span class="p">.</span><span class="nx">readInt</span><span class="p">())</span>
+
+      <span class="k">if</span> <span class="nx">layerInfoSize</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="vi">@numLayers = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readShortInt</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nx">@numLayers</span> <span class="o">&lt;</span> <span class="mi">0</span>
+          <span class="vi">@numLayers = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span> <span class="nx">@numLayers</span>
+
+        <span class="k">if</span> <span class="nx">@numLayers</span> <span class="o">*</span> <span class="p">(</span><span class="mi">18</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">*</span> <span class="nx">@header</span><span class="p">.</span><span class="nx">channels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nx">layerInfoSize</span>
+          <span class="k">throw</span> <span class="s2">&quot;Unlikely number of #{@numLayers} layers for #{@header[&#39;channels&#39;]} with #{layerInfoSize} layer info size. Giving up.&quot;</span>
+
+        <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Found #{@numLayers} layer(s)&quot;</span>
+
+        <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">@numLayers</span><span class="p">]</span>
+          <span class="nv">layer = </span><span class="k">new</span> <span class="nx">PSDLayer</span> <span class="nx">@file</span>
+          <span class="nx">layer</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span>
+          <span class="nx">@layers</span><span class="p">.</span><span class="nx">push</span> <span class="nx">layer</span>
+
+        <span class="k">for</span> <span class="nx">layer</span> <span class="k">in</span> <span class="nx">@layers</span>
+          <span class="nx">layer</span><span class="p">.</span><span class="nx">getImageData</span><span class="p">()</span>
+
+        <span class="nx">@layers</span><span class="p">.</span><span class="nx">reverse</span><span class="p">()</span>
+
+      <span class="nx">@file</span><span class="p">.</span><span class="nx">seek</span> <span class="nx">maskSize</span>
+
+    <span class="nv">baseLayer = </span><span class="k">new</span> <span class="nx">PSDLayer</span> <span class="nx">@file</span><span class="p">,</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">@header</span>
+    <span class="nv">rle = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readShortInt</span><span class="p">()</span> <span class="o">is</span> <span class="mi">1</span>
+    <span class="nv">height = </span><span class="nx">baseLayer</span><span class="p">.</span><span class="nx">height</span>
+
+    <span class="k">if</span> <span class="nx">rle</span>
+      <span class="nv">nLines = </span><span class="nx">height</span> <span class="o">*</span> <span class="nx">baseLayer</span><span class="p">.</span><span class="nx">channelsInfo</span><span class="p">.</span><span class="nx">length</span>
+      <span class="nv">lineLengths = </span><span class="p">[]</span>
+      <span class="k">for</span> <span class="nx">h</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">nLines</span><span class="p">]</span>
+        <span class="nx">lineLengths</span><span class="p">.</span><span class="nx">push</span> <span class="nx">@readShortInt</span><span class="p">()</span>
+
+      <span class="nx">baseLayer</span><span class="p">.</span><span class="nx">getImageData</span><span class="p">(</span><span class="kc">false</span><span class="p">,</span> <span class="nx">lineLengths</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="nx">baseLayer</span><span class="p">.</span><span class="nx">getImageData</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="o">not</span> <span class="nx">@layers</span><span class="p">.</span><span class="nx">length</span>
+      <span class="nx">@layers</span><span class="p">.</span><span class="nx">push</span> <span class="nx">baseLayer</span>
+
+  <span class="nv">groupLayers: </span><span class="o">-&gt;</span>
+    <span class="nv">parents = </span><span class="p">[]</span>
+    <span class="k">for</span> <span class="nx">layer</span> <span class="k">in</span> <span class="nx">@layers</span>
+      <span class="nv">layer.parent = </span><span class="nx">parents</span><span class="p">[</span><span class="nx">parents</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">or</span> <span class="kc">null</span>
+      <span class="nv">layer.parents = </span><span class="nx">parents</span><span class="p">[</span><span class="mi">1</span><span class="p">..]</span>
+
+      <span class="k">continue</span> <span class="k">if</span> <span class="nx">layer</span><span class="p">.</span><span class="nx">layerType</span><span class="p">.</span><span class="nx">code</span> <span class="o">is</span> <span class="mi">0</span>
+
+      <span class="k">if</span> <span class="nx">layer</span><span class="p">.</span><span class="nx">layerType</span><span class="p">.</span><span class="nx">code</span> <span class="o">is</span> <span class="mi">3</span> <span class="o">and</span> <span class="nx">parents</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="k">delete</span> <span class="nx">parents</span><span class="p">[</span><span class="nx">parents</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+      <span class="k">else</span>
+        <span class="nx">parents</span><span class="p">.</span><span class="nx">push</span> <span class="nx">layer</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

@@ -1,5 +1,13 @@
+# A PSDImage stores parsed image data for images contained within the PSD, and 
+# for the PSD itself.
 class PSDImage
   constructor: (@mode, @width, @height, @data = []) ->
+    # The pixel data is stored in the same format that is used by the HTML 
+    # canvas. It is a 1D array that consists of a single pixel's color values 
+    # expressed from 0 to 255 in chunks of 4. Each chunk consists of red, 
+    # green, blue, and alpha values, respectively.
+    #
+    # This means a pure-red single pixel is expressed as: `[255, 0, 0, 255]`
     @pixelData = []
 
     switch @mode
