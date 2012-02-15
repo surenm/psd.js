@@ -1,30 +1,59 @@
 <!DOCTYPE html>  <html> <head>   <title>psdimage.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="log.html">                 log.coffee               </a>                                           <a class="source" href="psd.html">                 psd.coffee               </a>                                           <a class="source" href="psdfile.html">                 psdfile.coffee               </a>                                           <a class="source" href="psdheader.html">                 psdheader.coffee               </a>                                           <a class="source" href="psdimage.html">                 psdimage.coffee               </a>                                           <a class="source" href="psdlayer.html">                 psdlayer.coffee               </a>                                           <a class="source" href="psdlayermask.html">                 psdlayermask.coffee               </a>                                           <a class="source" href="psdresource.html">                 psdresource.coffee               </a>                                           <a class="source" href="util.html">                 util.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               psdimage.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>A PSDImage stores parsed image data for images contained within the PSD, and 
 for the PSD itself.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">PSDImage</span>
-  <span class="nv">constructor: </span><span class="nf">(@mode, @width, @height, @data = []) -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>The pixel data is stored in the same format that is used by the HTML 
+  <span class="nv">COMPRESSIONS =</span>
+    <span class="mi">0</span><span class="o">:</span> <span class="s1">&#39;Raw&#39;</span>
+    <span class="mi">1</span><span class="o">:</span> <span class="s1">&#39;RLE&#39;</span>
+    <span class="mi">2</span><span class="o">:</span> <span class="s1">&#39;ZIP&#39;</span>
+    <span class="mi">3</span><span class="o">:</span> <span class="s1">&#39;ZIPPrediction&#39;</span>
+
+  <span class="nv">constructor: </span><span class="nf">(@file, @compression, @header, @length) -&gt;</span>
+    <span class="vi">@startPos = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">tell</span><span class="p">()</span>
+    <span class="vi">@endPos = </span><span class="nx">@startPos</span> <span class="o">+</span> <span class="nx">@length</span>
+
+    <span class="vi">@width = </span><span class="nx">@header</span><span class="p">.</span><span class="nx">cols</span>
+    <span class="vi">@height = </span><span class="nx">@header</span><span class="p">.</span><span class="nx">rows</span>
+    
+    <span class="vi">@pixelData =</span>
+      <span class="nv">r: </span><span class="p">[]</span>
+      <span class="nv">g: </span><span class="p">[]</span>
+      <span class="nv">b: </span><span class="p">[]</span>
+
+  <span class="nv">parse: </span><span class="o">-&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>ZIP compression isn't implemented yet. Luckily this is pretty rare. Still,
+it's a TODO.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">if</span> <span class="nx">@compression</span> <span class="k">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+      <span class="k">throw</span> <span class="s2">&quot;Image with ZIP compression. Don&#39;t know how to parse this. Giving up.&quot;</span>
+    <span class="k">else</span>
+      <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Image compression: id=#{@compression}, name=#{COMPRESSIONS[@compression]}&quot;</span>
+
+    <span class="k">switch</span> <span class="nx">@compression</span>
+      <span class="k">when</span> <span class="mi">0</span> <span class="k">then</span> <span class="nx">@parseRaw</span><span class="p">()</span>
+      <span class="k">when</span> <span class="mi">1</span> <span class="k">then</span> <span class="nx">@parseRLE</span><span class="p">()</span>
+
+  <span class="nv">parseRaw: </span><span class="o">-&gt;</span>
+    <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Attempting to parse RAW encoded image...&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>First, determine the size of the image data</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="vi">@size = </span><span class="nx">@width</span> <span class="o">*</span> <span class="nx">@height</span>
+    <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Image size: #{@size} (#{@width}x#{@height})&quot;</span>
+    
+    <span class="k">for</span> <span class="nx">color</span> <span class="k">in</span> <span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">]</span>
+      <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">@size</span><span class="p">]</span>
+        <span class="nx">@pixelData</span><span class="p">[</span><span class="nx">color</span><span class="p">].</span><span class="nx">push</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">read</span><span class="p">(</span><span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+  <span class="nv">parseRLE: </span><span class="o">-&gt;</span>
+    <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Attempting to parse RLE encoded image...&quot;</span>
+      </pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>Normally, the pixel data is stored in planar order, meaning all the red
+values come first, then the green, then the blue. In the HTML canvas, the
+pixel color values are grouped by pixel such that the values alternate
+between R, G, B, A over and over.</p>
+
+<p>This will return the pixels in the same format that is used by the HTML 
 canvas. It is a 1D array that consists of a single pixel's color values 
 expressed from 0 to 255 in chunks of 4. Each chunk consists of red, 
 green, blue, and alpha values, respectively.</p>
 
-<p>This means a pure-red single pixel is expressed as: <code>[255, 0, 0, 255]</code></p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="vi">@pixelData = </span><span class="p">[]</span>
+<p>This means a pure-red single pixel is expressed as: <code>[255, 0, 0, 255]</code></p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">toCanvasPixels: </span><span class="o">-&gt;</span>
+    <span class="nv">result = </span><span class="p">[]</span>
 
-    <span class="k">switch</span> <span class="nx">@mode</span>
-      <span class="k">when</span> <span class="s2">&quot;L&quot;</span> <span class="k">then</span> <span class="nx">@parseLuminance</span><span class="p">()</span>
-      <span class="k">when</span> <span class="s2">&quot;RGB&quot;</span> <span class="k">then</span> <span class="nx">@parseRGB</span><span class="p">()</span>
-      <span class="k">when</span> <span class="s2">&quot;RGBA&quot;</span> <span class="k">then</span> <span class="nx">@parseRGB</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+    <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">@pixelData</span><span class="p">.</span><span class="nx">r</span><span class="p">.</span><span class="nx">length</span><span class="p">]</span>
+      <span class="nx">result</span><span class="p">.</span><span class="nx">push</span> <span class="nx">@pixelData</span><span class="p">.</span><span class="nx">r</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">@pixelData</span><span class="p">.</span><span class="nx">g</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">@pixelData</span><span class="p">.</span><span class="nx">b</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="mi">255</span>
 
-  <span class="nv">parseLuminance: </span><span class="o">-&gt;</span>
-    <span class="k">for</span> <span class="nx">val</span> <span class="k">in</span> <span class="nx">@data</span>
-      <span class="nx">@pixelData</span><span class="p">.</span><span class="nx">push</span> <span class="nx">val</span>
-      <span class="nx">@pixelData</span><span class="p">.</span><span class="nx">push</span> <span class="nx">val</span>
-      <span class="nx">@pixelData</span><span class="p">.</span><span class="nx">push</span> <span class="nx">val</span>
-      <span class="nx">@pixelData</span><span class="p">.</span><span class="nx">push</span> <span class="mi">255</span>
-
-  <span class="nv">parseRGB: </span><span class="nf">(alpha = false) -&gt;</span>
-    <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...(</span><span class="nx">@width</span><span class="o">*</span><span class="nx">@height</span><span class="p">)]</span>
-      <span class="nx">@pixelData</span><span class="p">.</span><span class="nx">push</span> <span class="nx">@data</span><span class="p">.</span><span class="nx">r</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
-      <span class="nx">@pixelData</span><span class="p">.</span><span class="nx">push</span> <span class="nx">@data</span><span class="p">.</span><span class="nx">g</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
-      <span class="nx">@pixelData</span><span class="p">.</span><span class="nx">push</span> <span class="nx">@data</span><span class="p">.</span><span class="nx">b</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
-      <span class="nx">@pixelData</span><span class="p">.</span><span class="nx">push</span> <span class="k">if</span> <span class="nx">alpha</span> <span class="k">then</span> <span class="nx">@data</span><span class="p">.</span><span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="k">else</span> <span class="mi">255</span>
-        
+    <span class="nx">result</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
