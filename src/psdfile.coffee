@@ -51,9 +51,9 @@ class PSDFile
   # 1 byte
   readBoolean: -> @read(1)[0] isnt 0
 
-  readUnicodeString: ->
+  readUnicodeString: (strlen = null) ->
     str = ""
-    strlen = @readUInt()
+    strlen = @readUInt() if not strlen
     for i in [0...strlen]
       charCode = @readShortUInt()
       str += chr(Util.i16(charCode)) if charCode > 0
@@ -81,11 +81,11 @@ class PSDFile
   # prepended to the chunk of character bytes. If a length isn't found, a 
   # string with the default length will be read instead.
   readLengthWithString: (defaultLen = 4) ->
-    length = @readUInt()
+    length = @read(1)[0]
     if length is 0
-      [str] = @readf ">#{defaultLen}s"
+      str = @readString defaultLen
     else
-      [str] = @readf ">#{length}s"
+      str = @readString length
 
     str
 

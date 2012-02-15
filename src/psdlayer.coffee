@@ -20,12 +20,6 @@ class PSDLayer
     2: "closed folder"
     3: "bounding section divider"
 
-  COMPRESSIONS =
-    0: 'Raw'
-    1: 'RLE'
-    2: 'ZIP'
-    3: 'ZIPPrediction'
-
   BLEND_MODES =
     "norm": "normal"
     "dark": "darken"
@@ -74,81 +68,42 @@ class PSDLayer
     "Tahoma"
   ]
 
-  constructor: (@file, @baseLayer = false, @header = null) ->
+  constructor: (@file, @header = null) ->
     @images = []
     @mask = {}
     @blendingRanges = {}
 
   parse: (layerIndex = null) ->
-    return @parseBaseLayer() if @baseLayer
-
     @parseInfo(layerIndex)
     @parseBlendModes()
 
-    # Remember position for skipping unrecognized data
+    # Length of the rest of the layer data
     extralen = @file.readUInt()
+    @layerEnd = @file.tell() + extralen
 
     # Marking our start point in case we need to bail and recover
     extrastart = @file.tell()
 
-    @parseMaskData()
+    result = @parseMaskData()
+    if not result
+      # Make this more graceful in the future?
+      throw "Error parsing mask data for layer ##{@idx}. Quitting"
+
     @parseBlendingRanges()
 
-    while @file.pos - extrastart < extralen
-      [signature, key, size] = @file.readf ">4s4s4s"
+    namelen = Util.pad4 @file.read(1)[0]
+    @name = @file.readString namelen
 
-      prevPos = @file.tell()
+    Log.debug "Layer name: #{@name}"
 
-      switch key
-        # Layer ID
-        when "lyid" then @id = @file.readUInt16()
-
-        # Metadata setting
-        when "shmd" then @readMetadata()
-
-        # Section divider setting
-        when "lsct" then @readLayerSectionDivider()
-
-        # Unicode name
-        when "luni"
-          @name = @file.readUnicodeString()
-          Log.debug "Layer name: #{@name}"
-
-        # Vector mask
-        when "vmsk" then @readVectorMask()
-
-        # Type tool
-        when "TySh" then @readTypeTool()
-
-    # Skip extra data
-    @file.seek extrastart + extralen, false
-
-  parseBaseLayer: ->
-    height = @header.height
-    width = @header.width
-    @top = 0
-    @left = 0
-    @bottom = height
-    @right = width
-    @width = width
-    @height = height
-
-    channels = @header.channels
-    chanDelta = 3 - channels
-    @channelsInfo = []
-    @channelsInfo.push([i, 0]) for i in [chanDelta...channels+chanDelta]
-
-    @blendMode =
-      code: "norm"
-      label: "normal"
-
-    @opacity = 255
-    @visible = true
-    @name = "Canvas"
-    @layerId = 0
+    # Channel image data
+    #@parseImageData()
+  
+    # Skip to end of layer and ignore the channel image data for now
+    @file.seek @layerEnd, false
 
   # Parse important information about this layer such as position, size,
-  # and channel info.
+  # and channel info. Layer Records section.
   parseInfo: (layerIndex) ->
     @idx = layerIndex
 
@@ -227,6 +182,7 @@ class PSDLayer
 
     # For some reason the mask position info is duplicated here? Skip.
     @file.seek 16
+    true
 
   parseBlendingRanges: ->
     length = @file.readUInt()
@@ -249,6 +205,24 @@ class PSDLayer
         dest: @file.readf ">BB"
 
     Log.debug "Blending ranges:", @blendingRanges
+
+  parseExtraData: ->
+    [
+      @signature,
+      @key
+    ] = @file.readf ">4s4s"
+
+    length = @file.readUInt()
+    pos = @file.tell()
+
+  parseImageData: ->
+    # From here to the end of the layer, it's all image data
+    while @file.tell() < @layerEnd
+      @compression = @file.readShortInt()
+
+      #Log.debug "Image compression: id=#{@compression.id}, name=#{@compression.name}"
+      #@image = new PSDImage @file, @compression
+      #@image.parse()
 
   readMetadata: ->
     Log.debug "Parsing layer metadata..."

@@ -6,9 +6,16 @@ class PSDLayerMask
     # Does the first alpha channel contain the transparency data?
     @mergedAlpha = false
 
+    # The global layer mask
+    @globalMask = {}
+
+    # Additional layer information
+    @extras = []
+
   parse: ->
-    # Read the size of this section. 4 bytes.
+    # Read the size of the entire layers and masks section
     maskSize = @file.readUInt()
+    endLoc = @file.tell() + maskSize
 
     # Store the current position in case we need to bail
     # and skip over this section.
@@ -46,29 +53,53 @@ class PSDLayerMask
           layer.parse(i)
           @layers.push layer
 
-        for layer in @layers
-          layer.getImageData()
+    # Temporarily skip the rest of layers & masks section
+    @file.seek endLoc, false
+    return
 
-        @layers.reverse()
+    # Parse the global layer mask
+    @parseGlobalMask()
 
-      @file.seek maskSize
+    # We have more additional info to parse, especially beacuse this is PS >= 4.0
+    @parseExtraInfo(endLoc) if @file.tell() < endLoc
 
-    baseLayer = new PSDLayer @file, true, @header
-    rle = @file.readShortUInt() is 1
-    height = baseLayer.height
+  parseGlobalMask: ->
+    length = @file.readInt()
+    end = @file.tell() + length
 
-    if rle
-      nLines = height * baseLayer.channelsInfo.length
-      lineLengths = []
-      for h in [0...nLines]
-        lineLengths.push @readShortUInt()
+    Log.debug "Global mask length: #{length}"
 
-      baseLayer.getImageData(false, lineLengths)
-    else
-      baseLayer.getImageData(false)
+    # This is undocumented, so we just read the bytes and store them for now
+    @globalMask.overlayColorSpace = @file.read(2)
 
-    if not @layers.length
-      @layers.push baseLayer
+    # This isn't well documented either. We know its 4 * 2 byte color components
+    # of some kind though.
+    @globalMask.colorComponents = @file.readf ">HHHH"
+
+    @globalMask.opacity = @file.readShortUInt()
+
+    # 0 = color selected; 1 = color protected; 128 = use value per layer
+    @globalMask.kind = @file.read(1)[0]
+
+    Log.debug "Global mask:", @globalMask
+
+    # Filler zeros, seek to end.
+    @file.seek end, false
+
+  parseExtraInfo: (end) ->
+    while @file.tell() < end
+      # Temporary
+      [
+        sig,
+        key,
+        length
+      ] = @file.readf ">4s4sI"
+
+      length = Util.pad2 length
+
+      Log.debug "Layer extra:", sig, key, length
+
+      @file.seek length
 
   groupLayers: ->
     parents = []

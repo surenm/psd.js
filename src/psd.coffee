@@ -46,7 +46,7 @@ Root.PSD = class PSD
     @numLayers = 0
     @layers = null
     @images = null
-    @mergedImage = null
+    @image = null
 
   # Attempt to parse all sections of the PSD file
   parse: ->
@@ -58,6 +58,7 @@ Root.PSD = class PSD
     @parseHeader()
     @parseImageResources()
     @parseLayersMasks()
+    #@parseImageData()
 
     @endTime = (new Date()).getTime()
     Log.debug "Parsing finished in #{@endTime - @startTime}ms"
@@ -106,3 +107,16 @@ Root.PSD = class PSD
 
     @layerMask = new PSDLayerMask @file, @header
     @layerMask.parse()
+
+  parseImageData: ->
+    @parseHeader() if not @header
+
+    # 0 = raw; 1 = RLE (TIFF); 2 = ZIP w/o prediction; 3 = ZIP w/ prediction
+    compression = @file.readShortInt()
+
+    # Length until EOF
+    length = @file.data.length - @file.tell()
+    Log.debug "#{length} bytes until EOF. Parsing image data..."
+
+    @image = new PSDImage @file, compression, @header, length
+    @image.parse()
