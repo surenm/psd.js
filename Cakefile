@@ -94,7 +94,7 @@ task 'compile', 'Compile all CoffeeScript source files', ->
     fs.writeFile "#{targetCoffee}.coffee", core, "utf8", (err) ->
       util.log err if err
       
-      exec "coffee #{coffeeCoreOpts}", (err, stdout, stderr) ->
+      exec "./node_modules/.bin/coffee #{coffeeCoreOpts}", (err, stdout, stderr) ->
         util.log err if err
         util.log "Compiled #{targetCoreJS}"
         fs.unlink "#{targetCoffee}.coffee"
