@@ -156,7 +156,7 @@ class PSDResource
 
     1034:
       name: 'Copyright flag'
-      parse: -> [@copyrighted] = @file.readf ">B"
+      parse: -> [@copyrighted] = @file.readf ">#{@size}B"
 
     1035:
       name: 'URL'
@@ -382,6 +382,8 @@ class PSDResource
       @file.seek @size
     else
       resource = RESOURCE_DESCRIPTIONS[@id]
+      unless resource?
+        debugger
       @rdesc = "[#{resource.name}]"
 
       if resource.parse?
