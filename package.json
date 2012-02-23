@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "A Photoshop file format (PSD) parser written in Coffeescript/Javascript for both browsers and NodeJS implementations",
   "homepage": "http://meltingice.github.com/psd.js/",
-  "author": "Isaac Z. Schlueter <meltingice8917@gmail.com> (http://meltingice.net/)",
+  "author": "Ryan LeFevre <ryan@twitpic.com> (http://meltingice.net/)",
   "repository": {
     "type": "git",
     "url": "https://github.com/meltingice/psd.js.git"
