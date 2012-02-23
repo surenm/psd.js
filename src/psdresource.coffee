@@ -382,8 +382,6 @@ class PSDResource
       @file.seek @size
     else
       resource = RESOURCE_DESCRIPTIONS[@id]
-      unless resource?
-        debugger
       @rdesc = "[#{resource.name}]"
 
       if resource.parse?
