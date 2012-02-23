@@ -360,7 +360,7 @@ class PSDResource
   constructor: (@file) ->
 
   parse: ->
-    @at = @file.tell()
+    @at = @file.tell()  
 
     [@type, @id, @namelen] = @file.readf ">4s H B"
 

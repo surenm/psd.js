@@ -4,7 +4,7 @@ class Util
   @i32: (c) -> ord(c[3]) + (ord(c[2])<<8) + (ord(c[1])<<16) + (ord(c[0])<<24)
 
   @pad2: (i) -> Math.floor((i + 1) / 2) * 2
-  @pad4: (i) -> Math.floor((i + 3) / 4) * 4
+  @pad4: (i) -> (((i & 0xFF) + 1 + 3) & ~ 0x03) - 1
 
   @rgbToHex: (c) ->
     m = /rgba?\((\d+), (\d+), (\d+)/.exec(c)

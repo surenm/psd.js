@@ -72,6 +72,7 @@ class PSDLayer
     @images = []
     @mask = {}
     @blendingRanges = {}
+    @effects = []
 
   parse: (layerIndex = null) ->
     @parseInfo(layerIndex)
@@ -92,13 +93,15 @@ class PSDLayer
     @parseBlendingRanges()
 
     namelen = Util.pad4 @file.read(1)[0]
-    @name = @file.readString namelen
+    [@name] = @file.readString namelen
 
     Log.debug "Layer name: #{@name}"
 
     # Channel image data
     #@parseImageData()
-  
+
+    @parseExtraData()
+
     # Skip to end of layer and ignore the channel image data for now
     @file.seek @layerEnd, false
 
@@ -207,22 +210,67 @@ class PSDLayer
     Log.debug "Blending ranges:", @blendingRanges
 
   parseExtraData: ->
-    [
-      @signature,
-      @key
-    ] = @file.readf ">4s4s"
+    while @file.tell() < @layerEnd
+      [
+        signature,
+        key
+      ] = @file.readf ">4s4s"
 
-    length = @file.readUInt()
-    pos = @file.tell()
+      length = @file.readUInt()
+      pos = @file.tell()
+
+      switch key
+        when "lyid" then @layerId = @file.readUInt()
+        when "shmd" then @readMetada()
+        when "lsct" then @readLayerSectionDivider()
+        when "luni" then @uniName = @file.readUnicodeString()
+        when "vmsk" then @readVectorMask()
+        when "TySh" then @readTypeTool()
+        when "lrFX" then @parseEffectsLayer()
+        else  
+          @file.seek length
+          Log.debug("Skipping additional layer info with key #{key}")
+
+  parseEffectsLayer: ->
+
+    [
+        v, # always 0
+        count
+    ] = @file.readf ">HH"
+
+    while count-- > 0
+      [
+        signature,
+        type
+      ] = @file.readf ">4s4s"
+
+      # common state info
+      if type == "cmnS"  
+       # always true
+        visible = @file.readBoolean()
+        # unused
+        @file.read(2)
+       
+      effect =    
+        switch type
+          when "dsdw" then new PSDDropDownLayerEffect @file     
+          when "isdw" then new PSDDropDownLayerEffect @file, true # inner drop shadow
+      
+      if effect?
+        effect.parse()
+        @effects.push(effect)
+      else
+        size = @file.readShortUInt()
+        @file.seek size 
 
   parseImageData: ->
     # From here to the end of the layer, it's all image data
     while @file.tell() < @layerEnd
       @compression = @file.readShortInt()
 
-      #Log.debug "Image compression: id=#{@compression.id}, name=#{@compression.name}"
-      #@image = new PSDImage @file, @compression
-      #@image.parse()
+      Log.debug "Image compression: id=#{@compression.id}, name=#{@compression.name}"
+      @image = new PSDImage @file, @compression
+      @image.parse()
 
   readMetadata: ->
     Log.debug "Parsing layer metadata..."
@@ -425,3 +473,5 @@ class PSDLayer
     Log.debug "Image: type=#{type}, width=#{@cols}, height=#{@rows}"
 
     @images.push image
+
+  isFolder: -> @type == SECTION_DIVIDER_TYPES[1] || @type == SECTION_DIVIDER_TYPES[2]
