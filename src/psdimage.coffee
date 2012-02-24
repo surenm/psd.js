@@ -18,6 +18,7 @@ class PSDImage
       r: []
       g: []
       b: []
+      a: []
 
   parse: ->
     # ZIP compression isn't implemented yet. Luckily this is pretty rare. Still,
@@ -60,6 +61,8 @@ class PSDImage
     result = []
 
     for i in [0...@pixelData.r.length]
-      result.push @pixelData.r[i], @pixelData.g[i], @pixelData.b[i], 255
+      alpha = @pixelData.a[i]
+      alpha ?= 255
+      result.push @pixelData.r[i], @pixelData.g[i], @pixelData.b[i], alpha
 
     result

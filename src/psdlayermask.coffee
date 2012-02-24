@@ -53,6 +53,11 @@ class PSDLayerMask
           layer.parse(i)
           @layers.push layer
 
+        for layer in @layers
+          layer.getImageData(true)
+
+        # TODO : layers.reverse()
+
     # Temporarily skip the rest of layers & masks section
     @file.seek endLoc, false
     return

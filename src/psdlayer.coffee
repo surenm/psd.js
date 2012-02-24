@@ -18,7 +18,7 @@ class PSDLayer
     0: "other"
     1: "open folder"
     2: "closed folder"
-    3: "bounding section divider"
+    3: "bounding section divider" # hidden in the UI
 
   BLEND_MODES =
     "norm": "normal"
@@ -244,24 +244,19 @@ class PSDLayer
         type
       ] = @file.readf ">4s4s"
 
-      # common state info
-      if type == "cmnS"  
-       # always true
-        visible = @file.readBoolean()
-        # unused
-        @file.read(2)
-       
       effect =    
         switch type
+          when "cmnS" then new PSDLayerEffectCommonStateInfo @file
           when "dsdw" then new PSDDropDownLayerEffect @file     
           when "isdw" then new PSDDropDownLayerEffect @file, true # inner drop shadow
       
       if effect?
         effect.parse()
-        @effects.push(effect)
+        @effects.push(effect) unless type == "cmnS" # ignore commons state info
       else
         size = @file.readShortUInt()
         @file.seek size 
+        Log.debug("Skipping effect layer with type #{type}")
 
   parseImageData: ->
     # From here to the end of the layer, it's all image data
@@ -373,7 +368,6 @@ class PSDLayer
       b: []
 
     opacityDivider = @opacity / 255
-
     for own i, channelTuple of @channelsInfo
       [channelId, length] = channelTuple
       if channelId < -1
@@ -382,7 +376,7 @@ class PSDLayer
       else
         width = @cols
         height = @rows
-
+      Log.debug "Reading channel #{channelId} from layer #{@name}"
       channel = @readColorPlane readPlaneInfo, lineLengths, i, height, width
       switch channelId
         when -1
@@ -407,13 +401,14 @@ class PSDLayer
 
     if readPlaneInfo
       compression = @file.readShortUInt()
-      Log.debug "Compression: id=#{compression}, name=#{COMPRESSIONS[compression]}"
 
       rleEncoded = compression is 1
       if rleEncoded
-        if not lineLengths
-          lineLengths = []
-          lineLengths.push @file.readShortUInt() for a in [0...height]
+        # Must always read the short so removed this :
+        # if lineLengths.length == 0
+        lineLengths = []
+        for a in [0...height]
+          lineLengths.push @file.readShortInt() 
       else
         Log.debug "ERROR: compression not implemented yet. Skipping."
 
@@ -436,9 +431,9 @@ class PSDLayer
     lineIndex = planeNum * height
 
     for i in [0...height]
-      len = lineLengths[lineIndex]
-      lineIndex++
+      len = lineLengths[lineIndex++]
       s = @file.readBytesList(len)
+      s.push 0 for x in [0...(width * 2 - len)]
       @decodeRLE s, 0, len, b, pos
       pos += width
 
@@ -468,10 +463,12 @@ class PSDLayer
     return if not @cols? or not @rows?
 
     type = if isNaN(@channels.a[0]) then "RGB" else "RGBA"
-    image = new PSDImage(type, @cols, @rows, @channels)
-    
+    image = new PSDImage(@file, 0, { cols: @cols, rows: @rows}, @cols * @rows)
+    image.pixelData = @channels
     Log.debug "Image: type=#{type}, width=#{@cols}, height=#{@rows}"
 
     @images.push image
 
-  isFolder: -> @type == SECTION_DIVIDER_TYPES[1] || @type == SECTION_DIVIDER_TYPES[2]
+  isFolder: -> @layerType == SECTION_DIVIDER_TYPES[1] || @layerType == SECTION_DIVIDER_TYPES[2]
+
+  isHidden: -> @layerType == SECTION_DIVIDER_TYPES[3]
