@@ -1,4 +1,4 @@
-# A PSDImage stores parsed image data for images contained within the PSD, and 
+# A PSDImage stores parsed image data for images contained within the PSD, and
 # for the PSD itself.
 class PSDImage
   COMPRESSIONS =
@@ -59,10 +59,13 @@ class PSDImage
   # This means a pure-red single pixel is expressed as: `[255, 0, 0, 255]`
   toCanvasPixels: ->
     result = []
-
+    
     for i in [0...@pixelData.r.length]
-      alpha = @pixelData.a[i]
-      alpha ?= 255
-      result.push @pixelData.r[i], @pixelData.g[i], @pixelData.b[i], alpha
+      alpha = @pixelData.a[i]; alpha ?= 255
+      result.push(
+        @pixelData.r[i], 
+        @pixelData.g[i], 
+        @pixelData.b[i], 
+        alpha)
 
     result

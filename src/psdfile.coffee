@@ -147,11 +147,7 @@ class PSDFile
     {type: osType, value: value}
 
   # Reads a byte list
-  readBytesList: (size) ->
-    bytesRead = @read size
-    result = []
-    result.push ord(b) for b in bytesRead
-    result
+  readBytesList: (size) -> @read size
   
   # Reads from the file given the unpack format string. Format string codes 
   # can be easily referenced 

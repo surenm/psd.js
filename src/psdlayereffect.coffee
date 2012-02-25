@@ -7,10 +7,7 @@ class PSDLayerEffect
   
   parse: ->
     # these are common to all effects
-    [
-        @size,
-        @version
-    ] = @file.readf ">ii"
+    [@version] = @file.readf ">i"
 
   getSpaceColor: ->
     @file.read(2) # 2 bytes for space

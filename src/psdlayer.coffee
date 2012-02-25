@@ -102,8 +102,8 @@ class PSDLayer
 
     @parseExtraData()
 
-    # Skip to end of layer and ignore the channel image data for now
-    @file.seek @layerEnd, false
+    if @file.tell() != @layerEnd
+      throw "Error parsing layer - unexpected end"
 
   # Parse important information about this layer such as position, size,
   # and channel info. Layer Records section.
@@ -219,17 +219,21 @@ class PSDLayer
       length = @file.readUInt()
       pos = @file.tell()
 
+      Log.debug("Found additional layer info with key #{key} and length #{length}")
       switch key
         when "lyid" then @layerId = @file.readUInt()
-        when "shmd" then @readMetada()
+        when "shmd" then @file.seek length # TODO - @readMetadata()
         when "lsct" then @readLayerSectionDivider()
-        when "luni" then @uniName = @file.readUnicodeString()
-        when "vmsk" then @readVectorMask()
+        when "luni" then @file.seek length # TODO - @uniName = @file.readUnicodeString()
+        when "vmsk" then @file.seek length # TODO - @readVectorMask()
         when "TySh" then @readTypeTool()
-        when "lrFX" then @parseEffectsLayer()
+        when "lrFX" then @parseEffectsLayer(); @file.read(2) # why these 2 bytes?
         else  
           @file.seek length
           Log.debug("Skipping additional layer info with key #{key}")
+
+      if @file.tell() != (pos + length)
+        throw "Error parsing additional layer info with key #{key} - unexpected end"
 
   parseEffectsLayer: ->
 
@@ -244,19 +248,26 @@ class PSDLayer
         type
       ] = @file.readf ">4s4s"
 
+      [size] = @file.readf ">i"
+
+      pos = @file.tell()
+
+      Log.debug("Parsing effect layer with type #{type} and size #{size}")
+
       effect =    
         switch type
           when "cmnS" then new PSDLayerEffectCommonStateInfo @file
           when "dsdw" then new PSDDropDownLayerEffect @file     
           when "isdw" then new PSDDropDownLayerEffect @file, true # inner drop shadow
-      
-      if effect?
-        effect.parse()
-        @effects.push(effect) unless type == "cmnS" # ignore commons state info
+
+      effect?.parse()
+
+      left = (pos + size) - @file.tell()
+      if left != 0
+       Log.debug("Failed to parse effect layer with type #{type}")
+       @file.seek left 
       else
-        size = @file.readShortUInt()
-        @file.seek size 
-        Log.debug("Skipping effect layer with type #{type}")
+        @effects.push(effect) unless type == "cmnS" # ignore commons state info
 
   parseImageData: ->
     # From here to the end of the layer, it's all image data
@@ -367,7 +378,8 @@ class PSDLayer
       g: []
       b: []
 
-    opacityDivider = @opacity / 255
+    opacity = @blendMode.opacityPercentage 
+    opacityDivider = opacity / 255
     for own i, channelTuple of @channelsInfo
       [channelId, length] = channelTuple
       if channelId < -1
@@ -381,7 +393,7 @@ class PSDLayer
       switch channelId
         when -1
           @channels.a = []
-          @channels.a.push (ch * opacityDivider) for ch in channel
+          @channels.a.push ((ch * opacityDivider) & 255) for ch in channel
         when 0 then @channels.r = channel
         when 1 then @channels.g = channel
         when 2 then @channels.b = channel
@@ -403,6 +415,11 @@ class PSDLayer
       compression = @file.readShortUInt()
 
       rleEncoded = compression is 1
+
+      # RLE compressed the image data starts with the byte counts for all the
+      # scan lines (rows * color_channels), with each count stored as a two¨byte value.
+      # In this case we're reading a single color channel so scan lines == height
+      # The RLE compressed data follows, with each scan line compressed separately.
       if rleEncoded
         # Must always read the short so removed this :
         # if lineLengths.length == 0
