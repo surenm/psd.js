@@ -75,7 +75,7 @@ class PSDFile
 
   # Reads a string with the given length. Note that the length is given in 
   # bytes, not characters.
-  readString: (length) -> @readf ">#{length}s"
+  readString: (length) -> @readf(">#{length}s")[0]
 
   # Used for reading pascal strings, which are strings that have their length 
   # prepended to the chunk of character bytes. If a length isn't found, a 

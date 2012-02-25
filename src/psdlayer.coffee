@@ -93,7 +93,7 @@ class PSDLayer
     @parseBlendingRanges()
 
     namelen = Util.pad4 @file.read(1)[0]
-    [@name] = @file.readString namelen
+    @name = @file.readString namelen
 
     Log.debug "Layer name: #{@name}"
 
