@@ -28,6 +28,7 @@ coffeeFiles   = [
   "psdlayermask"
   "psdlayereffect"
   "psdresource"
+  "psdtypetool"
   "util"
   "log"
 ]

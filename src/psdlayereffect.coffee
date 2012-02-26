@@ -14,8 +14,6 @@ class PSDLayerEffect
     @file.readf ">HHHH" # 4 * 2 byte color component - r, g, b, a
    
 class PSDLayerEffectCommonStateInfo extends PSDLayerEffect
-  
-  constructor: (file) -> super(file)
 
   parse: -> 
     super()
