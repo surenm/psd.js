@@ -18,7 +18,7 @@ class PSDLayer
     0: "other"
     1: "open folder"
     2: "closed folder"
-    3: "bounding section divider"
+    3: "bounding section divider" # hidden in the UI
 
   BLEND_MODES =
     "norm": "normal"
@@ -72,6 +72,7 @@ class PSDLayer
     @images = []
     @mask = {}
     @blendingRanges = {}
+    @effects = []
 
   parse: (layerIndex = null) ->
     @parseInfo(layerIndex)
@@ -98,9 +99,11 @@ class PSDLayer
 
     # Channel image data
     #@parseImageData()
-  
-    # Skip to end of layer and ignore the channel image data for now
-    @file.seek @layerEnd, false
+
+    @parseExtraData()
+
+    if @file.tell() != @layerEnd
+      throw "Error parsing layer - unexpected end"
 
   # Parse important information about this layer such as position, size,
   # and channel info. Layer Records section.
@@ -207,22 +210,73 @@ class PSDLayer
     Log.debug "Blending ranges:", @blendingRanges
 
   parseExtraData: ->
-    [
-      @signature,
-      @key
-    ] = @file.readf ">4s4s"
+    while @file.tell() < @layerEnd
+      [
+        signature,
+        key
+      ] = @file.readf ">4s4s"
 
-    length = @file.readUInt()
-    pos = @file.tell()
+      length = @file.readUInt()
+      pos = @file.tell()
+
+      Log.debug("Found additional layer info with key #{key} and length #{length}")
+      switch key
+        when "lyid" then @layerId = @file.readUInt()
+        when "shmd" then @file.seek length # TODO - @readMetadata()
+        when "lsct" then @readLayerSectionDivider()
+        when "luni" then @file.seek length # TODO - @uniName = @file.readUnicodeString()
+        when "vmsk" then @file.seek length # TODO - @readVectorMask()
+        when "TySh" then @readTypeTool()
+        when "lrFX" then @parseEffectsLayer(); @file.read(2) # why these 2 bytes?
+        else  
+          @file.seek length
+          Log.debug("Skipping additional layer info with key #{key}")
+
+      if @file.tell() != (pos + length)
+        throw "Error parsing additional layer info with key #{key} - unexpected end"
+
+  parseEffectsLayer: ->
+
+    [
+        v, # always 0
+        count
+    ] = @file.readf ">HH"
+
+    while count-- > 0
+      [
+        signature,
+        type
+      ] = @file.readf ">4s4s"
+
+      [size] = @file.readf ">i"
+
+      pos = @file.tell()
+
+      Log.debug("Parsing effect layer with type #{type} and size #{size}")
+
+      effect =    
+        switch type
+          when "cmnS" then new PSDLayerEffectCommonStateInfo @file
+          when "dsdw" then new PSDDropDownLayerEffect @file     
+          when "isdw" then new PSDDropDownLayerEffect @file, true # inner drop shadow
+
+      effect?.parse()
+
+      left = (pos + size) - @file.tell()
+      if left != 0
+       Log.debug("Failed to parse effect layer with type #{type}")
+       @file.seek left 
+      else
+        @effects.push(effect) unless type == "cmnS" # ignore commons state info
 
   parseImageData: ->
     # From here to the end of the layer, it's all image data
     while @file.tell() < @layerEnd
       @compression = @file.readShortInt()
 
-      #Log.debug "Image compression: id=#{@compression.id}, name=#{@compression.name}"
-      #@image = new PSDImage @file, @compression
-      #@image.parse()
+      Log.debug "Image compression: id=#{@compression.id}, name=#{@compression.name}"
+      @image = new PSDImage @file, @compression
+      @image.parse()
 
   readMetadata: ->
     Log.debug "Parsing layer metadata..."
@@ -324,8 +378,8 @@ class PSDLayer
       g: []
       b: []
 
-    opacityDivider = @opacity / 255
-
+    opacity = @blendMode.opacityPercentage 
+    opacityDivider = opacity / 255
     for own i, channelTuple of @channelsInfo
       [channelId, length] = channelTuple
       if channelId < -1
@@ -334,12 +388,12 @@ class PSDLayer
       else
         width = @cols
         height = @rows
-
+      Log.debug "Reading channel #{channelId} from layer #{@name}"
       channel = @readColorPlane readPlaneInfo, lineLengths, i, height, width
       switch channelId
         when -1
           @channels.a = []
-          @channels.a.push (ch * opacityDivider) for ch in channel
+          @channels.a.push ((ch * opacityDivider) & 255) for ch in channel
         when 0 then @channels.r = channel
         when 1 then @channels.g = channel
         when 2 then @channels.b = channel
@@ -359,13 +413,19 @@ class PSDLayer
 
     if readPlaneInfo
       compression = @file.readShortUInt()
-      Log.debug "Compression: id=#{compression}, name=#{COMPRESSIONS[compression]}"
 
       rleEncoded = compression is 1
+
+      # RLE compressed the image data starts with the byte counts for all the
+      # scan lines (rows * color_channels), with each count stored as a two¨byte value.
+      # In this case we're reading a single color channel so scan lines == height
+      # The RLE compressed data follows, with each scan line compressed separately.
       if rleEncoded
-        if not lineLengths
-          lineLengths = []
-          lineLengths.push @file.readShortUInt() for a in [0...height]
+        # Must always read the short so removed this :
+        # if lineLengths.length == 0
+        lineLengths = []
+        for a in [0...height]
+          lineLengths.push @file.readShortInt() 
       else
         Log.debug "ERROR: compression not implemented yet. Skipping."
 
@@ -388,9 +448,9 @@ class PSDLayer
     lineIndex = planeNum * height
 
     for i in [0...height]
-      len = lineLengths[lineIndex]
-      lineIndex++
+      len = lineLengths[lineIndex++]
       s = @file.readBytesList(len)
+      s.push 0 for x in [0...(width * 2 - len)]
       @decodeRLE s, 0, len, b, pos
       pos += width
 
@@ -420,8 +480,12 @@ class PSDLayer
     return if not @cols? or not @rows?
 
     type = if isNaN(@channels.a[0]) then "RGB" else "RGBA"
-    image = new PSDImage(type, @cols, @rows, @channels)
-    
+    image = new PSDImage(@file, 0, { cols: @cols, rows: @rows}, @cols * @rows)
+    image.pixelData = @channels
     Log.debug "Image: type=#{type}, width=#{@cols}, height=#{@rows}"
 
     @images.push image
+
+  isFolder: -> @layerType == SECTION_DIVIDER_TYPES[1] || @layerType == SECTION_DIVIDER_TYPES[2]
+
+  isHidden: -> @layerType == SECTION_DIVIDER_TYPES[3]
