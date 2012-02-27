@@ -4,7 +4,7 @@ Image = Canvas.Image
 
 {PSD} = require __dirname + '/../lib/psd.js'
 
-psd = PSD.fromFile __dirname + '/Concept 1.psd'
+psd = PSD.fromFile __dirname + '/test.psd'
 psd.parse()
 
 canvas = new Canvas(psd.header.cols, psd.header.rows)
