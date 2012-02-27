@@ -58,7 +58,7 @@ Root.PSD = class PSD
     @parseHeader()
     @parseImageResources()
     @parseLayersMasks()
-    #@parseImageData()
+    @parseImageData()
 
     @endTime = (new Date()).getTime()
     Log.debug "Parsing finished in #{@endTime - @startTime}ms"
@@ -111,12 +111,5 @@ Root.PSD = class PSD
   parseImageData: ->
     @parseHeader() if not @header
 
-    # 0 = raw; 1 = RLE (TIFF); 2 = ZIP w/o prediction; 3 = ZIP w/ prediction
-    compression = @file.readShortInt()
-
-    # Length until EOF
-    length = @file.data.length - @file.tell()
-    Log.debug "#{length} bytes until EOF. Parsing image data..."
-
-    @image = new PSDImage @file, compression, @header, length
+    @image = new PSDImage @file, @header
     @image.parse()
