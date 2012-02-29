@@ -53,59 +53,60 @@ class PSDImage
   parseRLE: ->
     Log.debug "Attempting to parse RLE encoded image..."
 
-    # RLE stores the line lengths in the first chunk of data
+    # RLE stores the scan line byte counts in the first chunk of data
     byteCounts = []
     for i in [0...@header.channels]
       for j in [0...@height]
         byteCounts.push @file.readShortInt()
 
-    Log.debug "Read byte counts. Current pos = #{@file.tell()}, End = #{@endPos}"
+    Log.debug "Read byte counts. Current pos = #{@file.tell()}, Pixels = #{@length}"
 
     # And then it stores the compressed image data
     @channelData = []
     @channelData.push 0 for x in [0...@length]
 
+    chanPos = 0
+    lineIndex = 0
+
     for i in [0...@header.channels] # i = plane num
-      lineIndex = 0
-      pos = 0
+      console.log "Parsing channel ##{i}, Start = #{@file.tell()}"
 
       for j in [0...@height]
-        len = byteCounts[lineIndex++]
-        src = @file.read len
-        @decodeRLE src, 0, len, @channelData, pos
-        pos += @width
+        byteCount = byteCounts[lineIndex++]
+        start = @file.tell()
+
+        while @file.tell() < start + byteCount
+          [len] = @file.read(1)
+
+          if len < 128
+            len++
+            data = @file.read len
+
+            # memcpy!
+            @channelData[chanPos...chanPos+len] = data
+            chanPos += len
+          else if len > 128
+            len ^= 0xff
+            len += 2
+
+            [val] = @file.read(1)
+            data = []
+            data.push val for z in [0...len]
+
+            @channelData[chanPos...chanPos+len] = data
+            chanPos += len
 
     switch @header.mode
       when 3 # RGBColor
         @combineRGB8Channel() if @header.depth is 8
         @combineRGB16Channel() if @header.depth is 16
 
-  decodeRLE: (src, sindex, slen, dst, dindex) ->
-    max = sindex + slen
-
-    while sindex < max
-      b = src[sindex]
-      sindex++
-      n = b
-      if b > 127
-        n = 255 - n + 2
-        b = src[sindex]
-        sindex++
-        for i in [0...n]
-          dst[dindex] = b
-          dindex++
-      else
-        n++
-        dst[dindex...dindex+n] = src[sindex...sindex+n]
-        dindex += n
-        sindex += n
-
   combineRGB8Channel: ->
     for i in [0...@channelLength]
-      @pixelData.a[i] = @channelData[i] if @header.channels is 4
-      @pixelData.r[i] = @channelData[i + @channelLength]
-      @pixelData.g[i] = @channelData[i + (@channelLength * 2)]
-      @pixelData.b[i] = @channelData[i + (@channelLength * 3)]
+      @pixelData.r[i] = @channelData[i]
+      @pixelData.g[i] = @channelData[i + @channelLength]
+      @pixelData.b[i] = @channelData[i + (@channelLength * 2)]
+      @pixelData.a[i] = @channelData[i + (@channelLength * 3)] if @header.channels is 4
       
   # Normally, the pixel data is stored in planar order, meaning all the red
   # values come first, then the green, then the blue. In the HTML canvas, the
