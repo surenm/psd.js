@@ -31,7 +31,7 @@ else
 # Create our class and add to global scope
 Root.PSD = class PSD
   # Enable/disable debugging console logs
-  @DEBUG = true
+  @DEBUG = false
 
   # Loads a PSD from a file. If we're in node, then this loads the
   # file from the filesystem. If we're in the browser, then this assumes

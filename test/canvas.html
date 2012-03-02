@@ -8,7 +8,6 @@
     PSD.fromURL("test.psd", function (psd) {
       var status = document.getElementById('status');
       status.innerHTML = "parsing file...";
-      psd.parseImageData();
 
       var canvas = document.getElementById('test');
       psd.toCanvas(canvas);
