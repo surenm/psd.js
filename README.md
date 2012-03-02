@@ -8,7 +8,9 @@ This implementation is inspired by, and in some parts directly ported, from:
   * [psdparse](https://github.com/jerem/psdparse)
   * [libpsd](http://sourceforge.net/projects/libpsd)
 
-**Please note: this is a work in progress and is not finished yet. Do not use in production anywhere.**
+**Please note!**
+
+The PSD file format is complex, buggy, hacky, and poorly documented. Because of this, and the fact that this is a relatively new project, psd.js may or may not be able to correctly parse every PSD you throw at it. Use with caution.
 
 ## Contributing
 
