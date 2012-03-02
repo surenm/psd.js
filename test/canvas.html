@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>psd.js canvas export</title>
+
+  <script type="text/javascript" src="../lib/psd.js"></script>
+  <script type="text/javascript">
+    PSD.fromURL("test.psd", function (psd) {
+      var status = document.getElementById('status');
+      status.innerHTML = "parsing file...";
+      psd.parseImageData();
+
+      var canvas = document.getElementById('test');
+      psd.toCanvas(canvas);
+
+      status.innerHTML = "done!";
+    });
+  </script>
+</head>
+<body>
+  <h1>PSD.js Canvas Export</h1>
+  <p>Status: <span id="status">downloading data...</span></p>
+
+  <canvas id="test"></canvas>
+</body>
+</html>

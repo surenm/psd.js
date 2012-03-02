@@ -227,7 +227,7 @@ class PSDLayer
         when "luni" then @file.seek length # TODO - @uniName = @file.readUnicodeString()
         when "vmsk" then @file.seek length # TODO - @readVectorMask()
         when "tySh" then @readTypeTool(true) # PS 5.0/5.5 only
-        when "TySh" then @readTypeTool() # PS 6.0+
+        #when "TySh" then @readTypeTool() # PS 6.0+
         when "lrFX" then @parseEffectsLayer(); @file.read(2) # why these 2 bytes?
         else  
           @file.seek length

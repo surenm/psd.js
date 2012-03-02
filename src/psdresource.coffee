@@ -380,7 +380,7 @@ class PSDResource
     else if 4000 <= @id < 5000
       @rdesc = "[Plug-in Resource]"
       @file.seek @size
-    else
+    else if RESOURCE_DESCRIPTIONS[@id]?
       resource = RESOURCE_DESCRIPTIONS[@id]
       @rdesc = "[#{resource.name}]"
 

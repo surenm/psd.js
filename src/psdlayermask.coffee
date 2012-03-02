@@ -12,6 +12,9 @@ class PSDLayerMask
     # Additional layer information
     @extras = []
 
+  # Skip over this section and don't parse it
+  skip: -> @file.seek @file.readUInt()
+
   parse: ->
     # Read the size of the entire layers and masks section
     maskSize = @file.readUInt()
