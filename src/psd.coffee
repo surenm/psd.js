@@ -192,3 +192,8 @@ Root.PSD = class PSD
     pixelData[i] = pxl for pxl, i in @image.toCanvasPixels()
 
     context.putImageData imageData, 0, 0
+
+  toImage: ->
+    canvas = document.createElement 'canvas'
+    @toCanvas canvas
+    canvas.toDataURL "image/png"
