@@ -90,7 +90,7 @@ class PSDLayer
     result = @parseMaskData()
     if not result
       # Make this more graceful in the future?
-      Log.debug "Error parsing mask data for layer ##{@idx}. Skipping."
+      Log.debug "Error parsing mask data for layer ##{layerIndex}. Skipping."
       return @file.seek @layerEnd, false
 
     @parseBlendingRanges()
@@ -105,7 +105,7 @@ class PSDLayer
     Log.debug "Layer #{layerIndex}:", @
 
     if @file.tell() != @layerEnd
-      console.log "Error parsing layer - unexpected end. Attempting to recover..."
+      Log.debug "Error parsing layer - unexpected end. Attempting to recover..."
       @file.seek @layerEnd, false
 
   # Parse important information about this layer such as position, size,
