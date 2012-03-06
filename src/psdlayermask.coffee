@@ -57,7 +57,8 @@ class PSDLayerMask
           @layers.push layer
 
         for layer in @layers
-          layer.getImageData(true)
+          layer.image = new PSDImage(@file, @header, layer)
+          layer.image.parse()
 
         # TODO : layers.reverse()
 

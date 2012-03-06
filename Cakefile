@@ -21,6 +21,7 @@ coffeeCoreOpts    = "-r coffeescript-growl -j #{targetName}.js -o #{csTargetDir}
 # All source files listed in include order
 coffeeFiles   = [
   "psd"
+  "psdcolor"
   "psdfile"
   "psdheader"
   "psdimage"
@@ -42,6 +43,11 @@ finished = (type) ->
 
 finishListener = (type, cb) ->
   finishedCallback[type] = cb
+
+###
+Options
+###
+option '-z', '--with-zip', 'Include ZIP decompression library'
 
 ###
 Tasks
@@ -69,7 +75,7 @@ task 'build', 'Compile and minify all CoffeeScript source files', ->
   finishListener 'js', ->
   invoke 'compile'
 
-task 'compile', 'Compile all CoffeeScript source files', ->
+task 'compile', 'Compile all CoffeeScript source files', (opts) ->
   util.log "Building #{targetCoreJS}"
   contents = []
   remaining = coffeeFiles.length
@@ -88,6 +94,9 @@ task 'compile', 'Compile all CoffeeScript source files', ->
     contents.unshift "###\nEND DEPENDENCIES\n###\n\n"
     deps = fs.readdirSync depsDir
     for dep in deps
+      # Special case
+      continue if dep is "zip.js" and not opts['with-zip']
+
       util.log "Adding dependency #{dep}"
       contents.unshift "`" + fs.readFileSync("#{depsDir}/#{dep}", "utf8") + "`\n\n"
 

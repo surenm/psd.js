@@ -4,5 +4,7 @@ Image = Canvas.Image
 
 {PSD} = require __dirname + '/../lib/psd.js'
 
-psd = PSD.fromFile __dirname + '/test.psd'
+PSD.DEBUG = true
+
+psd = PSD.fromFile __dirname + '/twitpic.psd'
 psd.parse()

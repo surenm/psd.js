@@ -33,6 +33,9 @@ Root.PSD = class PSD
   # Enable/disable debugging console logs
   @DEBUG = false
 
+  # Has the (rather large) ZIP library been included?
+  @ZIP_ENABLED = inflater?
+
   # Loads a PSD from a file. If we're in node, then this loads the
   # file from the filesystem. If we're in the browser, then this assumes
   # it has been passed a File object (either from a file input element,
@@ -140,6 +143,7 @@ Root.PSD = class PSD
     Log.debug "\n### Layers & Masks ###"
 
     @layerMask = new PSDLayerMask @file, @header
+    @layers = @layerMask.layers
 
     if skip
       Log.debug "Skipped!"

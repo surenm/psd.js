@@ -53,7 +53,7 @@ class PSDFile
 
   readUnicodeString: (strlen = null) ->
     str = ""
-    strlen = @readUInt() if not strlen
+    strlen = @readInt() if not strlen
     for i in [0...strlen]
       charCode = @readShortUInt()
       str += chr(Util.i16(charCode)) if charCode > 0
@@ -73,9 +73,10 @@ class PSDFile
 
     descriptors
 
-  # Reads a string with the given length. Note that the length is given in 
-  # bytes, not characters.
-  readString: (length) -> @readf(">#{length}s")[0]
+  # Reads a string with the given length. Because some strings are also
+  # null-byte padded, we strip out these null bytes since they are of no
+  # use to us in Javascript.
+  readString: (length) -> @readf(">#{length}s")[0].replace /\u0000/g, ""
 
   # Used for reading pascal strings, which are strings that have their length 
   # prepended to the chunk of character bytes. If a length isn't found, a 
