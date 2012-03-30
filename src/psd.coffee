@@ -77,7 +77,7 @@ Root.PSD = class PSD
 
     @header = null
     @resources = null
-    @numLayers = 0
+    @layerMask = null
     @layers = null
     @images = null
     @image = null
@@ -137,8 +137,8 @@ Root.PSD = class PSD
     Log.debug "Image resources overran expected size by #{-n} bytes" if n isnt 0
 
   parseLayersMasks: (skip = false) ->
-    @parseHeader() if not @header
-    @parseImageResources(true) if not @resources
+    @parseHeader() unless @header
+    @parseImageResources(true) unless @resources
 
     Log.debug "\n### Layers & Masks ###"
 
@@ -152,52 +152,23 @@ Root.PSD = class PSD
       @layerMask.parse()
 
   parseImageData: ->
-    @parseHeader() if not @header
-    @parseImageResources(true) if not @resources
-    @parseLayersMasks(true) if not @layerMask
+    @parseHeader() unless @header
+    @parseImageResources(true) unless @resources
+    @parseLayersMasks(true) unless @layerMask
 
     @image = new PSDImage @file, @header
     @image.parse()
 
   # Exports a flattened version to a file. For use in NodeJS.
   toFile: (filename, cb = ->) -> 
-    @parseImageData() if not @image
-
-    try
-      Canvas = require 'canvas'
-    catch e
-      throw "Exporting PSDs to file requires the canvas library"
-
-    Image = Canvas.Image
-
-    canvas = new Canvas(@header.cols, @header.rows)
-    context = canvas.getContext('2d')
-    imageData = context.getImageData 0, 0, canvas.width, canvas.height
-    pixelData = imageData.data
-
-    pixelData[i] = pxl for pxl, i in @image.toCanvasPixels()
-
-    context.putImageData imageData, 0, 0
-
-    fs.writeFile filename, canvas.toBuffer(), cb
+    @parseImageData() unless @image
+    @image.toFile filename, cb
 
   # Given a canvas element
   toCanvas: (canvas, width = null, height = null) ->
-    @parseImageData() if not @image
-
-    if width is null and height is null
-      canvas.width = @header.cols
-      canvas.height = @header.rows
-
-    context = canvas.getContext('2d')
-    imageData = context.getImageData 0, 0, canvas.width, canvas.height
-    pixelData = imageData.data
-
-    pixelData[i] = pxl for pxl, i in @image.toCanvasPixels()
-
-    context.putImageData imageData, 0, 0
+    @parseImageData() unless @image
+    @image.toCanvas canvas, width, height
 
   toImage: ->
-    canvas = document.createElement 'canvas'
-    @toCanvas canvas
-    canvas.toDataURL "image/png"
+    @parseImageData() unless @image
+    @image.toImage()

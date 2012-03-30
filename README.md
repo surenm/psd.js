@@ -16,6 +16,18 @@ The PSD file format is complex, buggy, hacky, and poorly documented. Because of 
 
 If you would like to contribute to psd.js, you can refer to the [official PSD file format specifications](http://www.adobe.com/devnet-apps/photoshop/fileformatashtml/) for help.
 
+### Installing Development Dependencies
+
+These dependencies are only required if you are making changes to the psd.js source. If you are simply using psd.js, there is no need to install them.
+
+In the psd.js folder, run:
+
+```
+npm install -d
+```
+
+And all of the dependencies will be installed for you automatically using npm.
+
 ### Building psd.js
 
 psd.js comes with a handy Cakefile to build the library for you. It first searches for all dependencies in the `deps/` folder, then adds the core library afterwards in the order speciifed in the Cakefile.

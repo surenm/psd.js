@@ -7,55 +7,22 @@ class PSDImage
     2: 'ZIP'
     3: 'ZIPPrediction'
 
-  MIN_TEMP_CHANNEL_LENGTH = 12288
+  constructor: (@file, @header) ->
+    @numPixels = @getImageWidth() * @getImageHeight()
 
-  constructor: (@file, @header, @layer = null) ->
-    @width = @header.cols
-    @height = @header.rows
-    @numPixels = @width * @height
-
-    @length = switch @header.depth
-      when 1 then (@width + 7) / 8 * @height
-      when 16 then @width * @height * 2
-      else @width * @height
+    @length = switch @getImageDepth()
+      when 1 then (@getImageWidth() + 7) / 8 * @getImageHeight()
+      when 16 then @getImageWidth() * @getImageHeight() * 2
+      else @getImageWidth() * @getImageHeight()
 
     @channelLength = @length # in bytes
-    @length *= @header.channels
+    @length *= @getImageChannels()
 
-    if @layer and not @layer.isFolder
-      maskChannelLength = switch @header.depth
-        when 8 then @layer.mask.width * @layer.mask.height
-        when 16 then @layer.mask.width * @layer.mask.height * 2
-        else 0
-
-      maskPixels = @layer.mask.width * @layer.mask.height
-      maskPixels *= 2 if @header.depth is 16
-      @maxChannelLength = Math.max maskChannelLength, @channelLength
-
-      if @maxChannelLength <= 0
-        for i in [0...@header.channels]
-          @file.seek @layer.channelsInfo[i].length
-
-        return # No data?
+    @channelData = []
+    @channelData.push 0 for x in [0...@length]
 
     @startPos = @file.tell()
     @endPos = @startPos + @length
-
-    @channelData = []
-
-    if @layer
-      for i in [0...@header.channels]
-        compression = @file.readShortInt()
-        @layer.channelsInfo[i].compression = compression
-
-        length = @layer.channelsInfo[i].length - 2
-        length = Math.max length, MIN_TEMP_CHANNEL_LENGTH
-
-        @layer.channelsInfo[i].data = @file.read(length)
-    else
-      @compression = @file.readShortInt()
-
-    @channelData.push 0 for x in [0...@length]
 
     @pixelData =
       r: []
@@ -64,114 +31,102 @@ class PSDImage
       a: []
 
   parse: ->
-    return @parseLayerChannels() if @layer
+    @compression = @parseCompression()
 
     # ZIP compression isn't implemented yet. Luckily this is pretty rare. Still,
     # it's a TODO.
-    Log.debug "Image compression: id=#{@compression}, name=#{COMPRESSIONS[@compression]}"
-    Log.debug "Image size: #{@length} (#{@width}x#{@height})"
-
-    args = Array::slice.call(arguments)
+    Log.debug "Image size: #{@length} (#{@getImageWidth()}x#{@getImageHeight()})"
 
     if @compression in [2, 3]
       unless PSD.ZIP_ENABLED
         Log.debug "ZIP library not included, skipping."
         return @file.seek @endPos, false
 
-      args.unshift(@compression is 3)
+    @parseImageData()
+
+  parseCompression: -> @file.readShortInt()
+
+  parseImageData: ->
+    Log.debug "Image compression: id=#{@compression}, name=#{COMPRESSIONS[@compression]}"
 
     switch @compression
-      when 0 then @parseRaw.apply @, args
-      when 1 then @parseRLE.apply @, args
-      when 2, 3 then @parseZip.apply @, args
+      when 0 then @parseRaw()
+      when 1 then @parseRLE()
+      when 2, 3 then @parseZip()
       else
         Log.debug "Unknown image compression. Attempting to skip."
-        @file.seek @endPos, false
+        return @file.seek @endPos, false
 
-  parseLayerChannels: ->
-    for i in [0...@header.channels]
-      channel = @layer.channelsInfo[i]
-
-      switch channel.compression
-        when 0
-          if channel.id is -2
-            @parseRaw.call @, channel.length
-          else
-            @parseRaw.call @, @channelLength
-        when 1 then @parseRLE.call @, new PSDFile(channel.data), channel
+    @processImageData()
 
   # Parse the image data as raw pixel values. There is no compression used here.
   parseRaw: (length = @length) ->
     Log.debug "Attempting to parse RAW encoded image..."
     @channelData.push @file.read(1)[0] for i in [0...length]
 
-    @processImageData()
-
   # Parse the image with RLE compression. This is the same as the TIFF standard format.
   # Contains the scanline byte lengths first, then the actual encoded image data.
-  parseRLE: (file = @file, channelInfo = null) ->
+  parseRLE: ->
     Log.debug "Attempting to parse RLE encoded image..."
 
-    if channelInfo
-      if channelInfo.id is -2
-        height = @layer.mask.height
-      else
-        height = @layer.rows
-    else
-      height = @height
-
     # RLE stores the scan line byte counts in the first chunk of data
+    @byteCounts = @getByteCounts()
+
+    Log.debug "Read byte counts. Current pos = #{@file.tell()}, Pixels = #{@length}"
+
+    @parseChannelData()
+
+  # Get the height of the image. This varies depending on whether we're parsing layer
+  # channel data or not.
+  getImageHeight: -> @header.rows
+  getImageWidth: -> @header.cols
+  getImageChannels: -> @header.channels
+  getImageDepth: -> @header.depth
+
+  getByteCounts: ->
     byteCounts = []
+    for i in [0...@getImageChannels()]
+      for j in [0...@getImageHeight()]
+        byteCounts.push @file.readShortInt()
 
-    if channelInfo
-      for j in [0...height]
-        byteCounts.push file.readShortInt()
-    else
-      for i in [0...@header.channels]
-        for j in [0...height]
-          byteCounts.push file.readShortInt()
+    byteCounts
 
-    Log.debug "Read byte counts. Current pos = #{file.tell()}, Pixels = #{@length}"
-
+  parseChannelData: ->
     # And then it stores the compressed image data
     chanPos = 0
     lineIndex = 0
 
-    parseChannel = =>
-      for j in [0...height]
-        byteCount = byteCounts[lineIndex++]
-        start = file.tell()
+    for i in [0...@getImageChannels()] # i = plane num
+      Log.debug "Parsing channel ##{i}, Start = #{@file.tell()}"
+      [chanPos, lineIndex] = @decodeRLEChannel(chanPos, lineIndex)
 
-        while file.tell() < start + byteCount
-          [len] = file.read(1)
+  decodeRLEChannel: (chanPos, lineIndex) ->
+    for j in [0...@getImageHeight()]
+      byteCount = @byteCounts[lineIndex++]
+      start = @file.tell()
 
-          if len < 128
-            len++
-            data = file.read len
+      while @file.tell() < start + byteCount
+        [len] = @file.read(1)
 
-            # memcpy!
-            @channelData[chanPos...chanPos+len] = data
-            chanPos += len
-          else if len > 128
-            len ^= 0xff
-            len += 2
+        if len < 128
+          len++
+          data = @file.read len
 
-            [val] = file.read(1)
-            data = []
-            data.push val for z in [0...len]
+          # memcpy!
+          @channelData[chanPos...chanPos+len] = data
+          chanPos += len
+        else if len > 128
+          len ^= 0xff
+          len += 2
 
-            @channelData[chanPos...chanPos+len] = data
-            chanPos += len
+          [val] = @file.read(1)
+          data = []
+          data.push val for z in [0...len]
 
-    if channelInfo
-      Log.debug "Parsing layer channel..."
-      parseChannel()
-    else
-      for i in [0...@header.channels] # i = plane num
-        Log.debug "Parsing channel ##{i}, Start = #{file.tell()}"
-        parseChannel()
+          @channelData[chanPos...chanPos+len] = data
+          chanPos += len
 
-    @processImageData()
+    [chanPos, lineIndex]
 
   parseZip: (prediction = false) ->
     #stream = inflater.append @file.read(@length)
@@ -184,18 +139,20 @@ class PSDImage
   # values to RGB so they're easier to work with and can be easily output to either
   # browser or file.
   processImageData: ->
+    Log.debug "Processing parsed image data. #{@channelData.length} pixels read."
+
     switch @header.mode
       when 1 # Greyscale
-        @combineGreyscale8Channel() if @header.depth is 8
-        @combineGreyscale16Channel() if @header.depth is 16
+        @combineGreyscale8Channel() if @getImageDepth() is 8
+        @combineGreyscale16Channel() if @getImageDepth() is 16
       when 3 # RGBColor
-        @combineRGB8Channel() if @header.depth is 8
-        @combineRGB16Channel() if @header.depth is 16
+        @combineRGB8Channel() if @getImageDepth() is 8
+        @combineRGB16Channel() if @getImageDepth() is 16
       when 4 #CMKYColor
         @combineCMYK8Channel()
 
   combineGreyscale8Channel: ->
-    if @header.channels is 2
+    if @getImageChannels() is 2
       # Has alpha channel
       for i in [0...@numPixels]
         alpha = @channelData[i]
@@ -213,7 +170,7 @@ class PSDImage
         @pixelData.a[i] = 255
 
   combineGreyscale16Channel: ->
-    if @header.channels is 2
+    if @getImageChannels() is 2
       # Has alpha channel
       for i in [0...@numPixels]
         alpha = @channelData[i] >> 8
@@ -235,14 +192,14 @@ class PSDImage
       @pixelData.r[i] = @channelData[i]
       @pixelData.g[i] = @channelData[i + @channelLength]
       @pixelData.b[i] = @channelData[i + (@channelLength * 2)]
-      @pixelData.a[i] = @channelData[i + (@channelLength * 3)] if @header.channels is 4
+      @pixelData.a[i] = @channelData[i + (@channelLength * 3)] if @getImageChannels() is 4
 
   combineRGB16Channel: ->
     for i in [0...@numPixels]
       @pixelData.r[i] = @channelData[i] >> 8
       @pixelData.g[i] = @channelData[i + @channelLength] >> 8
       @pixelData.b[i] = @channelData[i + (@channelLength * 2)] >> 8
-      @pixelData.a[i] = @channelData[i + (@channelLength * 3)] >> 8 if @header.channels is 4
+      @pixelData.a[i] = @channelData[i + (@channelLength * 3)] >> 8 if @getImageChannels() is 4
 
   combineCMYK8Channel: ->
     for i in [0...@numPixels]
@@ -256,7 +213,7 @@ class PSDImage
       @pixelData.g[i] = rgb.g
       @pixelData.b[i] = rgb.b
 
-      if @header.channels is 5
+      if @getImageChannels() is 5
         @pixelData.a[i] = @channelData[i + @channelData * 4]
       else
         @pixelData.a[i] = 255
@@ -285,3 +242,40 @@ class PSDImage
         alpha)
 
     result
+
+  toFile: (filename, cb = ->) ->
+    try
+      Canvas = require 'canvas'
+    catch e
+      throw "Exporting PSDs to file requires the canvas library"
+
+    Image = Canvas.Image
+
+    canvas = new Canvas(@header.cols, @header.rows)
+    context = canvas.getContext('2d')
+    imageData = context.getImageData 0, 0, canvas.width, canvas.height
+    pixelData = imageData.data
+
+    pixelData[i] = pxl for pxl, i in @toCanvasPixels()
+
+    context.putImageData imageData, 0, 0
+
+    fs.writeFile filename, canvas.toBuffer(), cb
+
+  toCanvas: (canvas, width = null, height = null) ->
+    if width is null and height is null
+      canvas.width = @header.cols
+      canvas.height = @header.rows
+
+    context = canvas.getContext('2d')
+    imageData = context.getImageData 0, 0, canvas.width, canvas.height
+    pixelData = imageData.data
+
+    pixelData[i] = pxl for pxl, i in @toCanvasPixels()
+
+    context.putImageData imageData, 0, 0
+
+  toImage: ->
+    canvas = document.createElement 'canvas'
+    @toCanvas canvas
+    canvas.toDataURL "image/png"

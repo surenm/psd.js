@@ -69,7 +69,7 @@ class PSDLayer
   ]
 
   constructor: (@file, @header = null) ->
-    @images = []
+    @image = null
     @mask = {}
     @blendingRanges = {}
     @effects = []

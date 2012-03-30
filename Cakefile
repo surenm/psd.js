@@ -1,5 +1,5 @@
 fs      = require 'fs'
-{exec}  = require 'child_process'
+{exec, spawn}  = require 'child_process'
 util    = require 'util'
 {jsmin} = require 'jsmin'
 
@@ -25,6 +25,7 @@ coffeeFiles   = [
   "psdfile"
   "psdheader"
   "psdimage"
+  "psdchannelimage"
   "psdlayer"
   "psdlayermask"
   "psdlayereffect"
@@ -48,10 +49,22 @@ finishListener = (type, cb) ->
 Options
 ###
 option '-z', '--with-zip', 'Include ZIP decompression library'
+option '-f', '--file [FILE]', 'Test file to load (for debugging)'
 
 ###
 Tasks
 ###
+task 'debug', 'Run psd.js in debug mode with node-inspector', (opts) ->
+  throw "Must specify a file with -f" if not opts.file
+
+  debug = spawn 'coffee', ['--nodejs', '--debug-brk', opts.file]
+  debug.stdout.on 'data', (data) -> console.log data
+
+  insp = spawn 'node-inspector'
+  insp.stdout.on 'data', (data) -> util.log data
+
+  exec 'open http://127.0.0.1:8080/debug?port=5858'
+
 task 'docs', 'Generates documentation for the coffee files', ->
   util.log 'Invoking docco on the CoffeeScript source files'
   

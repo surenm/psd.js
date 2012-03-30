@@ -57,35 +57,37 @@ class PSDLayerMask
           @layers.push layer
 
         for layer in @layers
-          layer.image = new PSDImage(@file, @header, layer)
+          layer.image = new PSDChannelImage(@file, @header, layer)
           layer.image.parse()
 
         # TODO : layers.reverse()
 
+    # Parse the global layer mask
+    @parseGlobalMask()
+
     # Temporarily skip the rest of layers & masks section
     @file.seek endLoc, false
     return
-
-    # Parse the global layer mask
-    @parseGlobalMask()
 
     # We have more additional info to parse, especially beacuse this is PS >= 4.0
     @parseExtraInfo(endLoc) if @file.tell() < endLoc
 
   parseGlobalMask: ->
     length = @file.readInt()
+    return if length is 0
+
     end = @file.tell() + length
 
     Log.debug "Global mask length: #{length}"
 
-    # This is undocumented, so we just read the bytes and store them for now
-    @globalMask.overlayColorSpace = @file.read(2)
+    @globalMask.overlayColorSpace = @file.readShortInt()
 
-    # This isn't well documented either. We know its 4 * 2 byte color components
-    # of some kind though.
-    @globalMask.colorComponents = @file.readf ">HHHH"
+    # TODO: parse color space components into actual color.
+    @globalMask.colorComponents = []
+    for i in [0...4]
+      @globalMask.colorComponents.push(@file.readShortInt() >> 8)
 
-    @globalMask.opacity = @file.readShortUInt()
+    @globalMask.opacity = @file.readShortInt()
 
     # 0 = color selected; 1 = color protected; 128 = use value per layer
     @globalMask.kind = @file.read(1)[0]

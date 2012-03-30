@@ -11,16 +11,7 @@ psd.parse()
 
 for layer in psd.layers
   continue if layer.isFolder
-  
-  canvas = new Canvas(layer.cols, layer.rows)
-  context = canvas.getContext('2d')
-  imageData = context.getImageData 0, 0, canvas.width, canvas.height
-  pixelData = imageData.data
 
-  pixelData[i] = pxl for pxl, i in layer.image.toCanvasPixels()
-
-  context.putImageData imageData, 0, 0
-
-  do (layer, canvas) ->
-    fs.writeFile "output/#{layer.name}.png", canvas.toBuffer(), ->
-      console.log "Export #{layer.name} to disk"
+  do (layer) -> 
+    layer.image.toFile __dirname + "/output/#{layer.name}.png", ->
+      console.log "Layer #{layer.name} output to file."
