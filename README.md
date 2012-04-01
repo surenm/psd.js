@@ -14,7 +14,7 @@ The PSD file format is complex, buggy, hacky, and poorly documented. Because of 
 
 ## Contributing
 
-If you would like to contribute to psd.js, you can refer to the [official PSD file format specifications](http://www.adobe.com/devnet-apps/photoshop/fileformatashtml/) for help.
+If you would like to contribute to psd.js, you can refer to the [official PSD file format specifications](http://www.adobe.com/devnet-apps/photoshop/fileformatashtml/) for basic help.
 
 ### Installing Development Dependencies
 
@@ -69,12 +69,23 @@ console.log "Resources", psd.resources
 console.log "Layers", psd.layers
 ```
 
-### Exporting Merged Image Data
+### Setting Options
 
-You can also easily export a merged/flattened version of the PSD image either to file (NodeJS) or canvas (browser).
+**By default, psd.js will parse and format individual layer image data.** If you're working with large files, you will probably want to disable this for the time being as you may find your node.js process running out of memory for allocation.
 
 ``` coffeescript
-{PSD} = require __dirname + '/../lib/psd.js'
+psd = PSD.fromFile __dirname + '/test.psd'
+psd.setOptions layerImages: false
+
+psd.parse()
+```
+
+### Exporting Merged Image Data
+
+You can easily export a merged/flattened version of the PSD image either to file (NodeJS) or canvas (browser).
+
+``` coffeescript
+{PSD} = require 'psd.js'
 
 psd = PSD.fromFile __dirname + '/test.psd'
 
@@ -88,4 +99,20 @@ psd.toCanvas(canvas)
 
 # Get raw pixel data
 pixels = canvas.image.toCanvasPixels()
+```
+
+To export individual layers, access the image object for each layer:
+
+``` coffeescript
+{PSD} = require 'psd.js'
+
+psd = PSD.fromFile __dirname + '/test.psd'
+psd.parse()
+
+for layer in psd.layers
+  continue if layer.isFolder
+
+  do (layer) ->
+    layer.image.toFile __dirname + "/output/#{layer.name}.png", ->
+      console.log "Layer #{layer.name} output to file."
 ```
