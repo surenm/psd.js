@@ -2,6 +2,7 @@ class PSDChannelImage extends PSDImage
   constructor: (file, header, @layer) ->
     @width = @layer.cols
     @height = @layer.rows
+    @channelsInfo = @layer.channelsInfo
 
     super file, header
 
@@ -17,12 +18,13 @@ class PSDChannelImage extends PSDImage
     byteCounts
 
   parse: ->
-    Log.debug "Image size: #{@length} (#{@getImageWidth()}x#{@getImageHeight()})"
+    Log.debug "\nLayer: #{@layer.name}, image size: #{@length} (#{@getImageWidth()}x#{@getImageHeight()})"
     
     @chanPos = 0
 
     for i in [0...@getImageChannels()]
       @chInfo = @layer.channelsInfo[i]
+
       if @chInfo.length <= 0
         @parseCompression()
         continue
@@ -34,15 +36,28 @@ class PSDChannelImage extends PSDImage
         @width = @layer.cols
         @height = @layer.rows
 
+      start = @file.tell()
+
       Log.debug "Channel ##{@chInfo.id}: length=#{@chInfo.length}"
       @parseImageData()
 
+      end = @file.tell()
+
+      if end isnt start + @chInfo.length
+        Log.debug "ERROR: read incorrect number of bytes for channel ##{@chInfo.id}. 
+        Expected = #{start + @chInfo.length}, Actual: #{end}"
+        @file.seek start + @chInfo.length, false
+
     if @channelData.length isnt @length
-      Log.debug "ERROR: #{@channelData.length} pixels read; expected #{@length}"
+      Log.debug "ERROR: #{@channelData.length} read; expected #{@length}"
 
     @processImageData()
 
-  parseRaw: (length = @channelLength) -> super length
+  parseRaw: ->
+    Log.debug "Attempting to parse RAW encoded channel..."
+    data = @file.read(@chInfo.length - 2)
+    @channelData[@chanPos...@chanPos+@chInfo.length - 2] = data
+    @chanPos += @chInfo.length - 2
 
   parseImageData: ->
     @compression = @parseCompression()
@@ -57,6 +72,8 @@ class PSDChannelImage extends PSDImage
 
   parseChannelData: ->
     lineIndex = 0
-
+    chanPos = @chanPos
+    
     Log.debug "Parsing layer channel ##{@chInfo.id}, Start = #{@file.tell()}"
-    [@chanPos, lineIndex] = @decodeRLEChannel(@chanPos, lineIndex)
+    [chanPos, lineIndex] = @decodeRLEChannel(@chanPos, lineIndex)
+    @chanPos = chanPos

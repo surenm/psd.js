@@ -7,6 +7,13 @@ class PSDImage
     2: 'ZIP'
     3: 'ZIPPrediction'
 
+  channelsInfo: [
+    {id: 0},
+    {id: 1},
+    {id: 2},
+    {id: -1}
+  ]
+
   constructor: (@file, @header) ->
     @numPixels = @getImageWidth() * @getImageHeight()
 
@@ -62,6 +69,7 @@ class PSDImage
   # Parse the image data as raw pixel values. There is no compression used here.
   parseRaw: (length = @length) ->
     Log.debug "Attempting to parse RAW encoded image..."
+    @channelData = []
     @channelData.push @file.read(1)[0] for i in [0...length]
 
   # Parse the image with RLE compression. This is the same as the TIFF standard format.
@@ -189,10 +197,18 @@ class PSDImage
 
   combineRGB8Channel: ->
     for i in [0...@numPixels]
-      @pixelData.r[i] = @channelData[i]
-      @pixelData.g[i] = @channelData[i + @channelLength]
-      @pixelData.b[i] = @channelData[i + (@channelLength * 2)]
-      @pixelData.a[i] = @channelData[i + (@channelLength * 3)] if @getImageChannels() is 4
+      index = 0
+      for chan in @channelsInfo
+        switch chan.id
+          when -1
+            if @getImageChannels() is 4
+              @pixelData.a[i] = @channelData[i + (@channelLength * index)]
+          when 0 then @pixelData.r[i] = @channelData[i + (@channelLength * index)]
+          when 1 then @pixelData.g[i] = @channelData[i + (@channelLength * index)]
+          when 2 then @pixelData.b[i] = @channelData[i + (@channelLength * index)]
+
+        index++
+      
 
   combineRGB16Channel: ->
     for i in [0...@numPixels]
@@ -233,7 +249,7 @@ class PSDImage
   toCanvasPixels: ->
     result = []
     
-    for i in [0...@pixelData.r.length]
+    for i in [0...@numPixels]
       alpha = @pixelData.a[i]; alpha ?= 255
       result.push(
         @pixelData.r[i], 
@@ -251,7 +267,7 @@ class PSDImage
 
     Image = Canvas.Image
 
-    canvas = new Canvas(@header.cols, @header.rows)
+    canvas = new Canvas(@getImageWidth(), @getImageHeight())
     context = canvas.getContext('2d')
     imageData = context.getImageData 0, 0, canvas.width, canvas.height
     pixelData = imageData.data
@@ -264,8 +280,8 @@ class PSDImage
 
   toCanvas: (canvas, width = null, height = null) ->
     if width is null and height is null
-      canvas.width = @header.cols
-      canvas.height = @header.rows
+      canvas.width = @getImageWidth()
+      canvas.height = @getImageHeight()
 
     context = canvas.getContext('2d')
     imageData = context.getImageData 0, 0, canvas.width, canvas.height
