@@ -47,6 +47,10 @@ it's a TODO.</p>             </td>             <td class="code">               <
 
     <span class="nx">@parseImageData</span><span class="p">()</span>
 
+  <span class="nv">skip: </span><span class="o">-&gt;</span>
+    <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Skipping image data&quot;</span>
+    <span class="nx">@file</span><span class="p">.</span><span class="nx">seek</span> <span class="nx">@length</span>
+
   <span class="nv">parseCompression: </span><span class="o">-&gt;</span> <span class="nx">@file</span><span class="p">.</span><span class="nx">readShortInt</span><span class="p">()</span>
 
   <span class="nv">parseImageData: </span><span class="o">-&gt;</span>

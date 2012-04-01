@@ -70,6 +70,9 @@ Root.PSD = class PSD
       cb(psd)
 
     xhr.send null
+
+  options:
+    layerImages: true
   
   constructor: (data) ->
     # Store the main reference to our PSD file
@@ -81,6 +84,9 @@ Root.PSD = class PSD
     @layers = null
     @images = null
     @image = null
+
+  setOptions: (options) ->
+    @options[key] = val for own key, val of options
 
   # Attempt to parse all sections of the PSD file
   parse: ->
@@ -142,7 +148,7 @@ Root.PSD = class PSD
 
     Log.debug "\n### Layers & Masks ###"
 
-    @layerMask = new PSDLayerMask @file, @header
+    @layerMask = new PSDLayerMask @file, @header, @options
     @layers = @layerMask.layers
 
     if skip

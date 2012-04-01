@@ -6,7 +6,7 @@ Image = Canvas.Image
 
 PSD.DEBUG = true
 
-psd = PSD.fromFile __dirname + '/test.psd'
+psd = PSD.fromFile __dirname + '/test2.psd'
 psd.parse()
 
 for layer in psd.layers

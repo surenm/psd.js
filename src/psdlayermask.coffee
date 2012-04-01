@@ -1,5 +1,5 @@
 class PSDLayerMask
-  constructor: (@file, @header) ->
+  constructor: (@file, @header, @options) ->
     # Array to hold all of the layers
     @layers = []
 
@@ -58,7 +58,11 @@ class PSDLayerMask
 
         for layer in @layers
           layer.image = new PSDChannelImage(@file, @header, layer)
-          layer.image.parse()
+
+          if @options.layerImages
+            layer.image.parse()
+          else
+            layer.image.skip()
 
         # TODO : layers.reverse()
 

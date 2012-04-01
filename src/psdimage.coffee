@@ -51,6 +51,10 @@ class PSDImage
 
     @parseImageData()
 
+  skip: ->
+    Log.debug "Skipping image data"
+    @file.seek @length
+
   parseCompression: -> @file.readShortInt()
 
   parseImageData: ->

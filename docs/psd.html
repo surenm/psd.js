@@ -49,6 +49,9 @@ to conver the buffer into a byte array.</p>             </td>             <td cl
       <span class="nx">cb</span><span class="p">(</span><span class="nx">psd</span><span class="p">)</span>
 
     <span class="nx">xhr</span><span class="p">.</span><span class="nx">send</span> <span class="kc">null</span>
+
+  <span class="nv">options:</span>
+    <span class="nv">layerImages: </span><span class="kc">true</span>
   
   <span class="nv">constructor: </span><span class="nf">(data) -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <p>Store the main reference to our PSD file</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="vi">@file = </span><span class="k">new</span> <span class="nx">PSDFile</span> <span class="nx">data</span>
 
@@ -57,7 +60,10 @@ to conver the buffer into a byte array.</p>             </td>             <td cl
     <span class="vi">@layerMask = </span><span class="kc">null</span>
     <span class="vi">@layers = </span><span class="kc">null</span>
     <span class="vi">@images = </span><span class="kc">null</span>
-    <span class="vi">@image = </span><span class="kc">null</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <p>Attempt to parse all sections of the PSD file</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">parse: </span><span class="o">-&gt;</span>
+    <span class="vi">@image = </span><span class="kc">null</span>
+
+  <span class="nv">setOptions: </span><span class="nf">(options) -&gt;</span>
+    <span class="nx">@options</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">val</span> <span class="k">for</span> <span class="nx">own</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">val</span> <span class="k">of</span> <span class="nx">options</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <p>Attempt to parse all sections of the PSD file</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">parse: </span><span class="o">-&gt;</span>
     <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Beginning parsing&quot;</span>
     <span class="vi">@startTime = </span><span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">()).</span><span class="nx">getTime</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <p>It's important to parse all of the file sections in the correct order,
 which is used here.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">@parseHeader</span><span class="p">()</span>
@@ -95,7 +101,7 @@ incorrectly in one of the resources, or the file is corrupt.</p>             </t
 
     <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;\n### Layers &amp; Masks ###&quot;</span>
 
-    <span class="vi">@layerMask = </span><span class="k">new</span> <span class="nx">PSDLayerMask</span> <span class="nx">@file</span><span class="p">,</span> <span class="nx">@header</span>
+    <span class="vi">@layerMask = </span><span class="k">new</span> <span class="nx">PSDLayerMask</span> <span class="nx">@file</span><span class="p">,</span> <span class="nx">@header</span><span class="p">,</span> <span class="nx">@options</span>
     <span class="vi">@layers = </span><span class="nx">@layerMask</span><span class="p">.</span><span class="nx">layers</span>
 
     <span class="k">if</span> <span class="nx">skip</span>
