@@ -71,11 +71,13 @@ console.log "Layers", psd.layers
 
 ### Setting Options
 
-**By default, psd.js will parse and format individual layer image data.** If you're working with large files, you will probably want to disable this for the time being as you may find your node.js process running out of memory for allocation.
+**By default, psd.js will not parse/format individual layer image data.** If you're working with large files, you will probably want to leave this disabled this for the time being as you may find your node.js process running out of memory for allocation.
+
+To enable layer image parsing, do:
 
 ``` coffeescript
 psd = PSD.fromFile __dirname + '/test.psd'
-psd.setOptions layerImages: false
+psd.setOptions layerImages: true
 
 psd.parse()
 ```

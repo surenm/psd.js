@@ -72,7 +72,7 @@ Root.PSD = class PSD
     xhr.send null
 
   options:
-    layerImages: true
+    layerImages: false
   
   constructor: (data) ->
     # Store the main reference to our PSD file
