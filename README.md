@@ -119,6 +119,7 @@ To export individual layers, access the image object for each layer:
 {PSD} = require 'psd.js'
 
 psd = PSD.fromFile __dirname + '/test.psd'
+psd.setOptions layerImages: true
 psd.parse()
 
 for layer in psd.layers
