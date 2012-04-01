@@ -38,6 +38,16 @@ To build, simply run `cake build`. If you would like the library to automaticall
 
 There are two main things you can do with psd.js: parse information and export images.
 
+### Installing
+
+psd.js is available in npm. Simply run:
+
+```
+npm install psd.js
+```
+
+Alternatively, download and use the `lib/psd.js` file from this repository.
+
 ### Loading a PSD
 
 In order to load a PSD into psd.js, you have to give it the byte data in a UInt8Array buffer. psd.js has some helper methods for you to make your life easier.
