@@ -25,8 +25,7 @@ class PSDImage
     @channelLength = @length # in bytes
     @length *= @getImageChannels()
 
-    @channelData = []
-    @channelData.push 0 for x in [0...@length]
+    @channelData = new Uint8Array(@length)
 
     @startPos = @file.tell()
     @endPos = @startPos + @length
@@ -162,6 +161,9 @@ class PSDImage
         @combineRGB16Channel() if @getImageDepth() is 16
       when 4 #CMKYColor
         @combineCMYK8Channel()
+
+    # Manually delete channel data to free up memory
+    delete @channelData
 
   combineGreyscale8Channel: ->
     if @getImageChannels() is 2

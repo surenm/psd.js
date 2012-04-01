@@ -57,6 +57,7 @@ class PSDLayerMask
           @layers.push layer
 
         for layer in @layers
+          continue if layer.isFolder
           layer.image = new PSDChannelImage(@file, @header, layer)
 
           if @options.layerImages

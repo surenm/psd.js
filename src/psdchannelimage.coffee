@@ -68,6 +68,11 @@ class PSDChannelImage extends PSDImage
 
     @processImageData()
 
+    memusage = process.memoryUsage()
+    used = Math.round memusage.heapUsed / 1024 / 1024
+    total = Math.round memusage.heapTotal / 1024 / 1024
+    Log.debug "\nMemory usage: #{used}MB / #{total}MB\n"
+
   # Since we're parsing on a per-channel basis, we need to modify the behavior
   # of the RAW encoding parser a bit. This version is aware of the current
   # channel data position, since layers that have RAW encoding often use RLE
