@@ -6,5 +6,9 @@ Image = Canvas.Image
 
 psd = PSD.fromFile __dirname + '/test.psd'
 
+start = (new Date()).getTime()
+
 psd.toFile __dirname + '/output.png', ->
-  console.log "PSD flattened to output.png"
+  end = (new Date()).getTime()
+
+  console.log "PSD flattened to output.png in #{end - start}ms"
