@@ -30,11 +30,7 @@ class PSDImage
     @startPos = @file.tell()
     @endPos = @startPos + @length
 
-    @pixelData =
-      r: []
-      g: []
-      b: []
-      a: []
+    @pixelData = []
 
   parse: ->
     @compression = @parseCompression()
@@ -172,16 +168,10 @@ class PSDImage
         alpha = @channelData[i]
         grey = @channelData[@channelLength + i]
 
-        @pixelData.r[i] = grey
-        @pixelData.g[i] = grey
-        @pixelData.b[i] = grey
-        @pixelData.a[i] = alpha
+        @pixelData.push grey, grey, grey, alpha
     else
       for i in [0...@numPixels]
-        @pixelData.r[i] = @channelData[i]
-        @pixelData.g[i] = @channelData[i]
-        @pixelData.b[i] = @channelData[i]
-        @pixelData.a[i] = 255
+        @pixelData.push @channelData[i], @channelData[i], @channelData[i], 255
 
   combineGreyscale16Channel: ->
     if @getImageChannels() is 2
@@ -190,38 +180,47 @@ class PSDImage
         alpha = @channelData[i] >> 8
         grey = @channelData[@channelLength + i] >> 8
 
-        @pixelData.r[i] = grey
-        @pixelData.g[i] = grey
-        @pixelData.b[i] = grey
-        @pixelData.a[i] = alpha
+        @pixelData.push grey, grey, grey, alpha
     else
       for i in [0...@numPixels]
-        @pixelData.r[i] = @channelData[i]
-        @pixelData.g[i] = @channelData[i]
-        @pixelData.b[i] = @channelData[i]
-        @pixelData.a[i] = 255
+        @pixelData.push @channelData[i], @channelData[i], @channelData[i], 255
 
   combineRGB8Channel: ->
     for i in [0...@numPixels]
       index = 0
+      pixel = r: 0, g: 0, b: 0, a: 255
+
       for chan in @channelsInfo
         switch chan.id
           when -1
             if @getImageChannels() is 4
-              @pixelData.a[i] = @channelData[i + (@channelLength * index)]
-          when 0 then @pixelData.r[i] = @channelData[i + (@channelLength * index)]
-          when 1 then @pixelData.g[i] = @channelData[i + (@channelLength * index)]
-          when 2 then @pixelData.b[i] = @channelData[i + (@channelLength * index)]
+              pixel.a = @channelData[i + (@channelLength * index)]
+          when 0 then pixel.r = @channelData[i + (@channelLength * index)]
+          when 1 then pixel.g = @channelData[i + (@channelLength * index)]
+          when 2 then pixel.b = @channelData[i + (@channelLength * index)]
 
         index++
+
+      @pixelData.push pixel.r, pixel.g, pixel.b, pixel.a
       
 
   combineRGB16Channel: ->
     for i in [0...@numPixels]
-      @pixelData.r[i] = @channelData[i] >> 8
-      @pixelData.g[i] = @channelData[i + @channelLength] >> 8
-      @pixelData.b[i] = @channelData[i + (@channelLength * 2)] >> 8
-      @pixelData.a[i] = @channelData[i + (@channelLength * 3)] >> 8 if @getImageChannels() is 4
+      index = 0
+      pixel = r: 0, g: 0, b: 0, a: 255
+
+      for chan in @channelsInfo
+        switch chan.id
+          when -1
+            if @getImageChannels() is 4
+              pixel.a = @channelData[i + (@channelLength * index)] >> 8
+          when 0 then pixel.r = @channelData[i + (@channelLength * index)] >> 8
+          when 1 then pixel.g = @channelData[i + (@channelLength * index)] >> 8
+          when 2 then pixel.b = @channelData[i + (@channelLength * index)] >> 8
+
+        index++
+
+      @pixelData.push pixel.r, pixel.g, pixel.b, pixel.a
 
   combineCMYK8Channel: ->
     for i in [0...@numPixels]
@@ -231,14 +230,13 @@ class PSDImage
       k = @channelData[i + @channelLength * 3]
 
       rgb = PSDColor.cmykToRGB(c, m, y, k)
-      @pixelData.r[i] = rgb.r
-      @pixelData.g[i] = rgb.g
-      @pixelData.b[i] = rgb.b
+
+      @pixelData.push rgb.r, rgb.g, rgb.b
 
       if @getImageChannels() is 5
-        @pixelData.a[i] = @channelData[i + @channelData * 4]
+        @pixelData.push @channelData[i + @channelData * 4]
       else
-        @pixelData.a[i] = 255
+        @pixelData.push 255
 
       
   # Normally, the pixel data is stored in planar order, meaning all the red
@@ -252,18 +250,7 @@ class PSDImage
   # green, blue, and alpha values, respectively.
   #
   # This means a pure-red single pixel is expressed as: `[255, 0, 0, 255]`
-  toCanvasPixels: ->
-    result = []
-    
-    for i in [0...@numPixels]
-      alpha = @pixelData.a[i]; alpha ?= 255
-      result.push(
-        @pixelData.r[i], 
-        @pixelData.g[i], 
-        @pixelData.b[i], 
-        alpha)
-
-    result
+  toCanvasPixels: -> @pixelData
 
   toFile: (filename, cb = ->) ->
     try
