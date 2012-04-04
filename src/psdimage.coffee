@@ -71,6 +71,8 @@ class PSDImage
     @channelData = []
     @channelData.push @file.read(1)[0] for i in [0...length]
 
+    return true
+
   # Parse the image with RLE compression. This is the same as the TIFF standard format.
   # Contains the scanline byte lengths first, then the actual encoded image data.
   parseRLE: ->
@@ -106,6 +108,8 @@ class PSDImage
     for i in [0...@getImageChannels()] # i = plane num
       Log.debug "Parsing channel ##{i}, Start = #{@file.tell()}"
       [chanPos, lineIndex] = @decodeRLEChannel(chanPos, lineIndex)
+
+    return true
 
   decodeRLEChannel: (chanPos, lineIndex) ->
     for j in [0...@getImageHeight()]

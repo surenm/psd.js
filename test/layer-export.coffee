@@ -6,12 +6,13 @@ Image = Canvas.Image
 
 PSD.DEBUG = true
 
-psd = PSD.fromFile __dirname + '/test.psd'
+psd = PSD.fromFile __dirname + '/test2.psd'
 psd.setOptions layerImages: true
 psd.parse()
 
 for layer in psd.layers
   continue if layer.isFolder
 
-  layer.image.toFile __dirname + "/output/#{layer.name}.png", ->
-    console.log "Layer #{layer.name} output to file."
+  do (layer) ->
+    layer.image.toFile __dirname + "/output/#{layer.name}.png", ->
+      console.log "Layer #{layer.name} output to file."
