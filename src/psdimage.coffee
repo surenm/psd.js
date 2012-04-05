@@ -165,6 +165,11 @@ class PSDImage
     # Manually delete channel data to free up memory
     delete @channelData
 
+  getAlphaValue: (alpha = 255) ->
+    # Layer opacity
+    alpha = alpha * (@layer.blendMode.opacity / 255) if @layer?
+    alpha
+
   combineGreyscale8Channel: ->
     if @getImageChannels() is 2
       # Has alpha channel
@@ -172,10 +177,10 @@ class PSDImage
         alpha = @channelData[i]
         grey = @channelData[@channelLength + i]
 
-        @pixelData.push grey, grey, grey, alpha
+        @pixelData.push grey, grey, grey, @getAlphaValue(alpha)
     else
       for i in [0...@numPixels]
-        @pixelData.push @channelData[i], @channelData[i], @channelData[i], 255
+        @pixelData.push @channelData[i], @channelData[i], @channelData[i], @getAlphaValue()
 
   combineGreyscale16Channel: ->
     if @getImageChannels() is 2
@@ -184,10 +189,10 @@ class PSDImage
         alpha = @channelData[i] >> 8
         grey = @channelData[@channelLength + i] >> 8
 
-        @pixelData.push grey, grey, grey, alpha
+        @pixelData.push grey, grey, grey, @getAlphaValue(alpha)
     else
       for i in [0...@numPixels]
-        @pixelData.push @channelData[i], @channelData[i], @channelData[i], 255
+        @pixelData.push @channelData[i], @channelData[i], @channelData[i], @getAlphaValue()
 
   combineRGB8Channel: ->
     for i in [0...@numPixels]
@@ -205,7 +210,7 @@ class PSDImage
 
         index++
 
-      @pixelData.push pixel.r, pixel.g, pixel.b, pixel.a
+      @pixelData.push pixel.r, pixel.g, pixel.b, @getAlphaValue(pixel.a)
       
 
   combineRGB16Channel: ->
@@ -224,7 +229,7 @@ class PSDImage
 
         index++
 
-      @pixelData.push pixel.r, pixel.g, pixel.b, pixel.a
+      @pixelData.push pixel.r, pixel.g, pixel.b, @getAlphaValue(pixel.a)
 
   combineCMYK8Channel: ->
     for i in [0...@numPixels]
@@ -238,9 +243,9 @@ class PSDImage
       @pixelData.push rgb.r, rgb.g, rgb.b
 
       if @getImageChannels() is 5
-        @pixelData.push @channelData[i + @channelLength * 4]
+        @pixelData.push @getAlphaValue(@channelData[i + @channelLength * 4])
       else
-        @pixelData.push 255
+        @pixelData.push @getAlphaValue(255)
 
       
   # Normally, the pixel data is stored in planar order, meaning all the red

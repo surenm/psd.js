@@ -74,6 +74,18 @@ task 'docs', 'Generates documentation for the coffee files', ->
   exec "docco #{files.join(' ')}", (err, stdout, stderr) ->
     util.log err if err
     util.log "Documentation built into docs/ folder."
+
+task 'test', 'Run all unit tests', ->
+  try
+    reporter = require('nodeunit').reporters.default
+  catch e
+    console.log "Cannot find nodeunit module."
+    console.log "You can install nodeunit (and other dev tools) by running:"
+    console.log "\n\tnpm install -d"
+    return
+
+  process.chdir __dirname
+  reporter.run ['test']
         
 task 'watch', 'Automatically recompile the CoffeeScript files when updated', ->
   util.log "Watching for changes in #{csSrcDir}"
