@@ -238,7 +238,7 @@ class PSDImage
       @pixelData.push rgb.r, rgb.g, rgb.b
 
       if @getImageChannels() is 5
-        @pixelData.push @channelData[i + @channelData * 4]
+        @pixelData.push @channelData[i + @channelLength * 4]
       else
         @pixelData.push 255
 
