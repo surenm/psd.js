@@ -184,7 +184,7 @@ class PSDResource
 
     1041:
       name: 'ICC Untagged'
-      parse: -> [@disableProfile] = @file.readf ">B"
+      #parse: -> [@disableProfile] = @file.readf ">B"
 
     1042:
       name: 'Effects visible'

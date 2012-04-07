@@ -159,6 +159,9 @@ class PSDLayer
     if (flags & (0x01 << 3)) > 0
       @blendMode.pixelDataIrrelevant = (flags & (0x01 << 4)) > 0
 
+    @blendingMode = @blendMode.blender
+    @opacity = @blendMode.opacityPercentage
+
     Log.debug "Blending mode:", @blendMode
 
   parseMaskData: ->

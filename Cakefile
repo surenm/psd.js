@@ -76,16 +76,9 @@ task 'docs', 'Generates documentation for the coffee files', ->
     util.log "Documentation built into docs/ folder."
 
 task 'test', 'Run all unit tests', ->
-  try
-    reporter = require('nodeunit').reporters.default
-  catch e
-    console.log "Cannot find nodeunit module."
-    console.log "You can install nodeunit (and other dev tools) by running:"
-    console.log "\n\tnpm install -d"
-    return
-
-  process.chdir __dirname
-  reporter.run ['test']
+  {TargetPractice} = require './test/targetpractice'
+  tp = new TargetPractice "psd.tp/**/*.json"
+  tp.runTests()
         
 task 'watch', 'Automatically recompile the CoffeeScript files when updated', ->
   util.log "Watching for changes in #{csSrcDir}"

@@ -1,0 +1,6 @@
+[submodule "test/psd.tp"]
+	path = test/psd.tp
+	url = https://github.com/layervault/psd.tp.git
+[submodule "test/deps/png.js"]
+	path = test/deps/png.js
+	url = https://github.com/meltingice/png.js.git

@@ -204,6 +204,7 @@ class PSDImage
           when -1
             if @getImageChannels() is 4
               pixel.a = @channelData[i + (@channelLength * index)]
+            else continue
           when 0 then pixel.r = @channelData[i + (@channelLength * index)]
           when 1 then pixel.g = @channelData[i + (@channelLength * index)]
           when 2 then pixel.b = @channelData[i + (@channelLength * index)]
@@ -261,24 +262,24 @@ class PSDImage
   # This means a pure-red single pixel is expressed as: `[255, 0, 0, 255]`
   toCanvasPixels: -> @pixelData
 
-  toFile: (filename, cb = ->) ->
+  toFile: (filename) ->
     try
-      Canvas = require 'canvas'
+      {Png} = require 'png'
     catch e
-      throw "Exporting PSDs to file requires the canvas library"
+      throw "Exporting PSDs to file requires the node-png library"
 
-    Image = Canvas.Image
+    buffer = new Buffer @toCanvasPixels().length
+    pixelData = @toCanvasPixels()
 
-    canvas = new Canvas(@getImageWidth(), @getImageHeight())
-    context = canvas.getContext('2d')
-    imageData = context.getImageData 0, 0, canvas.width, canvas.height
-    pixelData = imageData.data
+    for i in [0...pixelData.length] by 4
+      buffer[i] = pixelData[i]
+      buffer[i+1] = pixelData[i+1]
+      buffer[i+2] = pixelData[i+2]
+      buffer[i+3] = 255 - pixelData[i+3] # Why is this inverted?
 
-    pixelData[i] = pxl for pxl, i in @toCanvasPixels()
-
-    context.putImageData imageData, 0, 0
-
-    fs.writeFile filename, canvas.toBuffer(), cb
+    png = new Png buffer, @getImageWidth(), @getImageHeight(), 'rgba'
+    image = png.encodeSync()
+    fs.writeFileSync filename, image
 
   toCanvas: (canvas, width = null, height = null) ->
     if width is null and height is null

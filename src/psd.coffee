@@ -125,10 +125,13 @@ Root.PSD = class PSD
 
     # Find the size of the resources section
     [n] = @file.readf ">L"
+    length = n
 
     if skip
       Log.debug "Skipped!"
       return @file.seek n
+
+    start = @file.tell()
 
     # Continue parsing resources until we've reached the end of the section.
     while n > 0
@@ -140,7 +143,9 @@ Root.PSD = class PSD
 
     # This shouldn't happen. If it does, then likely something is being parsed
     # incorrectly in one of the resources, or the file is corrupt.
-    Log.debug "Image resources overran expected size by #{-n} bytes" if n isnt 0
+    if n isnt 0
+      Log.debug "Image resources overran expected size by #{-n} bytes"
+      @file.seek start + length
 
   parseLayersMasks: (skip = false) ->
     @parseHeader() unless @header
