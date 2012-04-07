@@ -8,6 +8,7 @@ class exports.TargetPractice
   constructor: (@pattern) ->
 
   runTests: ->
-    glob @pattern, cwd: __dirname, (er, files) =>
+    glob @pattern, cwd: __dirname, (err, files) =>
+      console.log err if err
       test = new PSDTest files
       test.run()

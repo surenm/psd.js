@@ -24,6 +24,21 @@ class exports.PSDTest
 
   constructor: (@files) ->
     process.chdir __dirname
+
+    try
+      assert.ok fs.readdirSync(TP_ROOT).length > 0
+    catch e
+      console.log """
+      #{color.errorPrefix}It looks like the psd.tp submodule is missing. Run:
+
+        git submodule init
+        git submodule update
+
+      and then try running the tests again.#{color.errorSuffix}
+      """
+
+      process.exit()
+
     assert.ok @files, 'File data set'
 
   run: -> @testsAgainstFiles()
