@@ -87,7 +87,7 @@ class exports.PSDTest
   assertExports: (psd, testData, cb) ->
     return cb() unless testData._exports_to?
 
-    psd.toFile TMP_FILE
+    psd.toFileSync TMP_FILE
     @compareImages "#{TP_ROOT}/#{testData._exports_to}", TMP_FILE, cb
     
 
@@ -139,7 +139,7 @@ class exports.PSDTest
         cb()
       when "_exports_to"
         assert.ok obj.image?
-        obj.image.toFile TMP_FILE
+        obj.image.toFileSync TMP_FILE
         @compareImages "#{TP_ROOT}/#{v}", TMP_FILE, cb
       else cb() # unknown assertion
 

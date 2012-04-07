@@ -246,7 +246,7 @@ class PSDImage
       if @getImageChannels() is 5
         @pixelData.push @getAlphaValue(@channelData[i + @channelLength * 4])
       else
-        @pixelData.push @getAlphaValue(255)
+        @pixelData.push @getAlphaValue()
 
       
   # Normally, the pixel data is stored in planar order, meaning all the red
@@ -262,7 +262,16 @@ class PSDImage
   # This means a pure-red single pixel is expressed as: `[255, 0, 0, 255]`
   toCanvasPixels: -> @pixelData
 
-  toFile: (filename) ->
+  toFile: (filename, cb) ->
+    png = @getPng()
+    png.encode (image) -> fs.writeFile filename, image, cb
+
+  toFileSync: (filename) ->
+    png = @getPng()
+    image = png.encodeSync()
+    fs.writeFileSync filename, image
+
+  getPng: ->
     try
       {Png} = require 'png'
     catch e
@@ -277,9 +286,7 @@ class PSDImage
       buffer[i+2] = pixelData[i+2]
       buffer[i+3] = 255 - pixelData[i+3] # Why is this inverted?
 
-    png = new Png buffer, @getImageWidth(), @getImageHeight(), 'rgba'
-    image = png.encodeSync()
-    fs.writeFileSync filename, image
+    new Png buffer, @getImageWidth(), @getImageHeight(), 'rgba'
 
   toCanvas: (canvas, width = null, height = null) ->
     if width is null and height is null

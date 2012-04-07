@@ -34,6 +34,8 @@ psd.js comes with a handy Cakefile to build the library for you. It first search
 
 To build, simply run `cake build`. If you would like the library to automatically build after any source files are saved, you can run `cake watch`.
 
+Please run all of the tests before committing any code as well using `cake test`.
+
 ## Using psd.js
 
 There are two main things you can do with psd.js: parse information and export images.
@@ -101,9 +103,12 @@ You can easily export a merged/flattened version of the PSD image either to file
 
 psd = PSD.fromFile __dirname + '/test.psd'
 
-# In node...
+# In node (async)
 psd.toFile __dirname + '/output.png', ->
   console.log "PSD flattened to output.png"
+
+# In node (sync)
+psd.toFileSync __dirname + '/output.png'
 
 # In browser...
 canvas = document.getElementById('psd-output')

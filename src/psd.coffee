@@ -21,6 +21,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ###
 
+"use strict"
+
 # NodeJS or browser?
 if exports?
   Root = exports
@@ -174,6 +176,10 @@ Root.PSD = class PSD
   toFile: (filename, cb = ->) -> 
     @parseImageData() unless @image
     @image.toFile filename, cb
+
+  toFileSync: (filename) ->
+    @parseImageData() unless @image
+    @image.toFileSync filename
 
   # Given a canvas element
   toCanvas: (canvas, width = null, height = null) ->
