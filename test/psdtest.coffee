@@ -5,7 +5,7 @@ fs = require 'fs'
 crypto = require 'crypto'
 
 {PSD} = require "#{__dirname}/../lib/psd"
-{PNG} = require "#{__dirname}/deps/png.js/png"
+PNG = require "png-js"
 
 class exports.PSDTest
   TMP_FILE = "#{__dirname}/out.png"
@@ -147,14 +147,12 @@ class exports.PSDTest
         @outputError e
         cb()
 
-    expected = PNG.load expectedPath
-    expected.decodePixels (pixels) -> 
-      expectedPixels = expected.copyToImageData(pixels)
+    PNG.decode expectedPath, (pixels) -> 
+      expectedPixels = pixels
       decodeDone()
 
-    actual = PNG.load actualPath
-    actual.decodePixels (pixels) -> 
-      actualPixels = actual.copyToImageData(pixels)
+    PNG.decode actualPath, (pixels) -> 
+      actualPixels = pixels
       decodeDone()
 
   outputError: (e) ->
