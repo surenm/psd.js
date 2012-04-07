@@ -16,6 +16,7 @@ depsDir        = "deps"
 targetCoffee  = "#{csSrcDir}/build"
 
 targetCoreJS      = "#{csTargetDir}/#{targetName}.js"
+targetCoreMinJS   = "#{csTargetDir}/#{targetName}.min.js"
 coffeeCoreOpts    = "-r coffeescript-growl -j #{targetName}.js -o #{csTargetDir} -c #{targetCoffee}.coffee"
 
 # All source files listed in include order
@@ -90,7 +91,7 @@ task 'watch', 'Automatically recompile the CoffeeScript files when updated', ->
         invoke 'build'
         
 task 'build', 'Compile and minify all CoffeeScript source files', ->
-  finishListener 'js', ->
+  finishListener 'js', -> invoke 'minify'
   invoke 'compile'
 
 task 'compile', 'Compile all CoffeeScript source files', (opts) ->
