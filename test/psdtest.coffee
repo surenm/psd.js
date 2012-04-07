@@ -27,14 +27,14 @@ class exports.PSDTest
     assert.ok @files, 'File data set'
 
   run: -> @testsAgainstFiles()
+  teardown: -> fs.unlink TMP_FILE
 
   testsAgainstFiles: ->
     runTest = (file) =>
-      return unless @files.length
+      return @teardown() unless @files.length
       @doFileTest file, => runTest @files.shift()
 
     runTest @files.shift()
-    
 
   doFileTest: (file, cb) ->
     @needsNewline = false
