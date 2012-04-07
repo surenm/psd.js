@@ -1,6 +1,6 @@
 {
   "name": "psd.js",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "A Photoshop file format (PSD) parser written in Coffeescript/Javascript",
   "homepage": "http://meltingice.github.com/psd.js/",
   "author": "Ryan LeFevre <ryan@twitpic.com> (http://meltingice.net/)",
@@ -12,11 +12,17 @@
   "engines": {
     "node": ">= 0.5.5"
   },
+  "dependencies": {
+    "png": ">= 2.1.1"
+  },
   "devDependencies": {
     "jsmin": "1.0.1",
     "coffee-script": "> 1.1.0",
-    "coffeescript-growl": "git://github.com/jawj/coffeescript-growl.git"
+    "coffeescript-growl": "git://github.com/jawj/coffeescript-growl.git",
+    "nodeunit": ">= 0.7.4",
+    "glob": ">= 3.1.9"
   },
+
   "bugs": {
     "url": "https://github.com/meltingice/psd.js/issues"
   }
