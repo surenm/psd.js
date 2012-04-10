@@ -1,17 +1,26 @@
 <!DOCTYPE html>  <html> <head>   <title>psdcolor.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="log.html">                 log.coffee               </a>                                           <a class="source" href="psd.html">                 psd.coffee               </a>                                           <a class="source" href="psdchannelimage.html">                 psdchannelimage.coffee               </a>                                           <a class="source" href="psdcolor.html">                 psdcolor.coffee               </a>                                           <a class="source" href="psdfile.html">                 psdfile.coffee               </a>                                           <a class="source" href="psdheader.html">                 psdheader.coffee               </a>                                           <a class="source" href="psdimage.html">                 psdimage.coffee               </a>                                           <a class="source" href="psdlayer.html">                 psdlayer.coffee               </a>                                           <a class="source" href="psdlayereffect.html">                 psdlayereffect.coffee               </a>                                           <a class="source" href="psdlayermask.html">                 psdlayermask.coffee               </a>                                           <a class="source" href="psdresource.html">                 psdresource.coffee               </a>                                           <a class="source" href="psdtypetool.html">                 psdtypetool.coffee               </a>                                           <a class="source" href="util.html">                 util.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               psdcolor.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>Tons of color conversion functions.
-Borrowed directly from CamanJS.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">PSDColor</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Converts the hex representation of a color to RGB values.
+Borrowed directly from CamanJS.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">PSD.PSDColor = </span><span class="k">class</span> <span class="nx">PSDColor</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Converts the hex representation of a color to RGB values.
 Hex value can optionally start with the hash (#).</p>
 
 <pre>
 @param   String  hex   The colors hex value
 @return  Array         The RGB representation
 </pre>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="vi">@hexToRGB: </span><span class="nf">(hex) -&gt;</span>
-    <span class="nv">hex = </span><span class="nx">hex</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="nx">hex</span><span class="p">.</span><span class="nx">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">is</span> <span class="s">&quot;</span><span class="err">#</span><span class="s">&quot;</span>
+    <span class="nv">hex = </span><span class="nx">hex</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="nx">hex</span><span class="p">.</span><span class="nx">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">is</span> <span class="s2">&quot;#&quot;</span>
     <span class="nv">r = </span><span class="nb">parseInt</span> <span class="nx">hex</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">16</span>
     <span class="nv">g = </span><span class="nb">parseInt</span> <span class="nx">hex</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">16</span>
     <span class="nv">b = </span><span class="nb">parseInt</span> <span class="nx">hex</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">16</span>
 
-    <span class="nv">r: </span><span class="nx">r</span><span class="p">,</span> <span class="nv">g: </span><span class="nx">g</span><span class="p">,</span> <span class="nv">b: </span><span class="nx">b</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Converts an RGB color to HSL.
+    <span class="nv">r: </span><span class="nx">r</span><span class="p">,</span> <span class="nv">g: </span><span class="nx">g</span><span class="p">,</span> <span class="nv">b: </span><span class="nx">b</span>
+
+  <span class="vi">@rgbToHex: </span><span class="nf">(c) -&gt;</span>
+    <span class="k">if</span> <span class="nx">arguments</span><span class="p">.</span><span class="nx">length</span> <span class="o">is</span> <span class="mi">1</span>
+      <span class="nv">m = </span><span class="sr">/rgba?\((\d+), (\d+), (\d+)/</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="nv">m = </span><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">arguments</span><span class="p">)</span>
+      <span class="nx">m</span><span class="p">.</span><span class="nx">unshift</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nx">m</span> <span class="k">then</span> <span class="s1">&#39;#&#39;</span> <span class="o">+</span> <span class="p">(</span> <span class="nx">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span> <span class="o">|</span> <span class="nx">m</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span> <span class="o">|</span> <span class="nx">m</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="p">).</span><span class="nx">toString</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span> <span class="k">else</span> <span class="nx">c</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Converts an RGB color to HSL.
 Assumes r, g, and b are in the set [0, 255] and
 returns h, s, and l in the set [0, 1].</p>
 
@@ -21,9 +30,9 @@ returns h, s, and l in the set [0, 1].</p>
 @param   Number  b   Blue channel
 @return              The HSL representation
 </pre>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="vi">@rgbToHSL: </span><span class="nf">(r, g, b) -&gt;</span>
-    <span class="nx">r</span> <span class="o">/=</span> <span class="mi">255</span>
-    <span class="nx">g</span> <span class="o">/=</span> <span class="mi">255</span>
-    <span class="nx">b</span> <span class="o">/=</span> <span class="mi">255</span>
+    <span class="nx">r</span> <span class="err">/= 255</span>
+    <span class="nx">g</span> <span class="err">/= 255</span>
+    <span class="nx">b</span> <span class="err">/= 255</span>
 
     <span class="nv">max = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span> <span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="nx">b</span>
     <span class="nv">min = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span> <span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="nx">b</span>
@@ -33,15 +42,15 @@ returns h, s, and l in the set [0, 1].</p>
       <span class="nv">h = s = </span><span class="mi">0</span>
     <span class="k">else</span>
       <span class="nv">d = </span><span class="nx">max</span> <span class="o">-</span> <span class="nx">min</span>
-      <span class="nv">s = </span><span class="k">if</span> <span class="nx">l</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="k">then</span> <span class="nx">d</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">-</span> <span class="nx">max</span> <span class="o">-</span> <span class="nx">min</span><span class="p">)</span> <span class="k">else</span> <span class="nx">d</span> <span class="o">/</span> <span class="p">(</span><span class="nx">max</span> <span class="o">+</span> <span class="nx">min</span><span class="p">)</span>
+      <span class="nv">s = </span><span class="k">if</span> <span class="nx">l</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="k">then</span> <span class="nx">d</span> <span class="sr">/ (2 - max - min) else d /</span> <span class="p">(</span><span class="nx">max</span> <span class="o">+</span> <span class="nx">min</span><span class="p">)</span>
       <span class="nv">h = </span><span class="k">switch</span> <span class="nx">max</span>
         <span class="k">when</span> <span class="nx">r</span> <span class="k">then</span> <span class="p">(</span><span class="nx">g</span> <span class="o">-</span> <span class="nx">b</span><span class="p">)</span> <span class="o">/</span> <span class="nx">d</span> <span class="o">+</span> <span class="p">(</span><span class="k">if</span> <span class="nx">g</span> <span class="o">&lt;</span> <span class="nx">b</span> <span class="k">then</span> <span class="mi">6</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
         <span class="k">when</span> <span class="nx">g</span> <span class="k">then</span> <span class="p">(</span><span class="nx">b</span> <span class="o">-</span> <span class="nx">r</span><span class="p">)</span> <span class="o">/</span> <span class="nx">d</span> <span class="o">+</span> <span class="mi">2</span>
         <span class="k">when</span> <span class="nx">b</span> <span class="k">then</span> <span class="p">(</span><span class="nx">r</span> <span class="o">-</span> <span class="nx">g</span><span class="p">)</span> <span class="o">/</span> <span class="nx">d</span> <span class="o">+</span> <span class="mi">4</span>
       
-      <span class="nx">h</span> <span class="o">/=</span> <span class="mi">6</span>
+      <span class="nx">h</span> <span class="err">/= 6</span>
 
-    <span class="nv">h: </span><span class="nx">h</span><span class="p">,</span> <span class="nv">s: </span><span class="nx">s</span><span class="p">,</span> <span class="nv">l: </span><span class="nx">l</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>Converts an HSL color value to RGB. Conversion formula
+    <span class="nv">h: </span><span class="nx">Util</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">h</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="nv">s: </span><span class="nx">Util</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="nv">l: </span><span class="nx">Util</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">l</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>Converts an HSL color value to RGB. Conversion formula
 adapted from http://en.wikipedia.org/wiki/HSL<em>color</em>space.
 Assumes h, s, and l are contained in the set [0, 1] and
 returns r, g, and b in the set [0, 255].</p>
@@ -62,7 +71,11 @@ returns r, g, and b in the set [0, 255].</p>
       <span class="nv">g = </span><span class="nx">@hueToRGB</span> <span class="nx">p</span><span class="p">,</span> <span class="nx">q</span><span class="p">,</span> <span class="nx">h</span>
       <span class="nv">b = </span><span class="nx">@hueToRGB</span> <span class="nx">p</span><span class="p">,</span> <span class="nx">q</span><span class="p">,</span> <span class="nx">h</span> <span class="o">-</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span>
 
-    <span class="nv">r: </span><span class="nx">r</span> <span class="o">*</span> <span class="mi">255</span><span class="p">,</span> <span class="nv">g: </span><span class="nx">g</span> <span class="o">*</span> <span class="mi">255</span><span class="p">,</span> <span class="nv">b: </span><span class="nx">b</span> <span class="o">*</span> <span class="mi">255</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>Converts from the hue color space back to RGB</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="vi">@hueToRGB: </span><span class="nf">(p, q, t) -&gt;</span>
+    <span class="nx">r</span> <span class="o">*=</span> <span class="mi">255</span>
+    <span class="nx">g</span> <span class="o">*=</span> <span class="mi">255</span>
+    <span class="nx">b</span> <span class="o">*=</span> <span class="mi">255</span>
+
+    <span class="nv">r: </span><span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">r</span><span class="p">),</span> <span class="nv">g: </span><span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">g</span><span class="p">),</span> <span class="nv">b: </span><span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>Converts from the hue color space back to RGB</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="vi">@hueToRGB: </span><span class="nf">(p, q, t) -&gt;</span>
     <span class="k">if</span> <span class="nx">t</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">then</span> <span class="nx">t</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">if</span> <span class="nx">t</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">then</span> <span class="nx">t</span> <span class="o">-=</span> <span class="mi">1</span>
     <span class="k">if</span> <span class="nx">t</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span> <span class="k">then</span> <span class="k">return</span> <span class="nx">p</span> <span class="o">+</span> <span class="p">(</span><span class="nx">q</span> <span class="o">-</span> <span class="nx">p</span><span class="p">)</span> <span class="o">*</span> <span class="mi">6</span> <span class="o">*</span> <span class="nx">t</span>
@@ -79,16 +92,16 @@ returns h, s, and v in the set [0, 1].</p>
 @param   Number  b       The blue color value
 @return  Array           The HSV representation
 </pre>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="vi">@rgbToHSV: </span><span class="nf">(r, g, b) -&gt;</span>
-    <span class="nx">r</span> <span class="o">/=</span> <span class="mi">255</span>
-    <span class="nx">g</span> <span class="o">/=</span> <span class="mi">255</span>
-    <span class="nx">b</span> <span class="o">/=</span> <span class="mi">255</span>
+    <span class="nx">r</span> <span class="err">/= 255</span>
+    <span class="nx">g</span> <span class="err">/= 255</span>
+    <span class="nx">b</span> <span class="err">/= 255</span>
 
     <span class="nv">max = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span> <span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="nx">b</span>
     <span class="nv">min = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span> <span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="nx">b</span>
     <span class="nv">v = </span><span class="nx">max</span>
     <span class="nv">d = </span><span class="nx">max</span> <span class="o">-</span> <span class="nx">min</span>
 
-    <span class="nv">s = </span><span class="k">if</span> <span class="nx">max</span> <span class="o">is</span> <span class="mi">0</span> <span class="k">then</span> <span class="mi">0</span> <span class="k">else</span> <span class="nx">d</span> <span class="o">/</span> <span class="nx">max</span>
+    <span class="nv">s = </span><span class="k">if</span> <span class="nx">max</span> <span class="o">is</span> <span class="mi">0</span> <span class="k">then</span> <span class="mi">0</span> <span class="k">else</span> <span class="nx">d</span> <span class="err">/ max</span>
 
     <span class="k">if</span> <span class="nx">max</span> <span class="o">is</span> <span class="nx">min</span>
       <span class="nv">h = </span><span class="mi">0</span>
@@ -98,7 +111,7 @@ returns h, s, and v in the set [0, 1].</p>
         <span class="k">when</span> <span class="nx">g</span> <span class="k">then</span> <span class="p">(</span><span class="nx">b</span> <span class="o">-</span> <span class="nx">r</span><span class="p">)</span> <span class="o">/</span> <span class="nx">d</span> <span class="o">+</span> <span class="mi">2</span>
         <span class="k">when</span> <span class="nx">b</span> <span class="k">then</span> <span class="p">(</span><span class="nx">r</span> <span class="o">-</span> <span class="nx">g</span><span class="p">)</span> <span class="o">/</span> <span class="nx">d</span> <span class="o">+</span> <span class="mi">4</span>
 
-      <span class="nx">h</span> <span class="o">/=</span> <span class="mi">6</span>
+      <span class="nx">h</span> <span class="err">/= 6</span>
 
     <span class="nv">h: </span><span class="nx">h</span><span class="p">,</span> <span class="nv">s: </span><span class="nx">s</span><span class="p">,</span> <span class="nv">v: </span><span class="nx">v</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>Converts an HSV color value to RGB. Conversion formula
 adapted from http://en.wikipedia.org/wiki/HSV<em>color</em>space.
@@ -156,24 +169,24 @@ returns x, y, and z.</p>
 @param   Number  b       The blue color value
 @return  Array           The XYZ representation
 </pre>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="vi">@rgbToXYZ: </span><span class="nf">(r, g, b) -&gt;</span>
-    <span class="nx">r</span> <span class="o">/=</span> <span class="mi">255</span>
-    <span class="nx">g</span> <span class="o">/=</span> <span class="mi">255</span>
-    <span class="nx">b</span> <span class="o">/=</span> <span class="mi">255</span>
+    <span class="nx">r</span> <span class="err">/= 255</span>
+    <span class="nx">g</span> <span class="err">/= 255</span>
+    <span class="nx">b</span> <span class="err">/= 255</span>
 
     <span class="k">if</span> <span class="nx">r</span> <span class="o">&gt;</span> <span class="mf">0.04045</span>
       <span class="nv">r = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">((</span><span class="nx">r</span> <span class="o">+</span> <span class="mf">0.055</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1.055</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">)</span>
     <span class="k">else</span>
-      <span class="nx">r</span> <span class="o">/=</span> <span class="mf">12.92</span>
+      <span class="nx">r</span> <span class="err">/= 12.92</span>
 
     <span class="k">if</span> <span class="nx">g</span> <span class="o">&gt;</span> <span class="mf">0.04045</span>
       <span class="nv">g = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">((</span><span class="nx">g</span> <span class="o">+</span> <span class="mf">0.055</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1.055</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">)</span>
     <span class="k">else</span>
-      <span class="nx">g</span> <span class="o">/=</span> <span class="mf">12.92</span>
+      <span class="nx">g</span> <span class="err">/= 12.92</span>
 
     <span class="k">if</span> <span class="nx">b</span> <span class="o">&gt;</span> <span class="mf">0.04045</span>
       <span class="nv">b = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">((</span><span class="nx">b</span> <span class="o">+</span> <span class="mf">0.055</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1.055</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">)</span>
     <span class="k">else</span>
-      <span class="nx">b</span> <span class="o">/=</span> <span class="mf">12.92</span>
+      <span class="nx">b</span> <span class="err">/= 12.92</span>
 
     <span class="nv">x = </span><span class="nx">r</span> <span class="o">*</span> <span class="mf">0.4124</span> <span class="o">+</span> <span class="nx">g</span> <span class="o">*</span> <span class="mf">0.3576</span> <span class="o">+</span> <span class="nx">b</span> <span class="o">*</span> <span class="mf">0.1805</span><span class="p">;</span>
     <span class="nv">y = </span><span class="nx">r</span> <span class="o">*</span> <span class="mf">0.2126</span> <span class="o">+</span> <span class="nx">g</span> <span class="o">*</span> <span class="mf">0.7152</span> <span class="o">+</span> <span class="nx">b</span> <span class="o">*</span> <span class="mf">0.0722</span><span class="p">;</span>
@@ -191,9 +204,9 @@ r, g and b in the set [0, 255].</p>
 @param   Number  z       The Z value
 @return  Array           The RGB representation
 </pre>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="vi">@xyzToRGB: </span><span class="nf">(x, y, z) -&gt;</span>
-    <span class="nx">x</span> <span class="o">/=</span> <span class="mi">100</span>
-    <span class="nx">y</span> <span class="o">/=</span> <span class="mi">100</span>
-    <span class="nx">z</span> <span class="o">/=</span> <span class="mi">100</span>
+    <span class="nx">x</span> <span class="err">/= 100</span>
+    <span class="nx">y</span> <span class="err">/= 100</span>
+    <span class="nx">z</span> <span class="err">/= 100</span>
 
     <span class="nv">r = </span><span class="p">(</span><span class="mf">3.2406</span>  <span class="o">*</span> <span class="nx">x</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.5372</span> <span class="o">*</span> <span class="nx">y</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.4986</span> <span class="o">*</span> <span class="nx">z</span><span class="p">)</span>
     <span class="nv">g = </span><span class="p">(</span><span class="o">-</span><span class="mf">0.9689</span> <span class="o">*</span> <span class="nx">x</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.8758</span>  <span class="o">*</span> <span class="nx">y</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.0415</span>  <span class="o">*</span> <span class="nx">z</span><span class="p">)</span>
@@ -230,9 +243,9 @@ L<em>, a</em> and b* values</p>
     <span class="nv">whiteY = </span><span class="mf">100.0</span>
     <span class="nv">whiteZ = </span><span class="mf">108.883</span>
 
-    <span class="nx">x</span> <span class="o">/=</span> <span class="nx">whiteX</span>
-    <span class="nx">y</span> <span class="o">/=</span> <span class="nx">whiteY</span>
-    <span class="nx">z</span> <span class="o">/=</span> <span class="nx">whiteZ</span>
+    <span class="nx">x</span> <span class="err">/= whiteX</span>
+    <span class="nx">y</span> <span class="err">/= whiteY</span>
+    <span class="nx">z</span> <span class="err">/= whiteZ</span>
 
     <span class="k">if</span> <span class="nx">x</span> <span class="o">&gt;</span> <span class="mf">0.008856451679</span>
       <span class="nv">x = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="mf">0.3333333333</span><span class="p">)</span>
@@ -268,8 +281,8 @@ x, y and z values.</p>
 @return  Array           The XYZ representation
 </pre>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="vi">@labToXYZ: </span><span class="nf">(l, a, b) -&gt;</span>
     <span class="nv">y = </span><span class="p">(</span><span class="nx">l</span> <span class="o">+</span> <span class="mi">16</span><span class="p">)</span> <span class="o">/</span> <span class="mi">116</span>
-    <span class="nv">x = </span><span class="nx">y</span> <span class="o">+</span> <span class="p">(</span><span class="nx">a</span> <span class="o">/</span> <span class="mi">500</span><span class="p">)</span>
-    <span class="nv">z = </span><span class="nx">y</span> <span class="o">-</span> <span class="p">(</span><span class="nx">b</span> <span class="o">/</span> <span class="mi">200</span><span class="p">)</span>
+    <span class="nv">x = </span><span class="nx">y</span> <span class="o">+</span> <span class="p">(</span><span class="nx">a</span> <span class="err">/ 500)</span>
+    <span class="nv">z = </span><span class="nx">y</span> <span class="o">-</span> <span class="p">(</span><span class="nx">b</span> <span class="err">/ 200)</span>
 
     <span class="k">if</span> <span class="nx">x</span> <span class="o">&gt;</span> <span class="mf">0.2068965517</span>
       <span class="nv">x = </span><span class="nx">x</span> <span class="o">*</span> <span class="nx">x</span> <span class="o">*</span> <span class="nx">x</span>
@@ -286,50 +299,11 @@ x, y and z values.</p>
     <span class="k">else</span>
       <span class="nv">z = </span><span class="mf">0.1284185493</span> <span class="o">*</span> <span class="p">(</span><span class="nx">z</span> <span class="o">-</span> <span class="mf">0.1379310345</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <p>D65 reference white point</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">x: </span><span class="nx">x</span> <span class="o">*</span> <span class="mf">95.047</span><span class="p">,</span> <span class="nv">y: </span><span class="nx">y</span> <span class="o">*</span> <span class="mf">100.0</span><span class="p">,</span> <span class="nv">z: </span><span class="nx">z</span> <span class="o">*</span> <span class="mf">108.883</span>
 
-  <span class="vi">@rgbToCMY: </span><span class="nf">(r, g, b) -&gt;</span>
-    <span class="nv">c = </span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="nx">r</span> <span class="o">/</span> <span class="mi">255</span><span class="p">)</span>
-    <span class="nv">m = </span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="nx">g</span> <span class="o">/</span> <span class="mi">255</span><span class="p">)</span>
-    <span class="nv">y = </span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="nx">b</span> <span class="o">/</span> <span class="mi">255</span><span class="p">)</span>
-
-    <span class="nv">c: </span><span class="nx">c</span><span class="p">,</span> <span class="nv">m: </span><span class="nx">m</span><span class="p">,</span> <span class="nv">y: </span><span class="nx">y</span>
-
-  <span class="vi">@cmyToRGB: </span><span class="nf">(c, m, y) -&gt;</span>
-    <span class="nv">r = </span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nx">c</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span>
-    <span class="nv">g = </span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nx">m</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span>
-    <span class="nv">b = </span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nx">y</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span>
+  <span class="vi">@cmykToRGB: </span><span class="nf">(c, m, y, k) -&gt;</span>
+    <span class="nv">r = </span><span class="p">(</span><span class="mi">65535</span> <span class="o">-</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span> <span class="p">(</span><span class="mi">255</span> <span class="o">-</span> <span class="nx">k</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="nx">k</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">)))</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span>
+    <span class="nv">g = </span><span class="p">(</span><span class="mi">65535</span> <span class="o">-</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span> <span class="p">(</span><span class="mi">255</span> <span class="o">-</span> <span class="nx">k</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="nx">k</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">)))</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span>
+    <span class="nv">b = </span><span class="p">(</span><span class="mi">65535</span> <span class="o">-</span> <span class="p">(</span><span class="nx">y</span> <span class="o">*</span> <span class="p">(</span><span class="mi">255</span> <span class="o">-</span> <span class="nx">k</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="nx">k</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">)))</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span>
 
     <span class="nv">r: </span><span class="nx">r</span><span class="p">,</span> <span class="nv">g: </span><span class="nx">g</span><span class="p">,</span> <span class="nv">b: </span><span class="nx">b</span>
-
-  <span class="vi">@cmyToCMYK: </span><span class="nf">(c, m, y) -&gt;</span>
-    <span class="nv">_k = </span><span class="mi">1</span>
-
-    <span class="k">if</span> <span class="nx">c</span> <span class="o">&lt;</span> <span class="nx">_k</span> <span class="k">then</span> <span class="nv">_k = </span><span class="nx">c</span>
-    <span class="k">if</span> <span class="nx">m</span> <span class="o">&lt;</span> <span class="nx">_k</span> <span class="k">then</span> <span class="nv">_k = </span><span class="nx">m</span>
-    <span class="k">if</span> <span class="nx">y</span> <span class="o">&lt;</span> <span class="nx">_k</span> <span class="k">then</span> <span class="nv">_k = </span><span class="nx">y</span>
-    <span class="k">if</span> <span class="nx">k</span> <span class="o">is</span> <span class="mi">1</span>
-      <span class="nv">c = </span><span class="mi">0</span>
-      <span class="nv">m = </span><span class="mi">0</span>
-      <span class="nv">y = </span><span class="mi">0</span>
-    <span class="k">else</span>
-      <span class="nv">c = </span><span class="p">(</span><span class="nx">c</span> <span class="o">-</span> <span class="nx">_k</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nx">_k</span><span class="p">)</span>
-      <span class="nv">m = </span><span class="p">(</span><span class="nx">m</span> <span class="o">-</span> <span class="nx">_k</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nx">_k</span><span class="p">)</span>
-      <span class="nv">y = </span><span class="p">(</span><span class="nx">y</span> <span class="o">-</span> <span class="nx">_k</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nx">_k</span><span class="p">)</span>
-
-    <span class="nv">c: </span><span class="nx">c</span><span class="p">,</span> <span class="nv">m: </span><span class="nx">m</span><span class="p">,</span> <span class="nv">y: </span><span class="nx">y</span><span class="p">,</span> <span class="nv">k: </span><span class="nx">k</span>
-
-  <span class="vi">@cmykToCMY: </span><span class="nf">(c, m, y, k) -&gt;</span>
-    <span class="nv">c = </span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nx">k</span><span class="p">)</span> <span class="o">+</span> <span class="nx">k</span><span class="p">)</span>
-    <span class="nv">m = </span><span class="p">(</span><span class="nx">m</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nx">k</span><span class="p">)</span> <span class="o">+</span> <span class="nx">k</span><span class="p">)</span>
-    <span class="nv">y = </span><span class="p">(</span><span class="nx">y</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nx">k</span><span class="p">)</span> <span class="o">+</span> <span class="nx">k</span><span class="p">)</span>
-
-    <span class="nv">c: </span><span class="nx">c</span><span class="p">,</span> <span class="nv">m: </span><span class="nx">m</span><span class="p">,</span> <span class="nv">y: </span><span class="nx">y</span>
-
-  <span class="vi">@rgbToCMYK: </span><span class="nf">(r, g, b) -&gt;</span>
-    <span class="nv">cmy = </span><span class="nx">@rgbToCMY</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span>
-    <span class="nx">@cmyToCMYK</span><span class="p">(</span><span class="nx">cmy</span><span class="p">.</span><span class="nx">c</span><span class="p">,</span> <span class="nx">cmy</span><span class="p">.</span><span class="nx">m</span><span class="p">,</span> <span class="nx">cmy</span><span class="p">.</span><span class="nx">y</span><span class="p">)</span>
-
-  <span class="vi">@cmykToRGB: </span><span class="nf">(c, m, y, k) -&gt;</span>
-    <span class="nv">cmy = </span><span class="nx">@cmykToCMY</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="nx">m</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">k</span><span class="p">)</span>
-    <span class="nx">@cmyToRGB</span><span class="p">(</span><span class="nx">cmy</span><span class="p">.</span><span class="nx">c</span><span class="p">,</span> <span class="nx">cmy</span><span class="p">.</span><span class="nx">m</span><span class="p">,</span> <span class="nx">cmy</span><span class="p">.</span><span class="nx">y</span><span class="p">)</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
