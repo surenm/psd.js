@@ -45,7 +45,7 @@ There are two main things you can do with psd.js: parse information and export i
 psd.js is available in npm. Simply run:
 
 ```
-npm install psd.js
+npm install psd
 ```
 
 Alternatively, download and use the `lib/psd.js` file from this repository.
@@ -71,7 +71,7 @@ psd = new PSD(bytes)
 You can parse the PSD file for valuable information such as: image size, color channels, layer and mask information, etc.
 
 ``` coffeescript
-{PSD} = require 'psd.js'
+{PSD} = require 'psd'
 
 psd = PSD.fromFile __dirname + '/test.psd'
 psd.parse()
@@ -99,7 +99,7 @@ psd.parse()
 You can easily export a merged/flattened version of the PSD image either to file (NodeJS) or canvas (browser).
 
 ``` coffeescript
-{PSD} = require 'psd.js'
+{PSD} = require 'psd'
 
 psd = PSD.fromFile __dirname + '/test.psd'
 
@@ -121,7 +121,7 @@ pixels = canvas.image.toCanvasPixels()
 To export individual layers, access the image object for each layer:
 
 ``` coffeescript
-{PSD} = require 'psd.js'
+{PSD} = require 'psd'
 
 psd = PSD.fromFile __dirname + '/test.psd'
 psd.setOptions layerImages: true
