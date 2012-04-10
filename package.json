@@ -21,7 +21,8 @@
     "coffeescript-growl": "git://github.com/jawj/coffeescript-growl.git",
     "nodeunit": ">= 0.7.4",
     "glob": ">= 3.1.9",
-    "png-js": ">= 0.1.0"
+    "png-js": ">= 0.1.0",
+    "docco": ">= 0.3.0"
   },
 
   "bugs": {

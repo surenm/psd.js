@@ -40,9 +40,8 @@ class PSDImage
     Log.debug "Image size: #{@length} (#{@getImageWidth()}x#{@getImageHeight()})"
 
     if @compression in [2, 3]
-      unless PSD.ZIP_ENABLED
-        Log.debug "ZIP library not included, skipping."
-        return @file.seek @endPos, false
+      Log.debug "ZIP compression not implemented yet, skipping."
+      return @file.seek @endPos, false
 
     @parseImageData()
 
