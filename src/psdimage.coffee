@@ -234,19 +234,22 @@ class PSDImage
 
   combineCMYK8Channel: ->
     for i in [0...@numPixels]
-      c = @channelData[i]
-      m = @channelData[i + @channelLength]
-      y = @channelData[i + @channelLength * 2]
-      k = @channelData[i + @channelLength * 3]
-
-      rgb = PSDColor.cmykToRGB(c, m, y, k)
-
-      @pixelData.push rgb.r, rgb.g, rgb.b
-
       if @getImageChannels() is 5
-        @pixelData.push @getAlphaValue(@channelData[i + @channelLength * 4])
+        a = @channelData[i]
+        c = @channelData[i + @channelLength]
+        m = @channelData[i + @channelLength * 2]
+        y = @channelData[i + @channelLength * 3]
+        k = @channelData[i + @channelLength * 4]
       else
-        @pixelData.push @getAlphaValue()
+        a = 255
+        c = @channelData[i]
+        m = @channelData[i + @channelLength]
+        y = @channelData[i + @channelLength * 2]
+        k = @channelData[i + @channelLength * 3]
+
+      rgb = PSDColor.cmykToRGB(255 - c, 255 - m, 255 - y, 255 - k)
+
+      @pixelData.push rgb.r, rgb.g, rgb.b, @getAlphaValue(a)
 
       
   # Normally, the pixel data is stored in planar order, meaning all the red

@@ -1,6 +1,6 @@
 # Tons of color conversion functions.
 # Borrowed directly from CamanJS.
-class PSDColor
+PSD.PSDColor = class PSDColor
   # Converts the hex representation of a color to RGB values.
   # Hex value can optionally start with the hash (#).
   #
@@ -15,6 +15,15 @@ class PSDColor
     b = parseInt hex.substr(4, 2), 16
 
     r: r, g: g, b: b
+
+  @rgbToHex: (c) ->
+    if arguments.length is 1
+      m = /rgba?\((\d+), (\d+), (\d+)/.exec(c)
+    else
+      m = Array.prototype.slice.call(arguments)
+      m.unshift(0)
+
+    if m then '#' + ( m[1] << 16 | m[2] << 8 | m[3] ).toString(16) else c
 
   # Converts an RGB color to HSL.
   # Assumes r, g, and b are in the set [0, 255] and
@@ -47,7 +56,7 @@ class PSDColor
       
       h /= 6
 
-    h: h, s: s, l: l
+    h: Util.round(h, 3), s: Util.round(s, 3), l: Util.round(l, 3)
 
   # Converts an HSL color value to RGB. Conversion formula
   # adapted from http://en.wikipedia.org/wiki/HSL_color_space.
@@ -71,7 +80,11 @@ class PSDColor
       g = @hueToRGB p, q, h
       b = @hueToRGB p, q, h - 1/3
 
-    r: r * 255, g: g * 255, b: b * 255
+    r *= 255
+    g *= 255
+    b *= 255
+
+    r: Math.round(r), g: Math.round(g), b: Math.round(b)
 
   # Converts from the hue color space back to RGB
   @hueToRGB: (p, q, t) ->
@@ -319,48 +332,9 @@ class PSDColor
     # D65 reference white point
     x: x * 95.047, y: y * 100.0, z: z * 108.883
 
-  @rgbToCMY: (r, g, b) ->
-    c = 1 - (r / 255)
-    m = 1 - (g / 255)
-    y = 1 - (b / 255)
-
-    c: c, m: m, y: y
-
-  @cmyToRGB: (c, m, y) ->
-    r = (1 - c) * 255
-    g = (1 - m) * 255
-    b = (1 - y) * 255
+  @cmykToRGB: (c, m, y, k) ->
+    r = (65535 - (c * (255 - k) + (k << 8))) >> 8
+    g = (65535 - (m * (255 - k) + (k << 8))) >> 8
+    b = (65535 - (y * (255 - k) + (k << 8))) >> 8
 
     r: r, g: g, b: b
-
-  @cmyToCMYK: (c, m, y) ->
-    _k = 1
-
-    if c < _k then _k = c
-    if m < _k then _k = m
-    if y < _k then _k = y
-    if k is 1
-      c = 0
-      m = 0
-      y = 0
-    else
-      c = (c - _k) / (1 - _k)
-      m = (m - _k) / (1 - _k)
-      y = (y - _k) / (1 - _k)
-
-    c: c, m: m, y: y, k: k
-
-  @cmykToCMY: (c, m, y, k) ->
-    c = (c * (1 - k) + k)
-    m = (m * (1 - k) + k)
-    y = (y * (1 - k) + k)
-
-    c: c, m: m, y: y
-
-  @rgbToCMYK: (r, g, b) ->
-    cmy = @rgbToCMY(r, g, b)
-    @cmyToCMYK(cmy.c, cmy.m, cmy.y)
-
-  @cmykToRGB: (c, m, y, k) ->
-    cmy = @cmykToCMY(c, m, y, k)
-    @cmyToRGB(cmy.c, cmy.m, cmy.y)

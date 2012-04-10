@@ -4,7 +4,11 @@ Image = Canvas.Image
 
 {PSD} = require __dirname + '/../lib/psd.js'
 
-psd = PSD.fromFile __dirname + '/test-greyscale.psd'
+if process.argv.length is 2
+  console.log "Please specify an input file"
+  process.exit()
+
+psd = PSD.fromFile process.argv[2]
 
 start = (new Date()).getTime()
 

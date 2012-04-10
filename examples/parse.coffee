@@ -6,5 +6,9 @@ Image = Canvas.Image
 
 PSD.DEBUG = true
 
-psd = PSD.fromFile __dirname + '/test.psd'
+if process.argv.length is 2
+  console.log "Please specify an input file"
+  process.exit()
+
+psd = PSD.fromFile process.argv[2]
 psd.parse()

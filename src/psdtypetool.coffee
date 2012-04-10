@@ -51,7 +51,7 @@ class PSDTypeTool
         style:
           font: safeFontName
           size: st.FontSize
-          color: Util.rgbToHex("rgb(#{color[0]}, #{color[1]}, #{color[2]})")
+          color: PSDColor.rgbToHex("rgb(#{color[0]}, #{color[1]}, #{color[2]})")
           underline: st.Underline
           allCaps: st.FontCaps
           italic: !!~ fontName.indexOf("Italic") or st.FauxItalic
