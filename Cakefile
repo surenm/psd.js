@@ -72,7 +72,7 @@ task 'docs', 'Generates documentation for the coffee files', ->
   files = coffeeFiles
   files[i] = "#{csSrcDir}/#{files[i]}.coffee" for i in [0...files.length]
 
-  exec "docco #{files.join(' ')}", (err, stdout, stderr) ->
+  exec "./node_modules/docco/bin/docco #{files.join(' ')}", (err, stdout, stderr) ->
     util.log err if err
     util.log "Documentation built into docs/ folder."
 
