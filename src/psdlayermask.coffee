@@ -20,10 +20,6 @@ class PSDLayerMask
     maskSize = @file.readUInt()
     endLoc = @file.tell() + maskSize
 
-    # Store the current position in case we need to bail
-    # and skip over this section.
-    pos = @file.tell()
-
     Log.debug "Layer mask size is #{maskSize}"
 
     # If the mask size is > 0, then parse the section. Otherwise,
@@ -33,6 +29,10 @@ class PSDLayerMask
     
     # Size of the layer info section. 4 bytes, rounded up by 2's.
     layerInfoSize = Util.pad2 @file.readInt()
+
+    # Store the current position in case we need to bail
+    # and skip over this section.
+    pos = @file.tell()
 
     # If the layer info size is > 0, then we have some layers
     if layerInfoSize > 0
@@ -66,6 +66,11 @@ class PSDLayerMask
         else
           layer.image.skip()
 
+    # In case there are filler zeros
+    @file.seek pos + layerInfoSize, false
+
+    # TODO: Group layers
+
     # Parse the global layer mask
     @parseGlobalMask()
 
@@ -74,16 +79,18 @@ class PSDLayerMask
     return
 
     # We have more additional info to parse, especially beacuse this is PS >= 4.0
-    @parseExtraInfo(endLoc) if @file.tell() < endLoc
+    #@parseExtraInfo(endLoc) if @file.tell() < endLoc
 
   parseGlobalMask: ->
     length = @file.readInt()
     return if length is 0
 
+    start = @file.tell()
     end = @file.tell() + length
 
     Log.debug "Global mask length: #{length}"
 
+    # Undocumented
     @globalMask.overlayColorSpace = @file.readShortInt()
 
     # TODO: parse color space components into actual color.
@@ -91,6 +98,7 @@ class PSDLayerMask
     for i in [0...4]
       @globalMask.colorComponents.push(@file.readShortInt() >> 8)
 
+    # 0 = transparent, 100 = opaque
     @globalMask.opacity = @file.readShortInt()
 
     # 0 = color selected; 1 = color protected; 128 = use value per layer

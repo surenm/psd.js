@@ -107,9 +107,8 @@ class PSDLayer
 
     Log.debug "Layer #{layerIndex}:", @
 
-    if @file.tell() != @layerEnd
-      Log.debug "Error parsing layer - unexpected end. Attempting to recover..."
-      @file.seek @layerEnd, false
+    # In case there are filler zeros
+    @file.seek extrastart + extralen, false
 
   # Parse important information about this layer such as position, size,
   # and channel info. Layer Records section.

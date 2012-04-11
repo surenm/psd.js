@@ -81,7 +81,10 @@ class PSDChannelImage extends PSDImage
   parseRaw: ->
     Log.debug "Attempting to parse RAW encoded channel..."
     data = @file.read(@chInfo.length - 2)
-    @channelData[@chanPos...@chanPos+@chInfo.length - 2] = data
+    dataIndex = 0
+    for i in [@chanPos...@chanPos+@chInfo.length - 2]
+      @channelData[i] = data[dataIndex++]
+
     @chanPos += @chInfo.length - 2
 
   # Compression is stored on a per-channel basis, not a per-image basis for layers

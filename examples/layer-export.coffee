@@ -1,4 +1,6 @@
 fs = require 'fs'
+{exec} = require 'child_process'
+
 Canvas = require 'canvas'
 Image = Canvas.Image
 
@@ -6,13 +8,19 @@ Image = Canvas.Image
 
 PSD.DEBUG = true
 
-psd = PSD.fromFile __dirname + '/test.psd'
+if process.argv.length is 2
+  console.log "Please specify an input file"
+  process.exit()
+
+psd = PSD.fromFile process.argv[2]
 psd.setOptions layerImages: true
+
 psd.parse()
 
-for layer in psd.layers
-  continue if layer.isFolder
+exec "mkdir -p #{__dirname}/output", ->
+  for layer in psd.layers
+    continue if layer.isFolder
 
-  do (layer) ->
-    layer.image.toFile __dirname + "/output/#{layer.name}.png", ->
-      console.log "Layer #{layer.name} output to file."
+    do (layer) ->
+      layer.image.toFile __dirname + "/output/#{layer.name}.png", ->
+        console.log "Layer #{layer.name} output to file."

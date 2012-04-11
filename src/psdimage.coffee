@@ -301,11 +301,19 @@ class PSDImage
   toCanvasPixels: -> @pixelData
 
   toFile: (filename, cb) ->
+    return cb() if @toCanvasPixels().length is 0
+
     png = @getPng()
+    return cb() if png is null
+
     png.encode (image) -> fs.writeFile filename, image, cb
 
   toFileSync: (filename) ->
+    return if @toCanvasPixels().length is 0
+    
     png = @getPng()
+    return if png is null
+
     image = png.encodeSync()
     fs.writeFileSync filename, image
 
@@ -324,7 +332,11 @@ class PSDImage
       buffer[i+2] = pixelData[i+2]
       buffer[i+3] = 255 - pixelData[i+3] # Why is this inverted?
 
-    new Png buffer, @getImageWidth(), @getImageHeight(), 'rgba'
+    try
+      new Png buffer, @getImageWidth(), @getImageHeight(), 'rgba'
+    catch e
+      Log.debug e
+      return null
 
   toCanvas: (canvas, width = null, height = null) ->
     if width is null and height is null
