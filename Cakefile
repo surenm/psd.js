@@ -50,7 +50,6 @@ finishListener = (type, cb) ->
 ###
 Options
 ###
-option '-z', '--with-zip', 'Include ZIP decompression library'
 option '-f', '--file [FILE]', 'Test file to load (for debugging)'
 
 ###
@@ -122,9 +121,6 @@ task 'compile', 'Compile all CoffeeScript source files', (opts) ->
     contents.unshift "###\nEND DEPENDENCIES\n###\n\n"
     deps = fs.readdirSync depsDir
     for dep in deps
-      # Special case
-      continue if dep is "zip.js" and not opts['with-zip']
-
       util.log "Adding dependency #{dep}"
       contents.unshift "`" + fs.readFileSync("#{depsDir}/#{dep}", "utf8") + "`\n\n"
 
