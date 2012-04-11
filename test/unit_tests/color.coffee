@@ -21,11 +21,11 @@ module.exports =
     test.deepEqual PSDColor.hslToRGB(.583, .500, .392), r: 50, g: 100, b: 150
     test.done()
 
-  rgbToCMYK: (test) ->
+  cmykToRGB: (test) ->
     test.deepEqual PSDColor.cmykToRGB(11, 8, 8, 0), r: 245, g:248, b: 248
     test.done()
 
-  rgbToLAB: (test) ->
+  labToRGB: (test) ->
     test.deepEqual PSDColor.labToRGB(94, 0, 0),
       r: 237.72034699108337
       g: 237.72806888514194
