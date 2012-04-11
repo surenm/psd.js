@@ -30,7 +30,10 @@ coffeeFiles   = [
   "psdchannelimage"
   "psdlayer"
   "psdlayermask"
-  "psdlayereffect"
+
+  "layerdata/layereffect"
+  "layerdata/levels"
+
   "psdresource"
   "psdtypetool"
   "util"
