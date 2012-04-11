@@ -21,12 +21,6 @@ class PSDFile
   # causes the file pointer to move to the absolute location specified.
   seek: (amount, rel = true) ->
     if rel then @pos += amount else @pos = amount
-      
-  # Helper function to read an unsigned 16-bit integer
-  readUInt16: ->
-    b1 = @data[@pos++] << 8
-    b2 = @data[@pos++]
-    b1 | b2
 
   #
   # Helper functions so we don't have to remember the unpack

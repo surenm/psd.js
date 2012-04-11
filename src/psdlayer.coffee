@@ -81,8 +81,10 @@ class PSDLayer
     @parseBlendModes()
 
     # Length of the rest of the layer data
-    extralen = @file.readUInt()
+    extralen = @file.readInt()
     @layerEnd = @file.tell() + extralen
+
+    assert extralen > 0
 
     # Marking our start point in case we need to bail and recover
     extrastart = @file.tell()
@@ -119,6 +121,12 @@ class PSDLayer
     [@top, @left, @bottom, @right, @channels] = @file.readf ">iiiih"
     [@rows, @cols] = [@bottom - @top, @right - @left]
 
+    assert @channels > 0
+
+    # Alias
+    @height = @rows
+    @width = @cols
+
     # Sanity check
     if @bottom < @top or @right < @left or @channels > 64
       Log.debug "Somethings not right, attempting to skip layer."
@@ -129,7 +137,7 @@ class PSDLayer
     # Read channel info
     @channelsInfo = []
     for i in [0...@channels]
-      [channelID, channelLength] = @file.readf ">hL"
+      [channelID, channelLength] = @file.readf ">hi"
       Log.debug "Channel #{i}: id=#{channelID}, #{channelLength} bytes, type=#{CHANNEL_SUFFIXES[channelID]}"
 
       @channelsInfo.push id: channelID, length: channelLength
@@ -139,13 +147,15 @@ class PSDLayer
     @blendMode = {}
 
     [
-      @blendMode.sig, 
-      @blendMode.key, 
-      @blendMode.opacity,
-      @blendMode.clipping, 
+      @blendMode.sig, # 8BIM
+      @blendMode.key, # blending mode key
+      @blendMode.opacity, # 0 - 255
+      @blendMode.clipping, # 0 = base, 1 = non-base
       flags, 
       filler # unused data
     ] = @file.readf ">4s4sBBBB"
+
+    assert @blendMode.sig is "8BIM"
 
     @blendMode.key = @blendMode.key.trim()
     @blendMode.opacityPercentage = (@blendMode.opacity * 100) / 255
@@ -156,6 +166,7 @@ class PSDLayer
     @blendMode.visible = 1 - @blendMode.visible
     @blendMode.obsolete = (flags & (0x01 << 2)) > 0
     
+    # PS >= 5.0; tells if bit 4 has useful info
     if (flags & (0x01 << 3)) > 0
       @blendMode.pixelDataIrrelevant = (flags & (0x01 << 4)) > 0
 
@@ -165,10 +176,10 @@ class PSDLayer
     Log.debug "Blending mode:", @blendMode
 
   parseMaskData: ->
-    @mask.size = @file.readUInt()
+    @mask.size = @file.readInt()
 
     # Something wrong, bail.
-    return false if @mask.size not in [36, 20, 0]
+    assert @mask.size in [36, 20, 0]
 
     # Valid, but this section doesn't exist.
     return true if @mask.size is 0
@@ -183,7 +194,9 @@ class PSDLayer
       # Either 0 or 255
       @mask.defaultColor, 
       flags
-    ] = @file.readf ">LLLLBB"
+    ] = @file.readf ">llllBB"
+
+    assert @mask.defaultColor in [0, 255]
 
     @mask.width = @mask.right - @mask.left
     @mask.height = @mask.bottom - @mask.top
@@ -212,24 +225,31 @@ class PSDLayer
     true
 
   parseBlendingRanges: ->
-    length = @file.readUInt()
+    length = @file.readInt()
 
     # First, the grey blend. This is irrelevant for Lab & Greyscale.
     @blendingRanges.grey =
       source:
-        black: @file.readf ">BB"
-        white: @file.readf ">BB"
+        black: @file.readShortInt()
+        white: @file.readShortInt()
       dest:
-        black: @file.readf ">BB"
-        white: @file.readf ">BB"
+        black: @file.readShortInt()
+        white: @file.readShortInt()
 
     pos = @file.tell()
 
+    @blendingRanges.numChannels = (length - 8) / 8
+    assert @blendingRanges.numChannels > 0
+
     @blendingRanges.channels = []
-    while @file.tell() < pos + length - 8
+    for i in [0...@blendingRanges.numChannels]
       @blendingRanges.channels.push
-        source: @file.readf ">BB"
-        dest: @file.readf ">BB"
+        source: 
+          black: @file.readShortInt()
+          white: @file.readShortInt()
+        dest: 
+          black: @file.readShortInt()
+          white: @file.readShortInt()
 
   parseExtraData: ->
     while @file.tell() < @layerEnd
@@ -238,17 +258,19 @@ class PSDLayer
         key
       ] = @file.readf ">4s4s"
 
-      length = @file.readUInt()
+      assert.equal signature, "8BIM"
+
+      length = Util.pad2 @file.readInt()
       pos = @file.tell()
 
       Log.debug("Found additional layer info with key #{key} and length #{length}")
       switch key
-        when "lyid" then @layerId = @file.readUInt()
-        when "shmd" then @file.seek length # TODO - @readMetadata()
+        when "lyid" then @layerId = @file.readInt()
+        #when "shmd" then @file.seek length # TODO - @readMetadata()
         when "lsct" then @readLayerSectionDivider()
-        when "luni" then @file.seek length # TODO - @uniName = @file.readUnicodeString()
-        when "vmsk" then @file.seek length # TODO - @readVectorMask()
-        when "tySh" then @readTypeTool(true) # PS 5.0/5.5 only
+        #when "luni" then @file.seek length # TODO - @uniName = @file.readUnicodeString()
+        #when "vmsk" then @file.seek length # TODO - @readVectorMask()
+        #when "tySh" then @readTypeTool(true) # PS 5.0/5.5 only
         #when "TySh" then @readTypeTool() # PS 6.0+
         when "lrFX" then @parseEffectsLayer(); @file.read(2) # why these 2 bytes?
         else  

@@ -29,43 +29,42 @@ class PSDLayerMask
     # If the mask size is > 0, then parse the section. Otherwise,
     # this section doesn't exist and the whole layers/masks data
     # is 4 bytes (the length we've already read)
-    if maskSize > 0
-      # Size of the layer info section. 4 bytes, rounded up by 2's.
-      layerInfoSize = Util.pad2(@file.readUInt())
+    return if maskSize <= 0
+    
+    # Size of the layer info section. 4 bytes, rounded up by 2's.
+    layerInfoSize = Util.pad2 @file.readInt()
 
-      # If the layer info size is > 0, then we have some layers
-      if layerInfoSize > 0
-        # Read the number of layers, 2 bytes.
-        @numLayers = @file.readShortInt()
+    # If the layer info size is > 0, then we have some layers
+    if layerInfoSize > 0
+      # Read the number of layers, 2 bytes.
+      @numLayers = @file.readShortInt()
 
-        # If the number of layers is negative, the absolute value is
-        # the actual number of layers, and the first alpha channel contains
-        # the transparency data for the merged image.
-        if @numLayers < 0
-          Log.debug "Note: first alpha channel contains transparency data"
-          @numLayers = Math.abs @numLayers
-          @mergedAlpha = true
+      # If the number of layers is negative, the absolute value is
+      # the actual number of layers, and the first alpha channel contains
+      # the transparency data for the merged image.
+      if @numLayers < 0
+        Log.debug "Note: first alpha channel contains transparency data"
+        @numLayers = Math.abs @numLayers
+        @mergedAlpha = true
 
-        if @numLayers * (18 + 6 * @header.channels) > layerInfoSize
-          throw "Unlikely number of #{@numLayers} layers for #{@header['channels']} with #{layerInfoSize} layer info size. Giving up."
+      if @numLayers * (18 + 6 * @header.channels) > layerInfoSize
+        throw "Unlikely number of #{@numLayers} layers for #{@header['channels']} with #{layerInfoSize} layer info size. Giving up."
 
-        Log.debug "Found #{@numLayers} layer(s)"
+      Log.debug "Found #{@numLayers} layer(s)"
 
-        for i in [0...@numLayers]
-          layer = new PSDLayer @file
-          layer.parse(i)
-          @layers.push layer
+      for i in [0...@numLayers]
+        layer = new PSDLayer @file
+        layer.parse(i)
+        @layers.push layer
 
-        for layer in @layers
-          continue if layer.isFolder
-          layer.image = new PSDChannelImage(@file, @header, layer)
+      for layer in @layers
+        continue if layer.isFolder
+        layer.image = new PSDChannelImage(@file, @header, layer)
 
-          if @options.layerImages
-            layer.image.parse()
-          else
-            layer.image.skip()
-
-        # TODO : layers.reverse()
+        if @options.layerImages
+          layer.image.parse()
+        else
+          layer.image.skip()
 
     # Parse the global layer mask
     @parseGlobalMask()
