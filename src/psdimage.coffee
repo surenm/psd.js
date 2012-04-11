@@ -123,7 +123,9 @@ class PSDImage
           data = @file.read len
 
           # memcpy!
-          @channelData[chanPos...chanPos+len] = data
+          dataIndex = 0
+          @channelData[k] = data[dataIndex++] for k in [chanPos...chanPos+len]
+
           chanPos += len
         else if len > 128
           len ^= 0xff
@@ -133,7 +135,9 @@ class PSDImage
           data = []
           data.push val for z in [0...len]
 
-          @channelData[chanPos...chanPos+len] = data
+          dataIndex = 0
+          @channelData[k] = data[dataIndex++] for k in [chanPos...chanPos+len]
+
           chanPos += len
 
     [chanPos, lineIndex]
