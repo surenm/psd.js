@@ -174,7 +174,7 @@ PSD.PSDColor = class PSDColor
         g = p
         b = q
 
-    r: r * 255, g: g * 255, b: b * 255
+    Util.clamp {r: r * 255, g: g * 255, b: b * 255}, 0, 255
 
   # Converts a RGB color value to the XYZ color space. Formulas
   # are based on http://en.wikipedia.org/wiki/SRGB assuming that
@@ -251,7 +251,7 @@ PSD.PSDColor = class PSDColor
     else
       b *= 12.92
 
-    r: r * 255, g: g * 255, b: b * 255
+    Util.clamp {r: r * 255, g: g * 255, b: b * 255}, 0, 255
 
   # Converts a XYZ color value to the CIELAB color space. Formulas
   # are based on http://en.wikipedia.org/wiki/Lab_color_space
@@ -314,27 +314,34 @@ PSD.PSDColor = class PSDColor
     x = y + (a / 500)
     z = y - (b / 200)
 
-    if x > 0.2068965517
-      x = x * x * x
+    if Math.pow(x, 3) > 0.008856
+      x = Math.pow(x, 3)
     else
-      x = 0.1284185493 * (x - 0.1379310345)
+      x = (x - 16 / 116) / 7.787
   
-    if y > 0.2068965517
-      y = y * y * y
+    if Math.pow(y, 3) > 0.008856
+      y = Math.pow(y, 3)
     else
-      y = 0.1284185493 * (y - 0.1379310345)
+      y = (y - 16 / 116) / 7.787
   
-    if z > 0.2068965517
-      z = z * z * z
+    if Math.pow(z, 3) > 0.008856
+      z = Math.pow(z, 3)
     else
-      z = 0.1284185493 * (z - 0.1379310345)
+      z = (z - 16 / 116) / 7.787
 
     # D65 reference white point
     x: x * 95.047, y: y * 100.0, z: z * 108.883
 
+  @labToRGB: (l, a, b) ->
+    xyz = @labToXYZ(l, a, b)
+    Util.clamp @xyzToRGB(xyz.x, xyz.y, xyz.z), 0, 255
+
+  # Convers CMYK color to RGB. This is not quite as accurate as what
+  # Photoshop actually uses, becasue Photoshop converts using LAB color,
+  # which takes into consideration the monitor white point.
   @cmykToRGB: (c, m, y, k) ->
     r = (65535 - (c * (255 - k) + (k << 8))) >> 8
     g = (65535 - (m * (255 - k) + (k << 8))) >> 8
     b = (65535 - (y * (255 - k) + (k << 8))) >> 8
 
-    r: r, g: g, b: b
+    Util.clamp {r: r, g: g, b: b}, 0, 255

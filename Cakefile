@@ -8,6 +8,7 @@ targetName    = "psd"
 ###
 CoffeeScript Options
 ###
+strictMode    = false
 csSrcDir      = "src"
 csTargetDir   = "lib"
 
@@ -127,6 +128,7 @@ task 'compile', 'Compile all CoffeeScript source files', (opts) ->
       util.log "Adding dependency #{dep}"
       contents.unshift "`" + fs.readFileSync("#{depsDir}/#{dep}", "utf8") + "`\n\n"
 
+    contents.unshift "\"use strict\"" if strictMode
     core = contents.join("\n\n")
 
     fs.writeFile "#{targetCoffee}.coffee", core, "utf8", (err) ->

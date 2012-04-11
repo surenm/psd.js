@@ -160,6 +160,8 @@ class PSDImage
         @combineRGB16Channel() if @getImageDepth() is 16
       when 4 #CMKYColor
         @combineCMYK8Channel()
+      when 9 #LABColor
+        @combineLAB8Channel() if @getImageDepth() is 8
 
     # Manually delete channel data to free up memory
     delete @channelData
@@ -249,6 +251,23 @@ class PSDImage
       rgb = PSDColor.cmykToRGB(255 - c, 255 - m, 255 - y, 255 - k)
 
       @pixelData.push rgb.r, rgb.g, rgb.b, @getAlphaValue(a)
+
+  combineLAB8Channel: ->
+    for i in [0...@numPixels]
+      if @getImageChannels() is 4
+        alpha = @channelData[i]
+        l = @channelData[i + @channelLength]
+        a = @channelData[i + @channelLength * 2]
+        b = @channelData[i + @channelLength * 3]
+      else
+        alpha = 255
+        l = @channelData[i]
+        a = @channelData[i + @channelLength]
+        b = @channelData[i + @channelLength * 2]
+
+      rgb = PSDColor.labToRGB l * 100 >> 8, a - 128, b - 128
+
+      @pixelData.push rgb.r, rgb.g, rgb.b, @getAlphaValue(alpha)
 
       
   # Normally, the pixel data is stored in planar order, meaning all the red
