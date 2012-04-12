@@ -122,7 +122,25 @@ incorrectly in one of the resources, or the file is corrupt.</p>             </t
     <span class="nx">@parseLayersMasks</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="nx">unless</span> <span class="nx">@layerMask</span>
 
     <span class="vi">@image = </span><span class="k">new</span> <span class="nx">PSDImage</span> <span class="nx">@file</span><span class="p">,</span> <span class="nx">@header</span>
-    <span class="nx">@image</span><span class="p">.</span><span class="nx">parse</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-19">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-19">&#182;</a>               </div>               <p>Exports a flattened version to a file. For use in NodeJS.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">toFile: </span><span class="nf">(filename, cb = -&gt;) -&gt;</span> 
+    <span class="nx">@image</span><span class="p">.</span><span class="nx">parse</span><span class="p">()</span>
+
+  <span class="nv">getLayerStructure: </span><span class="o">-&gt;</span>
+    <span class="nx">@parseLayersMasks</span><span class="p">()</span> <span class="nx">unless</span> <span class="nx">@layerMask</span>
+
+    <span class="nv">result = </span><span class="p">{</span><span class="nv">layers: </span><span class="p">[]}</span>
+    <span class="nv">parseStack = </span><span class="p">[]</span>
+    <span class="k">for</span> <span class="nx">layer</span> <span class="k">in</span> <span class="nx">@layers</span>
+      <span class="k">if</span> <span class="nx">layer</span><span class="p">.</span><span class="nx">isFolder</span>
+        <span class="nx">parseStack</span><span class="p">.</span><span class="nx">push</span> <span class="nx">result</span>
+        <span class="nv">result = </span><span class="p">{</span><span class="nv">name: </span><span class="nx">layer</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nv">layers: </span><span class="p">[]}</span>
+      <span class="k">else</span> <span class="k">if</span> <span class="nx">layer</span><span class="p">.</span><span class="nx">isHidden</span>
+        <span class="nv">temp = </span><span class="nx">result</span>
+        <span class="nv">result = </span><span class="nx">parseStack</span><span class="p">.</span><span class="nx">pop</span><span class="p">()</span>
+        <span class="nx">result</span><span class="p">.</span><span class="nx">layers</span><span class="p">.</span><span class="nx">push</span> <span class="nx">temp</span>
+      <span class="k">else</span>
+        <span class="nx">result</span><span class="p">.</span><span class="nx">layers</span><span class="p">.</span><span class="nx">push</span> <span class="nx">layer</span>
+
+    <span class="nx">result</span></pre></div>             </td>           </tr>                               <tr id="section-19">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-19">&#182;</a>               </div>               <p>Exports a flattened version to a file. For use in NodeJS.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">toFile: </span><span class="nf">(filename, cb = -&gt;) -&gt;</span> 
     <span class="nx">@parseImageData</span><span class="p">()</span> <span class="nx">unless</span> <span class="nx">@image</span>
     <span class="nx">@image</span><span class="p">.</span><span class="nx">toFile</span> <span class="nx">filename</span><span class="p">,</span> <span class="nx">cb</span>
 

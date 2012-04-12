@@ -16,7 +16,7 @@ psd.parse()
 
 exec "mkdir -p #{__dirname}/output", ->
   for layer in psd.layers
-    continue if layer.isFolder
+    continue unless layer.image
 
     do (layer) ->
       layer.image.toFile __dirname + "/output/#{layer.name}.png", ->

@@ -1,7 +1,7 @@
 fs = require 'fs'
 
 {PSD} = require __dirname + '/../lib/psd.js'
-
+PSD.DEBUG = true
 if process.argv.length is 2
   console.log "Please specify an input file"
   process.exit()
@@ -14,11 +14,14 @@ psd.parse()
 console.log "Parsing finished!\n"
 console.log "PSD Groups\n======================="
 
-prefix = []
-for layer in psd.layers
-  console.log prefix.join("") + layer.name unless layer.isHidden
+base = psd.getLayerStructure()
 
-  if layer.isFolder
-    prefix.push "->  "
-  else if layer.isHidden
-    prefix.pop()
+outputFolder = (folder, prefix = []) ->
+  console.log prefix.join("") + folder.name if folder.name
+  for layer in folder.layers
+    console.log prefix.join("") + layer.name
+    if layer.layers?
+      # This is a nested folder
+      prefix.push "->  "; outputFolder(layer, prefix); prefix.pop()
+
+outputFolder(base)

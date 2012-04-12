@@ -168,6 +168,24 @@ Root.PSD = class PSD
     @image = new PSDImage @file, @header
     @image.parse()
 
+  getLayerStructure: ->
+    @parseLayersMasks() unless @layerMask
+
+    result = {layers: []}
+    parseStack = []
+    for layer in @layers
+      if layer.isFolder
+        parseStack.push result
+        result = {name: layer.name, layers: []}
+      else if layer.isHidden
+        temp = result
+        result = parseStack.pop()
+        result.layers.push temp
+      else
+        result.layers.push layer
+
+    result
+
   # Exports a flattened version to a file. For use in NodeJS.
   toFile: (filename, cb = ->) -> 
     @parseImageData() unless @image

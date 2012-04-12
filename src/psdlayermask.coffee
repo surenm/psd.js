@@ -58,7 +58,11 @@ class PSDLayerMask
         @layers.push layer
 
       for layer in @layers
-        continue if layer.isFolder
+        if layer.isFolder or layer.isHidden
+          # Layer contains no image data. Skip ahead.
+          @file.seek 8
+          continue
+
         layer.image = new PSDChannelImage(@file, @header, layer)
 
         if @options.layerImages
