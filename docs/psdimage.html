@@ -102,7 +102,9 @@ channel data or not.</p>             </td>             <td class="code">        
 
         <span class="k">if</span> <span class="nx">len</span> <span class="o">&lt;</span> <span class="mi">128</span>
           <span class="nx">len</span><span class="o">++</span>
-          <span class="nv">data = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">read</span> <span class="nx">len</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>memcpy!</p>             </td>             <td class="code">               <div class="highlight"><pre>          <span class="nx">@channelData</span><span class="p">[</span><span class="nx">chanPos</span><span class="p">...</span><span class="nx">chanPos</span><span class="o">+</span><span class="nx">len</span><span class="p">]</span> <span class="o">=</span> <span class="nx">data</span>
+          <span class="nv">data = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">read</span> <span class="nx">len</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>memcpy!</p>             </td>             <td class="code">               <div class="highlight"><pre>          <span class="nv">dataIndex = </span><span class="mi">0</span>
+          <span class="nx">@channelData</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="nx">dataIndex</span><span class="o">++</span><span class="p">]</span> <span class="k">for</span> <span class="nx">k</span> <span class="k">in</span> <span class="p">[</span><span class="nx">chanPos</span><span class="p">...</span><span class="nx">chanPos</span><span class="o">+</span><span class="nx">len</span><span class="p">]</span>
+
           <span class="nx">chanPos</span> <span class="o">+=</span> <span class="nx">len</span>
         <span class="k">else</span> <span class="k">if</span> <span class="nx">len</span> <span class="o">&gt;</span> <span class="mi">128</span>
           <span class="nx">len</span> <span class="o">^=</span> <span class="mh">0xff</span>
@@ -112,7 +114,9 @@ channel data or not.</p>             </td>             <td class="code">        
           <span class="nv">data = </span><span class="p">[]</span>
           <span class="nx">data</span><span class="p">.</span><span class="nx">push</span> <span class="nx">val</span> <span class="k">for</span> <span class="nx">z</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">len</span><span class="p">]</span>
 
-          <span class="nx">@channelData</span><span class="p">[</span><span class="nx">chanPos</span><span class="p">...</span><span class="nx">chanPos</span><span class="o">+</span><span class="nx">len</span><span class="p">]</span> <span class="o">=</span> <span class="nx">data</span>
+          <span class="nv">dataIndex = </span><span class="mi">0</span>
+          <span class="nx">@channelData</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="nx">dataIndex</span><span class="o">++</span><span class="p">]</span> <span class="k">for</span> <span class="nx">k</span> <span class="k">in</span> <span class="p">[</span><span class="nx">chanPos</span><span class="p">...</span><span class="nx">chanPos</span><span class="o">+</span><span class="nx">len</span><span class="p">]</span>
+
           <span class="nx">chanPos</span> <span class="o">+=</span> <span class="nx">len</span>
 
     <span class="p">[</span><span class="nx">chanPos</span><span class="p">,</span> <span class="nx">lineIndex</span><span class="p">]</span>
