@@ -25,7 +25,6 @@
 if exports?
   Root = exports
   fs = require 'fs'
-  assert = require 'assert'
 else
   Root = window
 

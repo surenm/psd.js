@@ -22,6 +22,8 @@ coffeeCoreOpts    = "-r coffeescript-growl -j #{targetName}.js -o #{csTargetDir}
 
 # All source files listed in include order
 coffeeFiles   = [
+  "psdassert"
+  
   "psd"
   "psdcolor"
   "psdfile"
