@@ -123,7 +123,7 @@ class exports.PSDTest
         @assertAttributes obj[k], v, testDone
       else if typeof v is "string"
         try
-          assert.equal v, obj[k], "Attributes are equal"
+          assert.equal v, obj[k], "Attribute #{v} === #{obj[k]}"
         catch e
           @outputError e
 
