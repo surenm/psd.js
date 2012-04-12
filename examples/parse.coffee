@@ -1,6 +1,4 @@
 fs = require 'fs'
-Canvas = require 'canvas'
-Image = Canvas.Image
 
 {PSD} = require __dirname + '/../lib/psd.js'
 

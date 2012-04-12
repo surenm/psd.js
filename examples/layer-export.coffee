@@ -1,9 +1,6 @@
 fs = require 'fs'
 {exec} = require 'child_process'
 
-Canvas = require 'canvas'
-Image = Canvas.Image
-
 {PSD} = require __dirname + '/../lib/psd.js'
 
 PSD.DEBUG = true

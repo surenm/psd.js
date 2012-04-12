@@ -69,7 +69,10 @@ class PSDLayerMask
     # In case there are filler zeros
     @file.seek pos + layerInfoSize, false
 
-    # TODO: Group layers
+    # Layers are parsed in reverse order
+    @layers.reverse()
+
+    @groupLayers()
 
     # Parse the global layer mask
     @parseGlobalMask()
@@ -125,14 +128,11 @@ class PSDLayerMask
       @file.seek length
 
   groupLayers: ->
-    parents = []
+    groupLayer = null
     for layer in @layers
-      layer.parent = parents[parents.length - 1] or null
-      layer.parents = parents[1..]
-
-      continue if layer.layerType.code is 0
-
-      if layer.layerType.code is 3 and parents.length > 0
-        delete parents[parents.length - 1]
+      if layer.isFolder
+        groupLayer = layer
+      else if layer.isHidden
+        groupLayer = null
       else
-        parents.push layer
+        layer.groupLayer = groupLayer

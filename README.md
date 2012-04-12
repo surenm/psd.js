@@ -134,3 +134,7 @@ for layer in psd.layers
     layer.image.toFile __dirname + "/output/#{layer.name}.png", ->
       console.log "Layer #{layer.name} output to file."
 ```
+
+### Other Examples
+
+See the `examples/` folder and the wiki for some handy code snippets.

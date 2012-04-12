@@ -74,6 +74,8 @@ class PSDLayer
     @blendingRanges = {}
     @adjustments = {}
     @effects = []
+
+    @layerType = "normal"
     @isFolder = false
     @isHidden = false
 
