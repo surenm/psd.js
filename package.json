@@ -1,6 +1,6 @@
 {
   "name": "psd",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "A Photoshop file format (PSD) parser written in Coffeescript/Javascript",
   "homepage": "http://meltingice.github.com/psd.js/",
   "author": "Ryan LeFevre <ryan@twitpic.com> (http://meltingice.net/)",
