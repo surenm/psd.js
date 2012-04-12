@@ -1,10 +1,11 @@
-assert = null
-
 # Quick and dirty assertion polyfill for browsers
-do (assert) ->
-  if exports?
-    assert = require 'assert'
-    return
+assert = do (assert) ->
+  return require 'assert' if exports?
 
-  assert = (test) -> test == true
-  assert.equal = (actual, expected) -> actual is expected
+  assert = (test) ->
+    throw "Assertion error" unless test == true
+
+  assert.equal = (actual, expected) ->
+    throw "Assertion error" unless actual is expected
+
+  return assert
