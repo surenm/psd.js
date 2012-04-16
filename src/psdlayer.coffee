@@ -222,8 +222,9 @@ class PSDLayer
       @mask.disabled = (flags & (0x01 << 1)) > 0
       @mask.invert = (flags & (0x01 << 2)) > 0
 
-    # For some reason the mask position info is duplicated here? Skip. Ugh.
-    @file.seek 16
+      # For some reason the mask position info is duplicated here? Skip. Ugh.
+      @file.seek 16
+      
     true
 
   parseBlendingRanges: ->
@@ -257,6 +258,7 @@ class PSDLayer
   parseLayerName: ->
     # Name length is padded in multiples of 4
     namelen = Util.pad4 @file.read(1)[0]
+    console.log "Name length: #{namelen}"
     @name = @file.readString namelen
 
     Log.debug "Layer name: #{@name}"
