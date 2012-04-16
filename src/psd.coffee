@@ -49,7 +49,7 @@ Root.PSD = class PSD
       reader.onload = (f) ->
         # In order to convert the file data to a useful format, we need
         # to conver the buffer into a byte array.
-        bytes = new Uint8Array(f.target.result)
+        bytes = new Int8Array(f.target.result)
 
         psd = new PSD(bytes)
         cb(psd)
@@ -62,7 +62,7 @@ Root.PSD = class PSD
     xhr.open "GET", url, true
     xhr.responseType = "arraybuffer"
     xhr.onload = ->
-      data = new Uint8Array(xhr.response or xhr.mozResponseArrayBuffer)
+      data = new Int8Array(xhr.response or xhr.mozResponseArrayBuffer)
       psd = new PSD(data)
       cb(psd)
 

@@ -52,7 +52,7 @@ Alternatively, download and use the `lib/psd.js` file from this repository.
 
 ### Loading a PSD
 
-In order to load a PSD into psd.js, you have to give it the byte data in a UInt8Array buffer. psd.js has some helper methods for you to make your life easier.
+In order to load a PSD into psd.js, you have to give it the byte data in a Int8Array buffer. psd.js has some helper methods for you to make your life easier.
 
 ``` coffeescript
 # If you're in NodeJS, use this:

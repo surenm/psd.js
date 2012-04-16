@@ -268,6 +268,7 @@ class PSDLayer
       Log.debug("Found additional layer info with key #{key} and length #{length}")
       switch key
         when "levl" then @adjustments.levels = (new PSDLevels(@, length)).parse()
+        when "curv" then @adjustments.curves = (new PSDCurves(@, length)).parse()
         when "lyid" then @layerId = @file.readInt()
         #when "shmd" then @file.seek length # TODO - @readMetadata()
         when "lsct" then @readLayerSectionDivider()

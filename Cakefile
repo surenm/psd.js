@@ -33,6 +33,7 @@ coffeeFiles   = [
   "psdlayer"
   "psdlayermask"
 
+  "layerdata/curves"
   "layerdata/layereffect"
   "layerdata/levels"
 
