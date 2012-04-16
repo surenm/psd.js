@@ -279,6 +279,8 @@ class PSDLayer
       switch key
         when "levl" then @adjustments.levels = (new PSDLevels(@, length)).parse()
         when "curv" then @adjustments.curves = (new PSDCurves(@, length)).parse()
+        when "brit"
+          @adjustments.brightnessContrast = (new PSDBrightnessContrast(@, length)).parse()
         when "lyid" then @layerId = @file.readInt()
         when "lsct" then @readLayerSectionDivider()
         when "lrFX" then @parseEffectsLayer(); @file.read(2) # why these 2 bytes?
