@@ -274,17 +274,13 @@ class PSDLayer
       length = Util.pad2 @file.readInt()
       pos = @file.tell()
 
+      # TODO: many more adjustment layers to implement
       Log.debug("Extra layer info: key = #{key}, length = #{length}")
       switch key
         when "levl" then @adjustments.levels = (new PSDLevels(@, length)).parse()
         when "curv" then @adjustments.curves = (new PSDCurves(@, length)).parse()
         when "lyid" then @layerId = @file.readInt()
-        #when "shmd" then @file.seek length # TODO - @readMetadata()
         when "lsct" then @readLayerSectionDivider()
-        #when "luni" then @file.seek length # TODO - @uniName = @file.readUnicodeString()
-        #when "vmsk" then @file.seek length # TODO - @readVectorMask()
-        #when "tySh" then @readTypeTool(true) # PS 5.0/5.5 only
-        #when "TySh" then @readTypeTool() # PS 6.0+
         when "lrFX" then @parseEffectsLayer(); @file.read(2) # why these 2 bytes?
         else  
           @file.seek length
@@ -295,7 +291,6 @@ class PSDLayer
         @file.seek pos + length, false # Attempt to recover
 
   parseEffectsLayer: ->
-
     [
         v, # always 0
         count
@@ -327,19 +322,6 @@ class PSDLayer
        @file.seek left 
       else
         @effects.push(effect) unless type == "cmnS" # ignore commons state info
-
-  readMetadata: ->
-    Log.debug "Parsing layer metadata..."
-
-    count = @file.readUInt16()
-
-    for i in [0...count]
-      [sig, key, padding] = @file.readf ">4s4s4s"
-
-      #if key is "mlst"
-        #readAnimation. needs research.
-
-      @file.skipBlock("image metadata")
         
   readLayerSectionDivider: ->
     code = @file.readInt()
@@ -350,23 +332,3 @@ class PSDLayer
     switch code
       when 1, 2 then @isFolder = true
       when 3 then @isHidden = true
-    
-  readVectorMask: ->
-    version = @file.readUInt()
-    flags = @file.read 4
-
-    # TODO read path information
-
-  readTypeTool: (legacy = false) ->
-    @typeTool = new PSDTypeTool @file, legacy
-    @typeTool.parse()
-
-  getSafeFont: (font) ->
-    for safeFont in SAFE_FONTS
-      it = true
-      for word in safeFont.split " "
-        it = false if not !!~ font.indexOf(word)
-
-      return safeFont if it
-
-    font

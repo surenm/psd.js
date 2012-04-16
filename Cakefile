@@ -38,7 +38,6 @@ coffeeFiles   = [
   "layerdata/levels"
 
   "psdresource"
-  "psdtypetool"
   "util"
   "log"
 ]
