@@ -277,13 +277,20 @@ class PSDLayer
       # TODO: many more adjustment layers to implement
       Log.debug("Extra layer info: key = #{key}, length = #{length}")
       switch key
-        when "levl" then @adjustments.levels = (new PSDLevels(@, length)).parse()
-        when "curv" then @adjustments.curves = (new PSDCurves(@, length)).parse()
+        when "levl"
+          @adjustments.levels = (new PSDLevels(@, length)).parse()
+        when "curv"
+          @adjustments.curves = (new PSDCurves(@, length)).parse()
         when "brit"
           @adjustments.brightnessContrast = (new PSDBrightnessContrast(@, length)).parse()
-        when "lyid" then @layerId = @file.readInt()
-        when "lsct" then @readLayerSectionDivider()
-        when "lrFX" then @parseEffectsLayer(); @file.read(2) # why these 2 bytes?
+        when "blnc"
+          @adjustments.colorBalance = (new PSDColorBalance(@, length)).parse()
+        when "lyid"
+          @layerId = @file.readInt()
+        when "lsct"
+          @readLayerSectionDivider()
+        when "lrFX"
+          @parseEffectsLayer(); @file.read(2) # why these 2 bytes?
         else  
           @file.seek length
           Log.debug("Skipping additional layer info with key #{key}")
