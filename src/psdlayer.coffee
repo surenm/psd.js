@@ -75,7 +75,12 @@ class PSDLayer
     @adjustments = {}
     @effects = []
 
+    # Defaults
     @layerType = "normal"
+    @blendingMode = "normal"
+    @opacity = 255
+    @fillOpacity = 255
+
     @isFolder = false
     @isHidden = false
 
@@ -99,12 +104,7 @@ class PSDLayer
       return @file.seek @layerEnd, false
 
     @parseBlendingRanges()
-
-    namelen = Util.pad4 @file.read(1)[0]
-    @name = @file.readString namelen
-
-    Log.debug "Layer name: #{@name}"
-
+    @parseLayerName()
     @parseExtraData()
 
     Log.debug "Layer #{layerIndex}:", @
@@ -173,7 +173,7 @@ class PSDLayer
       @blendMode.pixelDataIrrelevant = (flags & (0x01 << 4)) > 0
 
     @blendingMode = @blendMode.blender
-    @opacity = @blendMode.opacityPercentage
+    @opacity = @blendMode.opacity
 
     Log.debug "Blending mode:", @blendMode
 
@@ -253,6 +253,14 @@ class PSDLayer
           black: @file.readShortInt()
           white: @file.readShortInt()
 
+  # Parse the name of this layer
+  parseLayerName: ->
+    # Name length is padded in multiples of 4
+    namelen = Util.pad4 @file.read(1)[0]
+    @name = @file.readString namelen
+
+    Log.debug "Layer name: #{@name}"
+
   parseExtraData: ->
     while @file.tell() < @layerEnd
       [
@@ -265,7 +273,7 @@ class PSDLayer
       length = Util.pad2 @file.readInt()
       pos = @file.tell()
 
-      Log.debug("Found additional layer info with key #{key} and length #{length}")
+      Log.debug("Extra layer info: key = #{key}, length = #{length}")
       switch key
         when "levl" then @adjustments.levels = (new PSDLevels(@, length)).parse()
         when "curv" then @adjustments.curves = (new PSDCurves(@, length)).parse()
