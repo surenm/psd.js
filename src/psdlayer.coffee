@@ -285,6 +285,8 @@ class PSDLayer
           @adjustments.brightnessContrast = (new PSDBrightnessContrast(@, length)).parse()
         when "blnc"
           @adjustments.colorBalance = (new PSDColorBalance(@, length)).parse()
+        when "hue2"
+          @adjustments.hueSaturation = (new PSDHueSaturation(@, length)).parse()
         when "lyid"
           @layerId = @file.readInt()
         when "lsct"
