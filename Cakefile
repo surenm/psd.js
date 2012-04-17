@@ -40,6 +40,7 @@ coffeeFiles   = [
   "layerdata/layereffect"
   "layerdata/levels"
   "layerdata/selectivecolor"
+  "layerdata/threshold"
 
   "psdresource"
   "util"

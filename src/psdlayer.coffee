@@ -289,6 +289,8 @@ class PSDLayer
           @adjustments.hueSaturation = (new PSDHueSaturation(@, length)).parse()
         when "selc"
           @adjustments.selectiveColor = (new PSDSelectiveColor(@, length)).parse()
+        when "thrs"
+          @adjustments.threshold = (new PSDThreshold(@, length)).parse()
         when "lyid"
           @layerId = @file.readInt()
         when "lsct"
