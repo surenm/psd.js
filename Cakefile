@@ -37,6 +37,7 @@ coffeeFiles   = [
   "layerdata/colorbalance"
   "layerdata/curves"
   "layerdata/huesaturation"
+  "layerdata/invert"
   "layerdata/layereffect"
   "layerdata/levels"
   "layerdata/selectivecolor"

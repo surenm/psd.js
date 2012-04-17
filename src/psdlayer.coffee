@@ -291,6 +291,8 @@ class PSDLayer
           @adjustments.selectiveColor = (new PSDSelectiveColor(@, length)).parse()
         when "thrs"
           @adjustments.threshold = (new PSDThreshold(@, length)).parse()
+        when "nvrt"
+          @adjustments.invert = (new PSDInvert(@, length)).parse()
         when "lyid"
           @layerId = @file.readInt()
         when "lsct"
