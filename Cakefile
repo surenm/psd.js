@@ -39,6 +39,7 @@ coffeeFiles   = [
   "layerdata/huesaturation"
   "layerdata/layereffect"
   "layerdata/levels"
+  "layerdata/selectivecolor"
 
   "psdresource"
   "util"
