@@ -121,7 +121,7 @@ Root.PSD = class PSD
     @resources = []
 
     # Find the size of the resources section
-    [n] = @file.readf ">L"
+    n = @file.readInt()
     length = n
 
     if skip
@@ -132,8 +132,12 @@ Root.PSD = class PSD
 
     # Continue parsing resources until we've reached the end of the section.
     while n > 0
+      pos = @file.tell()
+
       resource = new PSDResource @file
-      n -= resource.parse()
+      resource.parse()
+
+      n -= @file.tell() - pos
       @resources.push resource
 
       Log.debug "Resource: ", resource

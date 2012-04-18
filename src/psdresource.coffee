@@ -371,12 +371,14 @@ class PSDResource
     @name = @name.substr(0, @name.length - 1)
     @shortName = @name.substr(0, 20)
 
-    [@size] = @file.readf ">L"
+    @size = @file.readInt()
     @size = Util.pad2(@size)
 
-    if 2000 <= @id <= 2997
+    if 2000 <= @id <= 2998
       @rdesc = "[Path Information]"
       @file.seek @size
+    else if @id is 2999
+      assert 0
     else if 4000 <= @id < 5000
       @rdesc = "[Plug-in Resource]"
       @file.seek @size
@@ -388,5 +390,5 @@ class PSDResource
         resource.parse.call(@)
       else
         @file.seek @size
-
-    4 + 2 + Util.pad2(1 + @namelen) + 4 + Util.pad2(@size)
+    else
+      @file.seek @size
