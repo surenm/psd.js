@@ -135,6 +135,7 @@ task 'compile', 'Compile all CoffeeScript source files', (opts) ->
       util.log "Adding dependency #{dep}"
       contents.unshift "`" + fs.readFileSync("#{depsDir}/#{dep}", "utf8") + "`\n\n"
 
+    contents.unshift fs.readFileSync("#{csSrcDir}/license.coffee") + "\n\n"
     contents.unshift "\"use strict\"" if strictMode
     core = contents.join("\n\n")
 
