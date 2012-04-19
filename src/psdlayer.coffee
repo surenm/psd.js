@@ -293,6 +293,8 @@ class PSDLayer
           @adjustments.threshold = (new PSDThreshold(@, length)).parse()
         when "nvrt"
           @adjustments.invert = (new PSDInvert(@, length)).parse()
+        when "post"
+          @adjustments.posterize = (new PSDPosterize(@, length)).parse()
         when "lyid"
           @layerId = @file.readInt()
         when "lsct"

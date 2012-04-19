@@ -40,6 +40,7 @@ coffeeFiles   = [
   "layerdata/invert"
   "layerdata/layereffect"
   "layerdata/levels"
+  "layerdata/posterize"
   "layerdata/selectivecolor"
   "layerdata/threshold"
 
