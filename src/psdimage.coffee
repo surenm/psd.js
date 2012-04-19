@@ -16,6 +16,7 @@ class PSDImage
 
   constructor: (@file, @header) ->
     @numPixels = @getImageWidth() * @getImageHeight()
+    @numPixels *= 2 if @getImageDepth() is 16
 
     @length = switch @getImageDepth()
       when 1 then (@getImageWidth() + 7) / 8 * @getImageHeight()
@@ -192,14 +193,15 @@ class PSDImage
   combineGreyscale16Channel: ->
     if @getImageChannels() is 2
       # Has alpha channel
-      for i in [0...@numPixels]
-        alpha = @channelData[i] >> 8
-        grey = @channelData[@channelLength + i] >> 8
+      for i in [0...@numPixels] by 2
+        alpha = Util.toUInt16 @channelData[i + 1], @channelData[i]
+        grey = Util.toUInt16 @channelData[@channelLength + i + 1], @channelData[@channelLength + i]
 
         @pixelData.push grey, grey, grey, @getAlphaValue(alpha)
     else
-      for i in [0...@numPixels]
-        @pixelData.push @channelData[i], @channelData[i], @channelData[i], @getAlphaValue()
+      for i in [0...@numPixels] by 2
+        pixel = Util.toUInt16 @channelData[i+1], @channelData[i]
+        @pixelData.push pixel, pixel, pixel, @getAlphaValue()
 
   combineRGB8Channel: ->
     for i in [0...@numPixels]
@@ -222,18 +224,22 @@ class PSDImage
       
 
   combineRGB16Channel: ->
-    for i in [0...@numPixels]
+    for i in [0...@numPixels] by 2
       index = 0
       pixel = r: 0, g: 0, b: 0, a: 255
 
       for chan in @channelsInfo
+        b1 = @channelData[i + (@channelLength * index) + 1]
+        b2 = @channelData[i + (@channelLength * index)]
+
         switch chan.id
           when -1
             if @getImageChannels() is 4
-              pixel.a = @channelData[i + (@channelLength * index)] >> 8
-          when 0 then pixel.r = @channelData[i + (@channelLength * index)] >> 8
-          when 1 then pixel.g = @channelData[i + (@channelLength * index)] >> 8
-          when 2 then pixel.b = @channelData[i + (@channelLength * index)] >> 8
+              pixel.a = Util.toUInt16(b1, b2)
+            else continue
+          when 0 then pixel.r = Util.toUInt16(b1, b2)
+          when 1 then pixel.g = Util.toUInt16(b1, b2)
+          when 2 then pixel.b = Util.toUInt16(b1, b2)
 
         index++
 
