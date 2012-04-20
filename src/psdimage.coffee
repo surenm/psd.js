@@ -170,6 +170,7 @@ class PSDImage
         @combineMultiChannel8()
       when 9 #LABColor
         @combineLAB8Channel() if @getImageDepth() is 8
+        @combineLAB16Channel() if @getImageDepth() is 16
 
     # Manually delete channel data to free up memory
     delete @channelData

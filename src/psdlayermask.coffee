@@ -70,13 +70,12 @@ class PSDLayerMask
         else
           layer.image.skip()
 
+      # Layers are parsed in reverse order
+      @layers.reverse()
+      @groupLayers()
+
     # In case there are filler zeros
     @file.seek pos + layerInfoSize, false
-
-    # Layers are parsed in reverse order
-    @layers.reverse()
-
-    @groupLayers()
 
     # Parse the global layer mask
     @parseGlobalMask()
