@@ -164,7 +164,8 @@ class PSDImage
         @combineRGB8Channel() if @getImageDepth() is 8
         @combineRGB16Channel() if @getImageDepth() is 16
       when 4 #CMKYColor
-        @combineCMYK8Channel()
+        @combineCMYK8Channel() if @getImageDepth() is 8
+        @combineCMYK16Channel() if @getImageDepth() is 16
       when 7 # Multichannel
         @combineMultiChannel8()
       when 9 #LABColor
@@ -253,6 +254,25 @@ class PSDImage
         m = @channelData[i + @channelLength * 2]
         y = @channelData[i + @channelLength * 3]
         k = @channelData[i + @channelLength * 4]
+      else
+        a = 255
+        c = @channelData[i]
+        m = @channelData[i + @channelLength]
+        y = @channelData[i + @channelLength * 2]
+        k = @channelData[i + @channelLength * 3]
+
+      rgb = PSDColor.cmykToRGB(255 - c, 255 - m, 255 - y, 255 - k)
+
+      @pixelData.push rgb.r, rgb.g, rgb.b, @getAlphaValue(a)
+
+  combineCMYK16Channel: ->
+    for i in [0...@numPixels] by 2
+      if @getImageChannels() is 5
+        a = @channelData[i]
+        c = @channelData[i + @channelLength]
+        m = @channelData[i + @channelLength * 2]
+        y = @channelData[i + @channelLength * 3]
+        k = @channelData[i + @channelLength * 3]
       else
         a = 255
         c = @channelData[i]
