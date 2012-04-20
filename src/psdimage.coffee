@@ -301,6 +301,23 @@ class PSDImage
 
       @pixelData.push rgb.r, rgb.g, rgb.b, @getAlphaValue(alpha)
 
+  combineLAB16Channel: ->
+    for i in [0...@numPixels] by 2
+      if @getImageChannels() is 4
+        alpha = @channelData[i]
+        l = @channelData[i + @channelLength]
+        a = @channelData[i + @channelLength * 2]
+        b = @channelData[i + @channelLength * 3]
+      else
+        alpha = 255
+        l = @channelData[i]
+        a = @channelData[i + @channelLength]
+        b = @channelData[i + @channelLength * 2]
+
+      rgb = PSDColor.labToRGB l * 100 >> 8, a - 128, b - 128
+
+      @pixelData.push rgb.r, rgb.g, rgb.b, @getAlphaValue(alpha)
+
   combineMultiChannel8: ->
     for i in [0...@numPixels]
       c = @channelData[i]
