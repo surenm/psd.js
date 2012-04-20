@@ -27,13 +27,27 @@ class PSDFile
   # format codes.
   #
   
-  # 4 bytes
-  readInt: -> @readf(">i")[0]
-  readUInt: -> @readf(">I")[0]
+  # 4 bytes / 32-bit
+  readInt: ->
+    int = @readUInt()
+    if int >= 0x80000000 then int - 0x100000000 else int
+
+  readUInt: ->
+    b1 = @read(1)[0] << 24
+    b2 = @read(1)[0] << 16
+    b3 = @read(1)[0] << 8
+    b4 = @read(1)[0]
+    b1 | b2 | b3 | b4
 
   # 2 bytes
-  readShortInt: -> @readf(">h")[0]
-  readShortUInt: -> @readf(">H")[0]
+  readShortInt: ->
+    int = @readShortUInt()
+    if int >= 0x8000 then int - 0x10000 else int
+
+  readShortUInt: ->
+    b1 = @read(1)[0] << 8
+    b2 = @read(1)[0]
+    b1 | b2
 
   # 4 bytes
   readLongInt: -> @readf(">l")[0]
@@ -45,32 +59,13 @@ class PSDFile
   # 1 byte
   readBoolean: -> @read(1)[0] isnt 0
 
-  readUnicodeString: (strlen = null) ->
-    str = ""
-    strlen = @readInt() if not strlen
-    for i in [0...strlen]
-      charCode = @readShortUInt()
-      str += chr(Util.i16(charCode)) if charCode > 0
-
-    str
-
-  # Parses the structure of a descriptor
-  readDescriptorStructure: ->
-    name = @readUnicodeString()
-    classID = @readLengthWithString()
-    items = @readUInt()
-
-    descriptors = {}
-    for i in [0...items]
-      key = @readLengthWithString().trim()
-      descriptors[key] = @readOsType()
-
-    descriptors
-
   # Reads a string with the given length. Because some strings are also
   # null-byte padded, we strip out these null bytes since they are of no
   # use to us in Javascript.
-  readString: (length) -> @readf(">#{length}s")[0].replace /\u0000/g, ""
+  readString: (length) ->
+    ret = []
+    ret[i] = String.fromCharCode @read(1)[0] for i in [0...length]
+    ret.join ''
 
   # Used for reading pascal strings, which are strings that have their length 
   # prepended to the chunk of character bytes. If a length isn't found, a 
@@ -83,63 +78,6 @@ class PSDFile
       str = @readString length
 
     str
-
-  # Parses a special OS variable type
-  readOsType: ->
-    osType = @readString(4)
-    value = null
-    switch osType
-      when "TEXT" then value = @readUnicodeString()
-      when "enum", "Objc", "GlbO"
-        value =
-          typeID: @readLengthWithString()
-          enum: @readLengthWithString()
-      when "VlLs"
-        listSize = @readUInt()
-        value = []
-        value.push(@readOsType()) for i in [0...listSize]
-      when "doub" then value = @readDouble()
-      when "UntF"
-        value =
-          type: @readString(4)
-          value: @readDouble()
-      when "long" then value = @readUInt()
-      when "bool" then value = @readBoolean()
-      when "alis"
-        length = @readUInt()
-        value = @readString(length)
-      when "obj"
-        num = @readUInt()
-        for i in [0...num]
-          type = @readString(4)
-          switch type
-            when "prop"
-              value =
-                name: @readUnicodeString()
-                classID: @readLengthWithString()
-                keyID: @readLengthWithString()
-            when "Clss"
-              value =
-                name: @readUnicodeString()
-                classID: @readLengthWithString()
-            when "Enmr"
-              value =
-                name: @readUnicodeString()
-                classID: @readLengthWithString()
-                typeID: @readLengthWithString()
-                enum: @readLengthWithString()
-            when "rele"
-              value =
-                name: @readUnicodeString()
-                classID: @readLengthWithString()
-                offsetValue: @readUInt()
-            when "Idnt", "indx", "name" then value = null
-      when "tdta"
-        # Skip this
-        length = @readUInt()
-        @seek length
-
-    {type: osType, value: value}
 
   # Reads a byte list
   readBytesList: (size) -> @read size
