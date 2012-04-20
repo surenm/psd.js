@@ -7,6 +7,9 @@ else
 
 # Create our class and add to global scope
 Root.PSD = class PSD
+  # Version number
+  @VERSION = "0.4.0"
+
   # Enable/disable debugging console logs
   @DEBUG = false
 
