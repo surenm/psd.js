@@ -65,7 +65,7 @@ class PSDFile
   readString: (length) ->
     ret = []
     ret[i] = String.fromCharCode @read(1)[0] for i in [0...length]
-    ret.join ''
+    ret.join('').replace /\u0000/g, ""
 
   # Used for reading pascal strings, which are strings that have their length 
   # prepended to the chunk of character bytes. If a length isn't found, a 

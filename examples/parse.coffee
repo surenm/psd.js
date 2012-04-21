@@ -10,3 +10,8 @@ if process.argv.length is 2
 
 psd = PSD.fromFile process.argv[2]
 psd.parse()
+
+data = psd.toJSON()
+
+fs.writeFile __dirname + "/output.json", JSON.stringify(data, null, "\t"), (err) ->
+  console.log "JSON data saved to output.json"

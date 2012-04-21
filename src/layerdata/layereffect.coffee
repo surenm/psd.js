@@ -3,7 +3,7 @@
 
 class PSDLayerEffect
 
-  constructor: (@file) -> 
+  constructor: (@file) ->
   
   parse: ->
     # these are common to all effects
@@ -21,6 +21,8 @@ class PSDLayerEffectCommonStateInfo extends PSDLayerEffect
     @visible = @file.readBoolean()
     # unused
     @file.read(2)
+
+    {visible: @visible}
 
 # Based on https://github.com/alco/psdump/blob/master/libpsd-0.9/src/drop_shadow.c
 class PSDDropDownLayerEffect extends PSDLayerEffect
@@ -68,3 +70,10 @@ class PSDDropDownLayerEffect extends PSDLayerEffect
     [@opacity] = @file.read(1) 
     
     @nativeColor = @getSpaceColor() if @version == 2
+
+    data = {}
+    for own key, val of @
+      continue if key is "file"
+      data[key] = val
+
+    data

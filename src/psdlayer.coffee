@@ -334,14 +334,14 @@ class PSDLayer
           when "dsdw" then new PSDDropDownLayerEffect @file     
           when "isdw" then new PSDDropDownLayerEffect @file, true # inner drop shadow
 
-      effect?.parse()
+      data = effect?.parse()
 
       left = (pos + size) - @file.tell()
       if left != 0
        Log.debug("Failed to parse effect layer with type #{type}")
        @file.seek left 
       else
-        effects.push(effect) unless type == "cmnS" # ignore commons state info
+        effects.push(data) unless type == "cmnS" # ignore commons state info
 
     @adjustments.effects = effects
         
@@ -367,9 +367,9 @@ class PSDLayer
       'cols'
       'channelsInfo'
       'mask'
-      'adjustments'
       'layerType'
       'blendMode'
+      'adjustments'
     ]
 
     data = {}
