@@ -392,3 +392,17 @@ class PSDResource
         @file.seek @size
     else
       @file.seek @size
+
+  toJSON: ->
+    sections = [
+      'type'
+      'id'
+      'name'
+      'rdesc'
+    ]
+
+    data = {}
+    for section in sections
+      data[section] = @[section]
+
+    data

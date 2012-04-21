@@ -8,7 +8,7 @@ else
 # Create our class and add to global scope
 Root.PSD = class PSD
   # Version number
-  @VERSION = "0.4.1"
+  @VERSION = "0.4.2"
 
   # Enable/disable debugging console logs
   @DEBUG = false
@@ -197,8 +197,10 @@ Root.PSD = class PSD
       'layerMask'
     ]
 
-    data = {}
-    data.resources = @resources
+    data = resources: []
+
+    for resource in @resources
+      data.resources.push resource.toJSON()
 
     for section in sections
       data[section] = @[section].toJSON()

@@ -320,4 +320,18 @@ workflow. Strange.</p>             </td>             <td class="code">          
     <span class="k">else</span>
       <span class="nx">@file</span><span class="p">.</span><span class="nx">seek</span> <span class="nx">@size</span>
 
+  <span class="nv">toJSON: </span><span class="o">-&gt;</span>
+    <span class="nv">sections = </span><span class="p">[</span>
+      <span class="s1">&#39;type&#39;</span>
+      <span class="s1">&#39;id&#39;</span>
+      <span class="s1">&#39;name&#39;</span>
+      <span class="s1">&#39;rdesc&#39;</span>
+    <span class="p">]</span>
+
+    <span class="nv">data = </span><span class="p">{}</span>
+    <span class="k">for</span> <span class="nx">section</span> <span class="k">in</span> <span class="nx">sections</span>
+      <span class="nx">data</span><span class="p">[</span><span class="nx">section</span><span class="p">]</span> <span class="o">=</span> <span class="err">@</span><span class="p">[</span><span class="nx">section</span><span class="p">]</span>
+
+    <span class="nx">data</span>
+
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
