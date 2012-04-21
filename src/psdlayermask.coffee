@@ -139,3 +139,16 @@ class PSDLayerMask
         groupLayer = null
       else
         layer.groupLayer = groupLayer
+
+  toJSON: ->
+    data =
+      mergedAlpha: @mergedAlpha
+      globalMask: @globalMask
+      extraInfo: @extras
+      numLayers: @numLayers
+      layers: []
+
+    for layer in @layers
+      data.layers.push layer.toJSON()
+
+    data

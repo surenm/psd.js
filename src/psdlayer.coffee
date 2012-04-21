@@ -73,7 +73,6 @@ class PSDLayer
     @mask = {}
     @blendingRanges = {}
     @adjustments = {}
-    @effects = []
 
     # Defaults
     @layerType = "normal"
@@ -310,6 +309,8 @@ class PSDLayer
         @file.seek pos + length, false # Attempt to recover
 
   parseEffectsLayer: ->
+    effects = []
+
     [
         v, # always 0
         count
@@ -340,7 +341,9 @@ class PSDLayer
        Log.debug("Failed to parse effect layer with type #{type}")
        @file.seek left 
       else
-        @effects.push(effect) unless type == "cmnS" # ignore commons state info
+        effects.push(effect) unless type == "cmnS" # ignore commons state info
+
+    @adjustments.effects = effects
         
   readLayerSectionDivider: ->
     code = @file.readInt()
@@ -351,3 +354,26 @@ class PSDLayer
     switch code
       when 1, 2 then @isFolder = true
       when 3 then @isHidden = true
+
+  toJSON: ->
+    sections = [
+      'name'
+      'top'
+      'left'
+      'bottom'
+      'right'
+      'channels'
+      'rows'
+      'cols'
+      'channelsInfo'
+      'mask'
+      'adjustments'
+      'layerType'
+      'blendMode'
+    ]
+
+    data = {}
+    for section in sections
+      data[section] = @[section]
+
+    data

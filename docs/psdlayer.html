@@ -72,8 +72,7 @@
     <span class="vi">@image = </span><span class="kc">null</span>
     <span class="vi">@mask = </span><span class="p">{}</span>
     <span class="vi">@blendingRanges = </span><span class="p">{}</span>
-    <span class="vi">@adjustments = </span><span class="p">{}</span>
-    <span class="vi">@effects = </span><span class="p">[]</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Defaults</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="vi">@layerType = </span><span class="s2">&quot;normal&quot;</span>
+    <span class="vi">@adjustments = </span><span class="p">{}</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Defaults</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="vi">@layerType = </span><span class="s2">&quot;normal&quot;</span>
     <span class="vi">@blendingMode = </span><span class="s2">&quot;normal&quot;</span>
     <span class="vi">@opacity = </span><span class="mi">255</span>
     <span class="vi">@fillOpacity = </span><span class="mi">255</span>
@@ -241,6 +240,8 @@ and channel info. Layer Records section.</p>             </td>             <td c
         <span class="nx">@file</span><span class="p">.</span><span class="nx">seek</span> <span class="nx">pos</span> <span class="o">+</span> <span class="nx">length</span><span class="p">,</span> <span class="kc">false</span> <span class="c1"># Attempt to recover</span>
 
   <span class="nv">parseEffectsLayer: </span><span class="o">-&gt;</span>
+    <span class="nv">effects = </span><span class="p">[]</span>
+
     <span class="p">[</span>
         <span class="nx">v</span><span class="p">,</span> <span class="c1"># always 0</span>
         <span class="nx">count</span>
@@ -271,7 +272,9 @@ and channel info. Layer Records section.</p>             </td>             <td c
        <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span><span class="p">(</span><span class="s2">&quot;Failed to parse effect layer with type #{type}&quot;</span><span class="p">)</span>
        <span class="nx">@file</span><span class="p">.</span><span class="nx">seek</span> <span class="nx">left</span> 
       <span class="k">else</span>
-        <span class="nx">@effects</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">effect</span><span class="p">)</span> <span class="nx">unless</span> <span class="nx">type</span> <span class="o">==</span> <span class="s2">&quot;cmnS&quot;</span> <span class="c1"># ignore commons state info</span>
+        <span class="nx">effects</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">effect</span><span class="p">)</span> <span class="nx">unless</span> <span class="nx">type</span> <span class="o">==</span> <span class="s2">&quot;cmnS&quot;</span> <span class="c1"># ignore commons state info</span>
+
+    <span class="vi">@adjustments.effects = </span><span class="nx">effects</span>
         
   <span class="nv">readLayerSectionDivider: </span><span class="o">-&gt;</span>
     <span class="nv">code = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">readInt</span><span class="p">()</span>
@@ -282,5 +285,28 @@ and channel info. Layer Records section.</p>             </td>             <td c
     <span class="k">switch</span> <span class="nx">code</span>
       <span class="k">when</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="k">then</span> <span class="vi">@isFolder = </span><span class="kc">true</span>
       <span class="k">when</span> <span class="mi">3</span> <span class="k">then</span> <span class="vi">@isHidden = </span><span class="kc">true</span>
+
+  <span class="nv">toJSON: </span><span class="o">-&gt;</span>
+    <span class="nv">sections = </span><span class="p">[</span>
+      <span class="s1">&#39;name&#39;</span>
+      <span class="s1">&#39;top&#39;</span>
+      <span class="s1">&#39;left&#39;</span>
+      <span class="s1">&#39;bottom&#39;</span>
+      <span class="s1">&#39;right&#39;</span>
+      <span class="s1">&#39;channels&#39;</span>
+      <span class="s1">&#39;rows&#39;</span>
+      <span class="s1">&#39;cols&#39;</span>
+      <span class="s1">&#39;channelsInfo&#39;</span>
+      <span class="s1">&#39;mask&#39;</span>
+      <span class="s1">&#39;adjustments&#39;</span>
+      <span class="s1">&#39;layerType&#39;</span>
+      <span class="s1">&#39;blendMode&#39;</span>
+    <span class="p">]</span>
+
+    <span class="nv">data = </span><span class="p">{}</span>
+    <span class="k">for</span> <span class="nx">section</span> <span class="k">in</span> <span class="nx">sections</span>
+      <span class="nx">data</span><span class="p">[</span><span class="nx">section</span><span class="p">]</span> <span class="o">=</span> <span class="err">@</span><span class="p">[</span><span class="nx">section</span><span class="p">]</span>
+
+    <span class="nx">data</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

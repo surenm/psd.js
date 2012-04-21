@@ -48,4 +48,10 @@ version available at this time, anyways.</p>             </td>             <td c
 for now. TODO.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="vi">@colormodepos = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">pos</span>
     <span class="nx">@file</span><span class="p">.</span><span class="nx">skipBlock</span> <span class="s2">&quot;color mode data&quot;</span>
 
+  <span class="nv">toJSON: </span><span class="o">-&gt;</span>
+    <span class="nv">data = </span><span class="p">{}</span>
+    <span class="k">for</span> <span class="nx">section</span> <span class="k">in</span> <span class="nx">HEADER_SECTIONS</span>
+      <span class="nx">data</span><span class="p">[</span><span class="nx">section</span><span class="p">]</span> <span class="o">=</span> <span class="err">@</span><span class="p">[</span><span class="nx">section</span><span class="p">]</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <p>Some extra data</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">data.modename = </span><span class="nx">@modename</span>
+    <span class="nx">data</span>
+
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

@@ -10,7 +10,7 @@ This implementation is inspired by, and in some parts directly ported, from:
 
 **Please note!**
 
-The PSD file format is complex, buggy, hacky, and poorly documented. Because of this, and the fact that this is a relatively new project, psd.js may or may not be able to correctly parse every PSD you throw at it. Use with caution.
+The PSD file format is complex, buggy, hacky, and poorly documented. Because of this, psd.js may or may not be able to correctly parse every PSD you throw at it. Use with caution.
 
 ## Contributing
 
@@ -76,9 +76,12 @@ You can parse the PSD file for valuable information such as: image size, color c
 psd = PSD.fromFile __dirname + '/test.psd'
 psd.parse()
 
-console.log "Header", psd.header
-console.log "Resources", psd.resources
-console.log "Layers", psd.layers
+# Extract info to a friendly JSON format
+info = psd.toJSON()
+
+console.log "Header", info.header
+console.log "Resources", info.resources
+console.log "Layers", info.layerMask.layers
 ```
 
 ### Setting Options
