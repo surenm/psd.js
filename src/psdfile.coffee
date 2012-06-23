@@ -81,6 +81,14 @@ class PSDFile
 
   # Reads a byte list
   readBytesList: (size) -> @read size
+
+  readSpaceColor: ->
+    colorSpace = @readShortInt()
+
+    colorComponent = []
+    colorComponent.push @readShortInt() >> 8 for i in [0...4]
+    PSDColor.colorSpaceToARGB(colorSpace, colorComponent)
+    
   
   # Reads from the file given the unpack format string. Format string codes 
   # can be easily referenced 

@@ -67,6 +67,7 @@ class PSDChannelImage extends PSDImage
       Log.debug "ERROR: #{@channelData.length} read; expected #{@length}"
 
     @processImageData()
+    #@parseUserMask()
 
     if exports?
       memusage = process.memoryUsage()
@@ -105,3 +106,8 @@ class PSDChannelImage extends PSDImage
     
     Log.debug "Parsing layer channel ##{@chInfo.id}, Start = #{@file.tell()}"
     [@chanPos, lineIndex] = @decodeRLEChannel(@chanPos, lineIndex)
+
+  #parseUserMask: ->
+  #  if @getImageDepth() is 8
+  #    @parseUserMask8()
+    

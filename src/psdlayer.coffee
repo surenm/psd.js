@@ -294,6 +294,10 @@ class PSDLayer
           @adjustments.invert = (new PSDInvert(@, length)).parse()
         when "post"
           @adjustments.posterize = (new PSDPosterize(@, length)).parse()
+        when "tySh" # PS <= 5
+          @adjustments.typeTool = (new PSDTypeTool(@, length)).parse(true)
+        #when "TySh" # PS >= 6
+        #  @adjustments.typeTool = (new PSDTypeTool(@, length)).parse()
         when "lyid"
           @layerId = @file.readInt()
         when "lsct"

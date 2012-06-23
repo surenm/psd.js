@@ -345,3 +345,77 @@ PSD.PSDColor = class PSDColor
     b = (65535 - (y * (255 - k) + (k << 8))) >> 8
 
     Util.clamp {r: r, g: g, b: b}, 0, 255
+
+  @rgbToColor: (r, g, b) -> @argbToColor(255, r, g, b)
+  @argbToColor: (a, r, g, b) ->
+    (alpha << 24) | (r << 16) | (g << 8) | b
+
+  @hsbToColor: (h, s, b) -> @ahsbToColor 255, h, s, b
+  @ahsbToColor: (alpha, hue, saturation, brightness) ->
+    if saturation is 0
+      b = g = r = 255 * brightness
+    else
+      if brightness <= 0.5
+        m2 = brightness * (1 + saturation)
+      else
+        m2 = brightness + saturation - brightness * saturation
+
+      m1 = 2 * brightness - m2
+      r = @hueToColor hue + 120, m1, m2
+      g = @hueToColor hue, m1, m2
+      b = @hueToColor hue - 120, m1, m2
+
+    @argbToColor alpha, r, g, b
+
+  @hueToColor: (hue, m1, m2) ->
+    hue %= 360
+    if hue < 60
+      v = m1 + (m2 - m1) * hue / 60
+    else if hue < 180
+      v = m2
+    else if hue < 240
+      v = m1 + (m2 - m1) * (240 - hue) / 60
+    else
+      v = m1
+
+    v * 255
+
+  @cmykToColor: (cyan, magenta, yellow, black) ->
+    r = 1 - (cyan * (1 - black) + black) * 255
+    g = 1 - (magenta * (1 - black) + black) * 255
+    b = 1 - (yellow * (1- black) + black) * 255
+
+    r = Util.clamp r, 0, 255
+    g = Util.clamp g, 0, 255
+    b = Util.clamp b, 0, 255
+
+    @rgbToColor r, g, b
+
+  @labToColor: (l, a, b) -> @alabToColor(255, l, a, b)
+  @alabToColor: (alpha, lightness, a, b) ->
+    xyz = @labToXYZ(lightness, a, b)
+    @axyzToColor alpha, xyz.x, xyz.y, xyz.z
+
+  @axyzToColor: (alpha, x, y, z) ->
+    rgb = @xyzToRGB(x, y, z)
+    @argbToColor alpha, rgb.r, rgb.g, rgb.b
+
+  @colorSpaceToARGB: (colorSpace, colorComponent) ->
+    switch colorSpace
+      when 0
+        dstColor = @rgbToColor colorComponent[0],
+          colorComponent[1], colorComponent[2]
+      when 1
+        dstColor = @hsbToColor colorComponent[0],
+          colorComponent[1] / 100.0, colorComponent[2] / 100.0
+      when 2
+        dstColor = @cmykToColor colorComponent[0] / 100.0,
+          colorComponent[1] / 100.0, colorComponent[2] / 100.0,
+          colorComponent[3] / 100.0
+      when 7
+        dstColor = @labToColor colorComponent[0],
+          colorComponent[1], colorComponent[2]
+      else
+        dstColor = 0x00FFFFFF
+
+    dstColor
