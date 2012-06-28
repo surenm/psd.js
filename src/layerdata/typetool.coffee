@@ -22,17 +22,25 @@ class PSDTypeTool
     descriptorVersion = @file.readInt()
     assert descriptorVersion is 16
 
-    # Read descriptor
-    @data.name = @file.readLengthWithString()
+    # Read descriptor (NOTE: not sure if correct...)
+    @data.text = (new PSDObjectDescriptor(@file)).parse()
 
-    len = @file.readInt()
-    if len is 0
-      @data.classID = @file.readInt()
-    else
-      @data.classID = @file.readString(len)
+    warpVersion = @file.readShortInt()
+    assert warpVersion is 1
 
-    # Number of items in the descriptor
-    @data.text = (new PSDDescriptor(@file)).parse()
+    descriptorVersion = @file.readInt()
+    assert descriptorVersion is 16
+
+    @data.warp = (new PSDObjectDescriptor(@file)).parse()
+
+    [
+      @data.left
+      @data.top
+      @data.right
+      @data.bottom
+    ] = @file.readf ">4d"
+
+    @data
 
   parseLegacy: ->
     #

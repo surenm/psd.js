@@ -18,7 +18,7 @@ targetCoffee  = "#{csSrcDir}/build"
 
 targetCoreJS      = "#{csTargetDir}/#{targetName}.js"
 targetCoreMinJS   = "#{csTargetDir}/#{targetName}.min.js"
-coffeeCoreOpts    = "-r coffeescript-growl -j #{targetName}.js -o #{csTargetDir} -c #{targetCoffee}.coffee"
+coffeeCoreOpts    = "-j #{targetName}.js -o #{csTargetDir} -c #{targetCoffee}.coffee"
 
 # All source files listed in include order
 coffeeFiles   = [
@@ -43,6 +43,20 @@ coffeeFiles   = [
   "layerdata/posterize"
   "layerdata/selectivecolor"
   "layerdata/threshold"
+  "layerdata/typetool"
+
+  "descriptors/descriptor"
+  "descriptors/alias"
+  "descriptors/boolean"
+  "descriptors/class"
+  "descriptors/double"
+  "descriptors/enum"
+  "descriptors/integer"
+  "descriptors/list"
+  "descriptors/objectdescriptor"
+  "descriptors/reference"
+  "descriptors/string"
+  "descriptors/unitfloat"
 
   "psdresource"
   "util"
