@@ -31,6 +31,16 @@ class PSDTypeTool
 
     # Read descriptor (NOTE: not sure if correct...)
     @data.text = (new PSDDescriptor(@file)).parse()
+
+    # This isn't documented, but it seems like the raw EngineData
+    # can be parsed as character codes. It's not perfect, but you
+    # can get a general idea. Hopefully this can be improved in the
+    # future.
+    engineData = ""
+    for char in @data.text.EngineData
+      engineData += String.fromCharCode(char)
+
+    @data.text.EngineData = engineData.replace /\u0000/g, ""
     Log.debug "Text:", @data.text
 
     warpVersion = @file.readShortInt()

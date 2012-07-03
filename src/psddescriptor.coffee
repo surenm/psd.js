@@ -53,7 +53,6 @@ class PSDDescriptor
       when 'TEXT' then @file.readUnicodeString()
       when 'UntF' then @parseUnitDouble()
 
-    #type: type, value: value
     value
 
   parseBoolean: -> @file.readBoolean()
@@ -70,8 +69,6 @@ class PSDDescriptor
   parseEnum: ->
     @parseID()
     @parseID()
-    #type: @parseID()
-    #value: @parseID()
 
   # File Alias
   # This data is opaque and unique to Mac OS
@@ -141,6 +138,8 @@ class PSDDescriptor
       when "name" then @file.readUnicodeString()
       when "rele" then @parseOffset()
       when "prop" then @parseProperty()
+
+    value
 
   parseUnitDouble: ->
     unitID = @file.parseString(4)
