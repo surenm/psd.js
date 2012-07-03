@@ -4,6 +4,8 @@
 # but some of them are helper functions to make things a bit easier to
 # understand.
 class PSDFile
+  unicodeRegex: /\\u([\d\w]{4})/gi
+
   constructor: (@data) ->
     # Track our current position in the file data. This is analogous to the
     # file pointer in C.
@@ -59,6 +61,12 @@ class PSDFile
   # 1 byte
   readBoolean: -> @read(1)[0] isnt 0
 
+  # Unfortunately Javascript does not support 64-bit integers, so we
+  # have a temporary solution for now. In the future, we can parse and
+  # store the int either as an octet string, or something more useful.
+  readLongLong: -> @read(8)
+  readULongLong: -> @read(8)
+
   # Reads a string with the given length. Because some strings are also
   # null-byte padded, we strip out these null bytes since they are of no
   # use to us in Javascript.
@@ -66,6 +74,14 @@ class PSDFile
     ret = []
     ret[i] = String.fromCharCode @read(1)[0] for i in [0...length]
     ret.join('').replace /\u0000/g, ""
+
+  readUnicodeString: ->
+    len = @readInt() * 2
+    str = @readf(">#{len}s")[0]
+    str = str.replace @unicodeRegex, (match, grp) ->
+      String.fromCharCode parseInt(grp, 16)
+
+    str.replace /\u0000/g, ""
 
   # Used for reading pascal strings, which are strings that have their length 
   # prepended to the chunk of character bytes. If a length isn't found, a 

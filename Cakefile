@@ -26,6 +26,7 @@ coffeeFiles   = [
   
   "psd"
   "psdcolor"
+  "psddescriptor"
   "psdfile"
   "psdheader"
   "psdimage"
@@ -44,19 +45,6 @@ coffeeFiles   = [
   "layerdata/selectivecolor"
   "layerdata/threshold"
   "layerdata/typetool"
-
-  "descriptors/descriptor"
-  "descriptors/alias"
-  "descriptors/boolean"
-  "descriptors/class"
-  "descriptors/double"
-  "descriptors/enum"
-  "descriptors/integer"
-  "descriptors/list"
-  "descriptors/objectdescriptor"
-  "descriptors/reference"
-  "descriptors/string"
-  "descriptors/unitfloat"
 
   "psdresource"
   "util"

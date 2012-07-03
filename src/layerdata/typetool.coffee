@@ -9,12 +9,19 @@ class PSDTypeTool
 
     # 6 * 8 double numbers for transform info
     # xx, xy, yx, yy, tx, ty
-    @data.transformInfo = []
-    @data.transformInfo.push @file.readDouble() for i in [0...6]
+    @data.transformInfo = {}
+    [
+      @data.transformInfo.xx
+      @data.transformInfo.xy
+      @data.transformInfo.yx
+      @data.transformInfo.yy
+      @data.transformInfo.tx
+      @data.transformInfo.ty
+    ] = @file.readf(">6d")
 
     return @parseLegacy() if legacy
 
-    # TODO: finish implementing below
+    # Below is code for PS >= 6
 
     textVersion = @file.readShortInt()
     assert textVersion is 50
@@ -23,7 +30,8 @@ class PSDTypeTool
     assert descriptorVersion is 16
 
     # Read descriptor (NOTE: not sure if correct...)
-    @data.text = (new PSDObjectDescriptor(@file)).parse()
+    @data.text = (new PSDDescriptor(@file)).parse()
+    Log.debug "Text:", @data.text
 
     warpVersion = @file.readShortInt()
     assert warpVersion is 1
@@ -31,7 +39,8 @@ class PSDTypeTool
     descriptorVersion = @file.readInt()
     assert descriptorVersion is 16
 
-    @data.warp = (new PSDObjectDescriptor(@file)).parse()
+    @data.warp = (new PSDDescriptor(@file)).parse()
+    Log.debug "Warp:", @data.warp
 
     [
       @data.left
