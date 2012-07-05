@@ -173,6 +173,7 @@ class PSDLayer
 
     @blendingMode = @blendMode.blender
     @opacity = @blendMode.opacity
+    @visible = @blendMode.visible
 
     Log.debug "Blending mode:", @blendMode
 

@@ -151,6 +151,8 @@ Root.PSD = class PSD
     @image = new PSDImage @file, @header
     @image.parse()
 
+  # Folder layers are denoted by a flag, isFolder. This marks the beginning
+  # of the folder. The end of the folder is marked by the isHidden flag.
   getLayerStructure: ->
     @parseLayersMasks() unless @layerMask
 
