@@ -375,6 +375,7 @@ class PSDLayer
       'layerType'
       'blendMode'
       'adjustments'
+      'visible'
     ]
 
     data = {}
