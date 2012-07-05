@@ -386,10 +386,12 @@ class PSDImage
       Log.debug e
       return null
 
-  toCanvas: (canvas, width = null, height = null) ->
-    if width is null and height is null
-      canvas.width = @getImageWidth()
-      canvas.height = @getImageHeight()
+  toCanvas: (canvas, width = @getImageWidth(), height = @getImageHeight()) ->
+    if !width? or !height? or width <= 0 or height <= 0
+      throw "Layer does not contain image data"
+
+    canvas.width = width
+    canvas.height = height
 
     context = canvas.getContext('2d')
     imageData = context.getImageData 0, 0, canvas.width, canvas.height
