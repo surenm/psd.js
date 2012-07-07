@@ -70,7 +70,6 @@ class PSDImage
   # Parse the image data as raw pixel values. There is no compression used here.
   parseRaw: (length = @length) ->
     Log.debug "Attempting to parse RAW encoded image..."
-    @channelData = []
     @channelData.push @file.read(1)[0] for i in [0...length]
 
     return true
