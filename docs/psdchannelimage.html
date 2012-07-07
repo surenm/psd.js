@@ -11,6 +11,11 @@ not the same size as the full image.</p>             </td>             <td class
 
     <span class="k">super</span> <span class="nx">file</span><span class="p">,</span> <span class="nx">header</span>
 
+  <span class="nv">skip: </span><span class="o">-&gt;</span>
+    <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;Skipping channel image data. Layer = #{@layer.name}&quot;</span>
+    <span class="k">for</span> <span class="nx">channel</span> <span class="k">in</span> <span class="nx">@channelsInfo</span>
+      <span class="nx">@file</span><span class="p">.</span><span class="nx">seek</span> <span class="nx">channel</span><span class="p">.</span><span class="nx">length</span>
+
   <span class="nv">getImageWidth: </span><span class="o">-&gt;</span> <span class="nx">@width</span>
   <span class="nv">getImageHeight: </span><span class="o">-&gt;</span> <span class="nx">@height</span>
   <span class="nv">getImageChannels: </span><span class="o">-&gt;</span> <span class="nx">@layer</span><span class="p">.</span><span class="nx">channels</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Since we're working on a per-channel basis now, we only read the byte counts
@@ -43,8 +48,7 @@ of the layer mask.</p>             </td>             <td class="code">          
       <span class="nx">@parseImageData</span><span class="p">()</span>
 
       <span class="nv">end = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">tell</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>Sanity check</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="k">if</span> <span class="nx">end</span> <span class="o">isnt</span> <span class="nx">start</span> <span class="o">+</span> <span class="nx">@chInfo</span><span class="p">.</span><span class="nx">length</span>
-        <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;ERROR: read incorrect number of bytes for channel ##{@chInfo.id}. </span>
-<span class="s2">        Expected = #{start + @chInfo.length}, Actual: #{end}&quot;</span>
+        <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;ERROR: read incorrect number of bytes for channel ##{@chInfo.id}. Layer=#{@layer.name}, Expected = #{start + @chInfo.length}, Actual: #{end}&quot;</span>
         <span class="nx">@file</span><span class="p">.</span><span class="nx">seek</span> <span class="nx">start</span> <span class="o">+</span> <span class="nx">@chInfo</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span> <span class="kc">false</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>Futher sanity checks</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">if</span> <span class="nx">@channelData</span><span class="p">.</span><span class="nx">length</span> <span class="o">isnt</span> <span class="nx">@length</span>
       <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;ERROR: #{@channelData.length} read; expected #{@length}&quot;</span>
 
@@ -52,7 +56,7 @@ of the layer mask.</p>             </td>             <td class="code">          
       <span class="nv">memusage = </span><span class="nx">process</span><span class="p">.</span><span class="nx">memoryUsage</span><span class="p">()</span>
       <span class="nv">used = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">round</span> <span class="nx">memusage</span><span class="p">.</span><span class="nx">heapUsed</span> <span class="sr">/ 1024 /</span> <span class="mi">1024</span>
       <span class="nv">total = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">round</span> <span class="nx">memusage</span><span class="p">.</span><span class="nx">heapTotal</span> <span class="sr">/ 1024 /</span> <span class="mi">1024</span>
-      <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;\nMemory usage: #{used}MB / #{total}MB\n&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>Since we're parsing on a per-channel basis, we need to modify the behavior
+      <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="s2">&quot;\nMemory usage: #{used}MB / #{total}MB&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>Since we're parsing on a per-channel basis, we need to modify the behavior
 of the RAW encoding parser a bit. This version is aware of the current
 channel data position, since layers that have RAW encoding often use RLE
 encoded alpha channels.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">parseRaw: </span><span class="o">-&gt;</span>

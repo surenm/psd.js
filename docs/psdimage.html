@@ -16,7 +16,16 @@ for the PSD itself.</p>             </td>             <td class="code">         
   <span class="nv">constructor: </span><span class="nf">(@file, @header) -&gt;</span>
     <span class="vi">@numPixels = </span><span class="nx">@getImageWidth</span><span class="p">()</span> <span class="o">*</span> <span class="nx">@getImageHeight</span><span class="p">()</span>
     <span class="nx">@numPixels</span> <span class="o">*=</span> <span class="mi">2</span> <span class="k">if</span> <span class="nx">@getImageDepth</span><span class="p">()</span> <span class="o">is</span> <span class="mi">16</span>
+    
+    <span class="nx">@calculateLength</span><span class="p">()</span>
+    <span class="vi">@channelData = </span><span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">(</span><span class="nx">@length</span><span class="p">)</span>
 
+    <span class="vi">@startPos = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">tell</span><span class="p">()</span>
+    <span class="vi">@endPos = </span><span class="nx">@startPos</span> <span class="o">+</span> <span class="nx">@length</span>
+
+    <span class="vi">@pixelData = </span><span class="p">[]</span>
+
+  <span class="nv">calculateLength: </span><span class="o">-&gt;</span>
     <span class="vi">@length = </span><span class="k">switch</span> <span class="nx">@getImageDepth</span><span class="p">()</span>
       <span class="k">when</span> <span class="mi">1</span> <span class="k">then</span> <span class="p">(</span><span class="nx">@getImageWidth</span><span class="p">()</span> <span class="o">+</span> <span class="mi">7</span><span class="p">)</span> <span class="o">/</span> <span class="mi">8</span> <span class="o">*</span> <span class="nx">@getImageHeight</span><span class="p">()</span>
       <span class="k">when</span> <span class="mi">16</span> <span class="k">then</span> <span class="nx">@getImageWidth</span><span class="p">()</span> <span class="o">*</span> <span class="nx">@getImageHeight</span><span class="p">()</span> <span class="o">*</span> <span class="mi">2</span>
@@ -24,13 +33,6 @@ for the PSD itself.</p>             </td>             <td class="code">         
 
     <span class="vi">@channelLength = </span><span class="nx">@length</span> <span class="c1"># in bytes</span>
     <span class="nx">@length</span> <span class="o">*=</span> <span class="nx">@getImageChannels</span><span class="p">()</span>
-
-    <span class="vi">@channelData = </span><span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">(</span><span class="nx">@length</span><span class="p">)</span>
-
-    <span class="vi">@startPos = </span><span class="nx">@file</span><span class="p">.</span><span class="nx">tell</span><span class="p">()</span>
-    <span class="vi">@endPos = </span><span class="nx">@startPos</span> <span class="o">+</span> <span class="nx">@length</span>
-
-    <span class="vi">@pixelData = </span><span class="p">[]</span>
 
   <span class="nv">parse: </span><span class="o">-&gt;</span>
     <span class="vi">@compression = </span><span class="nx">@parseCompression</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>ZIP compression isn't implemented yet. Luckily this is pretty rare. Still,
@@ -347,10 +349,12 @@ green, blue, and alpha values, respectively.</p>
       <span class="nx">Log</span><span class="p">.</span><span class="nx">debug</span> <span class="nx">e</span>
       <span class="k">return</span> <span class="kc">null</span>
 
-  <span class="nv">toCanvas: </span><span class="nf">(canvas, width = null, height = null) -&gt;</span>
-    <span class="k">if</span> <span class="nx">width</span> <span class="o">is</span> <span class="kc">null</span> <span class="o">and</span> <span class="nx">height</span> <span class="o">is</span> <span class="kc">null</span>
-      <span class="nv">canvas.width = </span><span class="nx">@getImageWidth</span><span class="p">()</span>
-      <span class="nv">canvas.height = </span><span class="nx">@getImageHeight</span><span class="p">()</span>
+  <span class="nv">toCanvas: </span><span class="p">(</span><span class="nx">canvas</span><span class="p">,</span> <span class="nv">width = </span><span class="nx">@getImageWidth</span><span class="p">(),</span> <span class="nv">height = </span><span class="nx">@getImageHeight</span><span class="p">())</span> <span class="o">-&gt;</span>
+    <span class="k">if</span> <span class="o">!</span><span class="nx">width</span><span class="o">?</span> <span class="o">or</span> <span class="o">!</span><span class="nx">height</span><span class="o">?</span> <span class="o">or</span> <span class="nx">width</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="o">or</span> <span class="nx">height</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+      <span class="k">throw</span> <span class="s2">&quot;Layer does not contain image data&quot;</span>
+
+    <span class="nv">canvas.width = </span><span class="nx">width</span>
+    <span class="nv">canvas.height = </span><span class="nx">height</span>
 
     <span class="nv">context = </span><span class="nx">canvas</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">)</span>
     <span class="nv">imageData = </span><span class="nx">context</span><span class="p">.</span><span class="nx">getImageData</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">height</span>

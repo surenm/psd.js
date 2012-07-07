@@ -12,6 +12,11 @@ class PSDChannelImage extends PSDImage
 
     super file, header
 
+  skip: ->
+    Log.debug "Skipping channel image data. Layer = #{@layer.name}"
+    for channel in @channelsInfo
+      @file.seek channel.length
+
   getImageWidth: -> @width
   getImageHeight: -> @height
   getImageChannels: -> @layer.channels
@@ -58,8 +63,7 @@ class PSDChannelImage extends PSDImage
 
       # Sanity check
       if end isnt start + @chInfo.length
-        Log.debug "ERROR: read incorrect number of bytes for channel ##{@chInfo.id}. 
-        Expected = #{start + @chInfo.length}, Actual: #{end}"
+        Log.debug "ERROR: read incorrect number of bytes for channel ##{@chInfo.id}. Layer=#{@layer.name}, Expected = #{start + @chInfo.length}, Actual: #{end}"
         @file.seek start + @chInfo.length, false
 
     # Futher sanity checks
@@ -73,7 +77,7 @@ class PSDChannelImage extends PSDImage
       memusage = process.memoryUsage()
       used = Math.round memusage.heapUsed / 1024 / 1024
       total = Math.round memusage.heapTotal / 1024 / 1024
-      Log.debug "\nMemory usage: #{used}MB / #{total}MB\n"
+      Log.debug "\nMemory usage: #{used}MB / #{total}MB"
 
   # Since we're parsing on a per-channel basis, we need to modify the behavior
   # of the RAW encoding parser a bit. This version is aware of the current

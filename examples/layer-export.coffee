@@ -10,7 +10,9 @@ if process.argv.length is 2
   process.exit()
 
 psd = PSD.fromFile process.argv[2]
-psd.setOptions layerImages: true
+psd.setOptions
+  layerImages: true
+  onlyVisibleLayers: true
 
 psd.parse()
 

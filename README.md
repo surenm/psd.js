@@ -52,7 +52,7 @@ Alternatively, download and use the `lib/psd.js` file from this repository.
 
 ### Loading a PSD
 
-In order to load a PSD into psd.js, you have to give it the byte data in a Int8Array buffer. psd.js has some helper methods for you to make your life easier.
+In order to load a PSD into psd.js, you have to give it the byte data in a Uint8Array buffer. psd.js has some helper methods for you to make your life easier.
 
 ``` coffeescript
 # If you're in NodeJS, use this:
@@ -92,7 +92,9 @@ To enable layer image parsing, do:
 
 ``` coffeescript
 psd = PSD.fromFile __dirname + '/test.psd'
-psd.setOptions layerImages: true
+psd.setOptions
+  layerImages: true # Should we parse layer image data?
+  onlyVisibleLayers: true # Should we only parse layer images that are visible?
 
 psd.parse()
 ```

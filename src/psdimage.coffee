@@ -17,7 +17,16 @@ class PSDImage
   constructor: (@file, @header) ->
     @numPixels = @getImageWidth() * @getImageHeight()
     @numPixels *= 2 if @getImageDepth() is 16
+    
+    @calculateLength()
+    @channelData = new Uint8Array(@length)
 
+    @startPos = @file.tell()
+    @endPos = @startPos + @length
+
+    @pixelData = []
+
+  calculateLength: ->
     @length = switch @getImageDepth()
       when 1 then (@getImageWidth() + 7) / 8 * @getImageHeight()
       when 16 then @getImageWidth() * @getImageHeight() * 2
@@ -25,13 +34,6 @@ class PSDImage
 
     @channelLength = @length # in bytes
     @length *= @getImageChannels()
-
-    @channelData = new Uint8Array(@length)
-
-    @startPos = @file.tell()
-    @endPos = @startPos + @length
-
-    @pixelData = []
 
   parse: ->
     @compression = @parseCompression()

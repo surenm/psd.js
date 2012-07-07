@@ -49,7 +49,8 @@ Root.PSD = class PSD
     xhr.send null
 
   options:
-    layerImages: false
+    layerImages: false # Should we parse layer image data?
+    onlyVisibleLayers: false # Should we skip invisible layer image parsing?
   
   constructor: (data) ->
     # Store the main reference to our PSD file
