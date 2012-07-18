@@ -71,9 +71,8 @@ class PSDFile
   # null-byte padded, we strip out these null bytes since they are of no
   # use to us in Javascript.
   readString: (length) ->
-    ret = []
-    ret[i] = String.fromCharCode(@read(1)[0]) for i in [0...length]
-    ret.join('').replace /\u0000/g, ""
+    ret = String.fromCharCode.apply null, @read(length)
+    ret.replace /\u0000/g, ""
 
   readUnicodeString: ->
     len = @readInt() * 2
