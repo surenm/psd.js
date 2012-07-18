@@ -282,7 +282,6 @@ class PSDLayer
       switch key
         when "SoCo"
           @adjustments.solidColor = (new PSDSolidColor(@, length)).parse()
-          console.log "SoCo:", @adjustments.solidColor
         when "GdFl"
           @adjustments.gradient = (new PSDGradient(@, length)).parse()
         when "PtFl"
