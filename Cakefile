@@ -43,6 +43,7 @@ coffeeFiles   = [
   "layerdata/levels"
   "layerdata/posterize"
   "layerdata/selectivecolor"
+  "layerdata/solidcolor"
   "layerdata/threshold"
   "layerdata/typetool"
 

@@ -41,7 +41,9 @@ class PSDTypeTool
       engineData += String.fromCharCode(char)
 
     @data.text.EngineData = engineData.replace /\u0000/g, ""
-    Log.debug "Text:", @data.text
+
+    # This is a bit verbose
+    #Log.debug "Text:", @data.text
 
     warpVersion = @file.readShortInt()
     assert warpVersion is 1

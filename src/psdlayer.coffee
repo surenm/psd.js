@@ -265,8 +265,6 @@ class PSDLayer
     namelen = Util.pad4 @file.read(1)[0]
     @legacyName = Util.decodeMacroman(@file.read(namelen)).replace /\u0000/g, ''
 
-    Log.debug "Layer name: #{@name}"
-
   parseExtraData: ->
     while @file.tell() < @layerEnd
       [
@@ -282,6 +280,8 @@ class PSDLayer
       # TODO: many more adjustment layers to implement
       Log.debug("Extra layer info: key = #{key}, length = #{length}")
       switch key
+        when "SoCo"
+          @adjustments.solidColor = (new PSDSolidColor(@, length)).parse()
         when "levl"
           @adjustments.levels = (new PSDLevels(@, length)).parse()
         when "curv"
@@ -305,7 +305,11 @@ class PSDLayer
         when "TySh" # PS >= 6
           @adjustments.typeTool = (new PSDTypeTool(@, length)).parse()
         when "luni" # PS >= 5.0
-          @name = @file.readUnicodeString()
+          @name = @file.readUnicodeString(Util.pad4)
+
+          # This seems to be padded with null bytes (by 4?), but the easiest
+          # thing to do is to simply jump to the end of this section.
+          @file.seek pos + length, false
         when "lyid"
           @layerId = @file.readInt()
         when "lsct"
@@ -317,7 +321,7 @@ class PSDLayer
           Log.debug("Skipping additional layer info with key #{key}")
 
       if @file.tell() != (pos + length)
-        Log.debug "Error parsing additional layer info with key #{key} - unexpected end"
+        Log.debug "Warning: additional layer info with key #{key} - unexpected end"
         @file.seek pos + length, false # Attempt to recover
 
   parseEffectsLayer: ->
