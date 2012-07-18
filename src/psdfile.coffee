@@ -72,7 +72,7 @@ class PSDFile
   # use to us in Javascript.
   readString: (length) ->
     ret = []
-    ret[i] = String.fromCharCode @read(1)[0] for i in [0...length]
+    ret[i] = String.fromCharCode(@read(1)[0]) for i in [0...length]
     ret.join('').replace /\u0000/g, ""
 
   readUnicodeString: ->

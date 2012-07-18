@@ -103,8 +103,10 @@ class PSDLayer
       return @file.seek @layerEnd, false
 
     @parseBlendingRanges()
-    @parseLayerName()
+    @parseLegacyLayerName()
     @parseExtraData()
+
+    @name = @legacyName unless @name?
 
     Log.debug "Layer #{layerIndex}:", @
 
@@ -254,11 +256,14 @@ class PSDLayer
           black: @file.readShortInt()
           white: @file.readShortInt()
 
-  # Parse the name of this layer
-  parseLayerName: ->
+  # Parse the name of this layer. This is considered the "legacy"
+  # name because it is encoded with MacRoman encoding. PS >= 5.0
+  # includes a unicode version of the name, which is in the additional
+  # layer information section.
+  parseLegacyLayerName: ->
     # Name length is padded in multiples of 4
     namelen = Util.pad4 @file.read(1)[0]
-    @name = @file.readString namelen
+    @legacyName = Util.decodeMacroman(@file.read(namelen)).replace /\u0000/g, ''
 
     Log.debug "Layer name: #{@name}"
 
@@ -299,6 +304,8 @@ class PSDLayer
           @adjustments.typeTool = (new PSDTypeTool(@, length)).parse(true)
         when "TySh" # PS >= 6
           @adjustments.typeTool = (new PSDTypeTool(@, length)).parse()
+        when "luni" # PS >= 5.0
+          @name = @file.readUnicodeString()
         when "lyid"
           @layerId = @file.readInt()
         when "lsct"
