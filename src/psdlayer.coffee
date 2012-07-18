@@ -282,18 +282,29 @@ class PSDLayer
       switch key
         when "SoCo"
           @adjustments.solidColor = (new PSDSolidColor(@, length)).parse()
+          console.log "SoCo:", @adjustments.solidColor
+        when "GdFl"
+          @adjustments.gradient = (new PSDGradient(@, length)).parse()
+        when "PtFl"
+          @adjustments.pattern = (new PSDPattern(@, length)).parse()
+        when "brit"
+          @adjustments.brightnessContrast = (new PSDBrightnessContrast(@, length)).parse()
         when "levl"
           @adjustments.levels = (new PSDLevels(@, length)).parse()
         when "curv"
           @adjustments.curves = (new PSDCurves(@, length)).parse()
-        when "brit"
-          @adjustments.brightnessContrast = (new PSDBrightnessContrast(@, length)).parse()
+        when "expA"
+          @adjustments.exposure = (new PSDExposure(@, length)).parse()
+        when "vibA"
+          @adjustments.vibrance = (new PSDVibrance(@, length)).parse()
+        when "hue2" # PS >= 5.0
+          @adjustments.hueSaturation = (new PSDHueSaturation(@, length)).parse()
         when "blnc"
           @adjustments.colorBalance = (new PSDColorBalance(@, length)).parse()
-        when "hue2"
-          @adjustments.hueSaturation = (new PSDHueSaturation(@, length)).parse()
-        when "selc"
-          @adjustments.selectiveColor = (new PSDSelectiveColor(@, length)).parse()
+        when "blwh"
+          @adjustments.blackWhite = (new PSDBlackWhite(@, length)).parse()
+        when "phfl"
+          @adjustments.photoFilter = (new PSDPhotoFilter(@, length)).parse()
         when "thrs"
           @adjustments.threshold = (new PSDThreshold(@, length)).parse()
         when "nvrt"
@@ -305,7 +316,7 @@ class PSDLayer
         when "TySh" # PS >= 6
           @adjustments.typeTool = (new PSDTypeTool(@, length)).parse()
         when "luni" # PS >= 5.0
-          @name = @file.readUnicodeString(Util.pad4)
+          @name = @file.readUnicodeString()
 
           # This seems to be padded with null bytes (by 4?), but the easiest
           # thing to do is to simply jump to the end of this section.
@@ -316,6 +327,8 @@ class PSDLayer
           @readLayerSectionDivider()
         when "lrFX"
           @parseEffectsLayer(); @file.read(2) # why these 2 bytes?
+        when "selc"
+          @adjustments.selectiveColor = (new PSDSelectiveColor(@, length)).parse()
         else  
           @file.seek length
           Log.debug("Skipping additional layer info with key #{key}")
@@ -374,6 +387,7 @@ class PSDLayer
   toJSON: ->
     sections = [
       'name'
+      'legacyName'
       'top'
       'left'
       'bottom'

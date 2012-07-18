@@ -1,21 +1,21 @@
 class PSDDescriptor
   constructor: (@file) ->
-    @data = {}
 
   # Main entry point for parsing a descriptor
   parse: ->
     Log.debug "Parsing descriptor..."
 
-    @data.class = @parseClass()
+    data = {}
+    data.class = @parseClass()
 
     numItems = @file.readInt()
     Log.debug "Descriptor contains #{numItems} items"
 
     for i in [0...numItems]
       item = @parseKeyItem()
-      @data[item.id] = item.value
+      data[item.id] = item.value
 
-    @data
+    data
 
   parseID: ->
     len = @file.readInt()

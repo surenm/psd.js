@@ -52,7 +52,7 @@ class PSDTypeTool
     assert descriptorVersion is 16
 
     @data.warp = (new PSDDescriptor(@file)).parse()
-    Log.debug "Warp:", @data.warp
+    #Log.debug "Warp:", @data.warp
 
     [
       @data.left
