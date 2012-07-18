@@ -1,7 +1,7 @@
 # "Static" utility functions
 class Util
   @pad2: (i) -> Math.floor((i + 1) / 2) * 2
-  @pad4: (i) -> (((i & 0xFF) + 1 + 3) & ~0x03) - 1
+  @pad4: (i) -> i - (i % 4) + 3
 
   @toUInt16: (b1, b2) -> (b1 << 8) | b2
   @toInt16: (b1, b2) ->
