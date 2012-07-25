@@ -324,8 +324,11 @@ class PSDLayer
           @layerId = @file.readInt()
         when "lsct"
           @readLayerSectionDivider()
-        when "lrFX"
-          @parseEffectsLayer(); @file.read(2) # why these 2 bytes?
+        when "lrFX" # PS 5.0
+          @adjustments.legacyEffects = (new PSDEffectsInfo(@, length)).parseLegacy()
+          @file.read(2) # why these 2 bytes?
+        when "lfx2" # PS 6.0
+          @adjustments.effects = (new PSDEffectsInfo(@, length)).parse()
         when "selc"
           @adjustments.selectiveColor = (new PSDSelectiveColor(@, length)).parse()
         else  
@@ -333,45 +336,9 @@ class PSDLayer
           Log.debug("Skipping additional layer info with key #{key}")
 
       if @file.tell() != (pos + length)
-        Log.debug "Warning: additional layer info with key #{key} - unexpected end"
+        Log.debug "Warning: additional layer info with key #{key} - unexpected end. Position = #{@file.tell()}, Expected = #{(pos + length)}"
         @file.seek pos + length, false # Attempt to recover
 
-  parseEffectsLayer: ->
-    effects = []
-
-    [
-        v, # always 0
-        count
-    ] = @file.readf ">HH"
-
-    while count-- > 0
-      [
-        signature,
-        type
-      ] = @file.readf ">4s4s"
-
-      [size] = @file.readf ">i"
-
-      pos = @file.tell()
-
-      Log.debug("Parsing effect layer with type #{type} and size #{size}")
-
-      effect =    
-        switch type
-          when "cmnS" then new PSDLayerEffectCommonStateInfo @file
-          when "dsdw" then new PSDDropDownLayerEffect @file     
-          when "isdw" then new PSDDropDownLayerEffect @file, true # inner drop shadow
-
-      data = effect?.parse()
-
-      left = (pos + size) - @file.tell()
-      if left != 0
-       Log.debug("Failed to parse effect layer with type #{type}")
-       @file.seek left 
-      else
-        effects.push(data) unless type == "cmnS" # ignore commons state info
-
-    @adjustments.effects = effects
         
   readLayerSectionDivider: ->
     code = @file.readInt()

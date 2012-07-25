@@ -29,11 +29,13 @@ class PSDDescriptor
     id: @parseID()
 
   parseKeyItem: ->
-    id: @parseID()
-    value: @parseItem()
+    id = @parseID()
+    value = @parseItem(id)
 
-  parseItem: ->
-    type = @file.readString(4)
+    id: id, value: value
+
+  parseItem: (id, type = null) ->
+    type = @file.readString(4) unless type
     Log.debug "Found descriptor type: #{type}"
 
     value = switch type
@@ -142,7 +144,7 @@ class PSDDescriptor
     value
 
   parseUnitDouble: ->
-    unitID = @file.parseString(4)
+    unitID = @file.readString(4)
     unit = switch unitID
       when "#Ang" then "Angle"
       when "#Rsl" then "Density"

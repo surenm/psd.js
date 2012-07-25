@@ -1,6 +1,69 @@
 # libpsd has effect layer parsing 
 # see https://github.com/alco/psdump/blob/master/libpsd-0.9
 
+class PSDEffectsInfo
+  constructor: (@layer, @length) ->
+    @file = @layer.file
+
+  parse: ->
+    effectsVersion = @file.readInt()
+    assert effectsVersion is 0
+
+    version = @file.readInt()
+    assert version is 16
+
+    (new PSDEffectsDescriptor(@file)).parse()
+
+  parseLegacy: ->
+    effects = []
+
+    [
+        v, # always 0
+        count
+    ] = @file.readf ">HH"
+
+    while count-- > 0
+      [
+        signature,
+        type
+      ] = @file.readf ">4s4s"
+
+      [size] = @file.readf ">i"
+
+      pos = @file.tell()
+
+      Log.debug("Parsing effect layer with type #{type} and size #{size}")
+
+      effect =    
+        switch type
+          when "cmnS" then new PSDLayerEffectCommonStateInfo @file
+          when "dsdw" then new PSDDropDownLayerEffect @file     
+          when "isdw" then new PSDDropDownLayerEffect @file, true # inner drop shadow
+
+      data = effect?.parse()
+
+      left = (pos + size) - @file.tell()
+      if left != 0
+       Log.debug("Failed to parse effect layer with type #{type}")
+       @file.seek left 
+      else
+        effects.push(data) unless type == "cmnS" # ignore commons state info
+
+    legacy: true
+    effects: effects
+
+# This is ridiculous. The effects layer does not follow the standard
+# descriptor structure. Have to do a little hacking here.
+class PSDEffectsDescriptor extends PSDDescriptor
+  parseItem: (id) ->
+    type = @file.readString(4)
+
+    data = switch id
+      when "patternFill" then @parseLayerPatternOverlay()
+      else super(id, type)
+
+    data
+
 class PSDLayerEffect
 
   constructor: (@file) ->
