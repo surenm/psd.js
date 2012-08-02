@@ -23,6 +23,9 @@
     "png-js": ">= 0.1.0",
     "docco": ">= 0.3.0"
   },
+  "bundleDependencies": [
+    "png"
+  ],
   "bugs": {
     "url": "https://github.com/meltingice/psd.js/issues"
   },
