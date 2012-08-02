@@ -10,10 +10,14 @@ class PSDDescriptor
 
     numItems = @file.readInt()
     Log.debug "Descriptor contains #{numItems} items"
-
+    constants = PSDConstants.CONSTANTS
     for i in [0...numItems]
       item = @parseKeyItem()
-      data[item.id] = item.value
+      item_key = constants[item.id]
+      if item_key?
+        data[item_key] = item.value
+      else 
+        data[item.id] = item.value
 
     data
 
