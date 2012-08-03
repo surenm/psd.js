@@ -65,10 +65,7 @@ class PSDLayerMask
 
         layer.image = new PSDChannelImage(@file, @header, layer)
 
-        if @options.layerImages and (
-          (@options.onlyVisibleLayers and layer.visible) or
-          !@options.onlyVisibleLayers
-          )
+        if @options.layerImages and ((@options.onlyVisibleLayers and layer.visible) or !@options.onlyVisibleLayers)
           layer.image.parse()
         else
           layer.image.skip()
