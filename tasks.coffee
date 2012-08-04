@@ -5,8 +5,7 @@ AWS_S3 = AWS.load("amazon/s3").S3
 class Store
   PRODUCTION = "store_prod"
   STAGING = "store_staging"
-  fetch_from_store = (design_path, design_store) ->
-    console.log "Fetching design from  #{design_store}"
+
   @S3 = null
 
   @get_connection = () ->
@@ -22,16 +21,36 @@ class Store
 
     return @S3
     
-  save_to_store = (design_path, design_store) ->
-    console.log "Saving output to #{design_store}"
+  @fetch_from_store = (store, prefix) ->
+    console.log "Fetching design from  #{store}"
+    options = {
+      BucketName: store,
+      Prefix: prefix
+    }
+    console.log options
     
-    
-module.exports = {
-  screenshotJob: (design, callback) ->
-    Store.fetch_from_store (design, )
-    callback()
+    s3 = Store.get_connection()
+    objects = []
 
-  psdjsProcessorJob: (design, callback) ->
+    s3.ListObjects options, (err, data) ->
+      try
+        objects = data.Body.ListBucketResult.Contents
+        for object in objects 
+          console.log object.Key
+
+      catch error
+        console.log error
+    
+    return objects
+  
+  @save_to_store = (design_path, design_store) ->
+    console.log "Saving output to #{design_store}"
+
+module.exports = {
+  
+  psdjsProcessorJob: (args, callback) ->
+    prefix = "#{args.user}/#{args.design}"
+    Store.fetch_from_store args.store, prefix
     callback()
 }
 
