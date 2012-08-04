@@ -3,7 +3,7 @@ fs      = require 'fs'
 util    = require 'util'
 {jsmin} = require 'jsmin'
 sys = require "sys"
-
+ResqueTasks = require("./tasks")
 targetName    = "psd"
 
 ###
@@ -166,26 +166,16 @@ task 'minify', 'Minify the CoffeeScript files', ->
   fs.readFile targetCoreJS, "utf8", (err, contents) ->
     fs.writeFile targetCoreMinJS, jsmin(contents), "utf8", (err) ->
       util.log err if err
-      
-tasks = {
-  screenshotJob: (args, callback) ->
-    console.log args
-    callback()
-
-  psdjsProcessorJob: (args, callback) =>
-    console.log args
-    callback()
-}
-      
+  
 task 'run:worker', 'Deploy tasks and run workers by listening to global redis queue', ->
-  exec "./node_modules/.bin/coffee --bare -j tasks.js -c tasks.coffee"
+  ret = exec "./node_modules/.bin/coffee --bare -j tasks.js -c tasks.coffee"
   Resque = require "coffee-resque"
   connection = Resque.connect()
-  worker = connection.worker "psdjsProcessor,screenshot", tasks
+  worker = connection.worker "psdjsProcessor,screenshot", ResqueTasks
   worker.on 'error', (err, worker, queue, job) ->
     console.log "#{err} on running #{JSON.stringify(job.args)} on #{queue}"
   worker.on 'success', (worker, queue, job, result) -> 
-    console.log "Successfully ran #{JSON.stringify(job.args)} on #{queue} with #{result}"
+    console.log "Successfully ran #{JSON.stringify(job.args)} on #{queue}."
   worker.start()
     
     
