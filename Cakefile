@@ -167,11 +167,30 @@ task 'minify', 'Minify the CoffeeScript files', ->
     fs.writeFile targetCoreMinJS, jsmin(contents), "utf8", (err) ->
       util.log err if err
       
-task 'run:worker', 'Deploy tasks and run workers by listening to global redis queue', ->
-  worker_env = process.env
-  worker_env['WORKER'] = process.cwd() + '/tasks.js'
-  worker_env['QUEUE'] = "psdjs_processor"
-  worker = spawn('./node_modules/.bin/node-resque-worker', [], { cwd: undefined, env: worker_env })
+tasks = {
+  screenshotJob: (args, callback) ->
+    console.log args
+    callback()
 
-  worker.stdout.on 'data', (data) ->
-    sys.print data
+  psdjsProcessorJob: (args, callback) =>
+    console.log args
+    callback()
+}
+      
+task 'run:worker', 'Deploy tasks and run workers by listening to global redis queue', ->
+  exec "./node_modules/.bin/coffee --bare -j tasks.js -c tasks.coffee"
+  Resque = require "coffee-resque"
+  connection = Resque.connect()
+  worker = connection.worker "psdjsProcessor,screenshot", tasks
+  worker.on 'error', (err, worker, queue, job) ->
+    console.log "#{err} on running #{JSON.stringify(job.args)} on #{queue}"
+  worker.on 'success', (worker, queue, job, result) -> 
+    console.log "Successfully ran #{JSON.stringify(job.args)} on #{queue} with #{result}"
+  worker.start()
+    
+    
+task 'test:enqueue', 'Testing resque job queue by populating dummy objects', ->
+  Resque = require "coffee-resque"
+  connection = Resque.connect()
+  connection.enqueue 'psdjsProcessor', 'psdjsProcessorJob', ["design1"]
+  connection.enqueue 'screenshot', 'screenshotJob', ["design2"]
