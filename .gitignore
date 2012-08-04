@@ -1,3 +1,14 @@
 .DS_Store
 sftp-config.json
+node_modules/awssum
+node_modules/coffee-script
+node_modules/docco
+node_modules/express
+node_modules/glob
+node_modules/jsmin
+node_modules/jspack
+node_modules/nodeunit
+node_modules/png-js
+node_modules/resque
+node_modules/.bin
 .cake_task_cache
