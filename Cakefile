@@ -2,6 +2,7 @@ fs      = require 'fs'
 {exec, spawn}  = require 'child_process'
 util    = require 'util'
 {jsmin} = require 'jsmin'
+sys = require "sys"
 
 targetName    = "psd"
 
@@ -166,6 +167,11 @@ task 'minify', 'Minify the CoffeeScript files', ->
     fs.writeFile targetCoreMinJS, jsmin(contents), "utf8", (err) ->
       util.log err if err
       
-task 'run-worker', 'Deploy tasks and run workers by listening to global redis queue', ->
-  exec "./node_modules/.bin/coffee --bare -j tasks.js -c tasks.coffee"
-  
+task 'run:worker', 'Deploy tasks and run workers by listening to global redis queue', ->
+  worker_env = process.env
+  worker_env['WORKER'] = process.cwd() + '/tasks.js'
+  worker_env['QUEUE'] = "psdjs_processor"
+  worker = spawn('./node_modules/.bin/node-resque-worker', [], { cwd: undefined, env: worker_env })
+
+  worker.stdout.on 'data', (data) ->
+    sys.print data
