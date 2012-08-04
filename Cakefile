@@ -185,5 +185,4 @@ task 'run:worker', 'Run workers by listening to global redis queue', ->
 task 'test:enqueue', 'Testing resque job queue by populating dummy objects', ->
   Resque = require "coffee-resque"
   connection = Resque.connect()
-  connection.enqueue 'psdjsProcessor', 'psdjsProcessorJob', ["design1"]
-  connection.enqueue 'screenshot', 'screenshotJob', ["design2"]
+  connection.enqueue 'psdjsProcessor', 'psdjsProcessorJob', [{"user": "suren@goyaka.com", "design": "Social_Media_Buttons_PSD_psd-5015d36e4588ce0008000001", "store": "store_production"}]
