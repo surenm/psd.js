@@ -14,5 +14,6 @@ psd.setOptions
   layerImages: true
   onlyVisibleLayers: true
 
-psd.parse()  
+psd.parse()
+console.log psd.layers  
 fs.writeFileSync('./output.json', JSON.stringify(psd))
