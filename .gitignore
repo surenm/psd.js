@@ -12,3 +12,4 @@ node_modules/png-js
 node_modules/resque
 node_modules/.bin
 .cake_task_cache
+tasks.js
