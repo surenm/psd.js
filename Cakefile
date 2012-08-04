@@ -165,3 +165,7 @@ task 'minify', 'Minify the CoffeeScript files', ->
   fs.readFile targetCoreJS, "utf8", (err, contents) ->
     fs.writeFile targetCoreMinJS, jsmin(contents), "utf8", (err) ->
       util.log err if err
+      
+task 'run-worker', 'Deploy tasks and run workers by listening to global redis queue', ->
+  exec "./node_modules/.bin/coffee --bare -j tasks.js -c tasks.coffee"
+  
