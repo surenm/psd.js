@@ -167,11 +167,14 @@ task 'minify', 'Minify the CoffeeScript files', ->
     fs.writeFile targetCoreMinJS, jsmin(contents), "utf8", (err) ->
       util.log err if err
   
-task 'run:worker', 'Deploy tasks and run workers by listening to global redis queue', ->
-  ret = exec "./node_modules/.bin/coffee --bare -j tasks.js -c tasks.coffee"
+task 'deploy', 'Deploy workers', ->
+  exec "rm tasks.js"
+  exec "./node_modules/.bin/coffee --bare -j tasks.js -c tasks.coffee"
+  
+task 'run:worker', 'Run workers by listening to global redis queue', ->
   Resque = require "coffee-resque"
   connection = Resque.connect()
-  worker = connection.worker "psdjsProcessor,screenshot", ResqueTasks
+  worker = connection.worker "psdjsProcessor", ResqueTasks
   worker.on 'error', (err, worker, queue, job) ->
     console.log "#{err} on running #{JSON.stringify(job.args)} on #{queue}"
   worker.on 'success', (worker, queue, job, result) -> 
