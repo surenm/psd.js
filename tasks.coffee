@@ -1,4 +1,6 @@
 AWS = require "awssum"
+AMAZON = AWS.load('amazon/amazon')
+AWS_S3 = AWS.load("amazon/s3").S3
 
 class Store
   PRODUCTION = "store_prod"
