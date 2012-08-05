@@ -54,7 +54,7 @@ class Store
       console.log "Successfully written #{destination_file}"
     
     
-  @fetch_directory_from_store = (store, prefix) ->
+  @fetch_directory_from_store = (store, prefix, filter = ".psd") ->
     console.log "Fetching design from  #{store}"
     list_options = {
       BucketName: store,
@@ -67,7 +67,11 @@ class Store
       try
         objects = data.Body.ListBucketResult.Contents
         for object in objects 
-          Sync( () -> Store.fetch_object_from_store.sync(null, store, object.Key))
+          object_extname = path.extname object.Key
+          continue if filter? and filter != object_extname
+
+          Sync () -> 
+            Store.fetch_object_from_store.sync(null, store, object.Key)
       catch error
         console.log error
     
@@ -80,7 +84,7 @@ module.exports = {
   
   psdjsProcessorJob: (args, callback) ->
     prefix = "#{args.user}/#{args.design}"
-    Store.fetch_directory_from_store args.store, prefix
+    Store.fetch_directory_from_store args.store, prefix, ".psd"
     callback()
 }
 
