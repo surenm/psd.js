@@ -18,6 +18,7 @@ class PSDLayerMask
   parse: ->
     # Read the size of the entire layers and masks section
     maskSize = @file.readInt()
+      
     endLoc = @file.tell() + maskSize
 
     Log.debug "Layer mask size is #{maskSize}"
@@ -26,9 +27,16 @@ class PSDLayerMask
     # this section doesn't exist and the whole layers/masks data
     # is 4 bytes (the length we've already read)
     return if maskSize <= 0
-    
+
     # Size of the layer info section. 4 bytes, rounded up by 2's.
     layerInfoSize = Util.pad2 @file.readInt()
+
+    flag = true
+    flag = false if layerInfoSize != 0 
+    while flag
+      layerInfoSize = @file.readInt()
+      if layerInfoSize != 0 and layerInfoSize < maskSize
+        flag = false
 
     # Store the current position in case we need to bail
     # and skip over this section.
