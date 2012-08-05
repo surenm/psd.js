@@ -166,10 +166,6 @@ task 'minify', 'Minify the CoffeeScript files', ->
     fs.writeFile targetCoreMinJS, jsmin(contents), "utf8", (err) ->
       util.log err if err
   
-task 'deploy', 'Deploy workers', ->
-  exec "rm tasks.js"
-  exec "./node_modules/.bin/coffee --bare -j tasks.js -c tasks.coffee"
-  
 task 'run:worker', 'Run workers by listening to global redis queue', ->
   ResqueTasks = require("./tasks")
   Resque = require "coffee-resque"
