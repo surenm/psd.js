@@ -18,7 +18,9 @@
     "express": "2.5.x",
     "coffee-script": "> 1.1.0",
     "awssum": ">= 0.0.7",
-    "coffee-resque": ">= 0.1.7"
+    "coffee-resque": ">= 0.1.7",
+    "sync": ">= 0.2.1",
+    "buffered-writer": ">= 0.1.9"
   },
   "devDependencies": {
     "jsmin": "1.0.1",
