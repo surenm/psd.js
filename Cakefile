@@ -3,7 +3,6 @@ fs      = require 'fs'
 util    = require 'util'
 {jsmin} = require 'jsmin'
 sys = require "sys"
-ResqueTasks = require("./tasks")
 targetName    = "psd"
 
 ###
@@ -172,7 +171,9 @@ task 'deploy', 'Deploy workers', ->
   exec "./node_modules/.bin/coffee --bare -j tasks.js -c tasks.coffee"
   
 task 'run:worker', 'Run workers by listening to global redis queue', ->
+  ResqueTasks = require("./tasks")
   Resque = require "coffee-resque"
+  
   connection = Resque.connect()
   worker = connection.worker "psdjsProcessor", ResqueTasks
   worker.on 'error', (err, worker, queue, job) ->
