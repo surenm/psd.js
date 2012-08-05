@@ -33,10 +33,15 @@ class PSDLayerMask
 
     flag = true
     flag = false if layerInfoSize != 0 
+    skip_count = 0
     while flag
+      skip_count++
       layerInfoSize = @file.readInt()
       if layerInfoSize != 0 and layerInfoSize < maskSize
         flag = false
+    
+    if skip_count > 0
+      console.log "Skipped #{skip_count} times..."
 
     # Store the current position in case we need to bail
     # and skip over this section.
