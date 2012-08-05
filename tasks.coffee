@@ -5,6 +5,15 @@ fs = require "fs"
 path = require "path"
 Sync = require "sync"
 
+
+class FileUtils
+  @mkdir_p = (p, mode="0777") ->
+    ps = path.normalize(p).split('/')
+    exists = path.existsSync p
+    if not exists
+      FileUtils.mkdir_p ps.slice(0,-1).join('/'), mode
+      fs.mkdirSync p, mode
+
 class Store
   PRODUCTION = "store_prod"
   STAGING = "store_staging"
