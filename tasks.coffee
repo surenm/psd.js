@@ -1,6 +1,9 @@
 AWS = require "awssum"
 AMAZON = AWS.load('amazon/amazon')
 AWS_S3 = AWS.load("amazon/s3").S3
+fs = require "fs"
+path = require "path"
+Sync = require "sync"
 
 class Store
   PRODUCTION = "store_prod"
@@ -20,28 +23,41 @@ class Store
       })
 
     return @S3
-    
-  @fetch_from_store = (store, prefix) ->
-    console.log "Fetching design from  #{store}"
+  
+  @fetch_object_from_store = (store, key) ->
     options = {
+      BucketName: store, 
+      ObjectName: key 
+    }
+    
+    s3 = Store.get_connection()
+
+    s3.GetObject options, (err, data) ->
+      basename = path.basename key
+      destination_file = path.join "/tmp", basename
+      fptr = fs.createWriteStream destination_file, {flags: 'w', encoding: 'binary', mode: '0666'}
+      fptr.write(data.Body)
+      console.log "Successfully written #{destination_file}"
+    
+    
+  @fetch_directory_from_store = (store, prefix) ->
+    console.log "Fetching design from  #{store}"
+    list_options = {
       BucketName: store,
       Prefix: prefix
     }
-    console.log options
     
     s3 = Store.get_connection()
-    objects = []
 
-    s3.ListObjects options, (err, data) ->
+    s3.ListObjects list_options, (err, data) ->
       try
         objects = data.Body.ListBucketResult.Contents
         for object in objects 
-          console.log object.Key
-
+          Sync( () -> Store.fetch_object_from_store.sync(null, store, object.Key))
       catch error
         console.log error
     
-    return objects
+    return
   
   @save_to_store = (design_path, design_store) ->
     console.log "Saving output to #{design_store}"
@@ -50,7 +66,7 @@ module.exports = {
   
   psdjsProcessorJob: (args, callback) ->
     prefix = "#{args.user}/#{args.design}"
-    Store.fetch_from_store args.store, prefix
+    Store.fetch_directory_from_store args.store, prefix
     callback()
 }
 
