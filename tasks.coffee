@@ -42,8 +42,13 @@ class Store
     s3 = Store.get_connection()
 
     s3.GetObject options, (err, data) ->
+      dirname = path.dirname key
+      destination_dir = path.join "/tmp", "store", dirname
+      FileUtils.mkdir_p destination_dir
+
       basename = path.basename key
-      destination_file = path.join "/tmp", basename
+      destination_file = path.join destination_dir, basename
+
       fptr = fs.createWriteStream destination_file, {flags: 'w', encoding: 'binary', mode: '0666'}
       fptr.write(data.Body)
       console.log "Successfully written #{destination_file}"
