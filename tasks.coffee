@@ -6,15 +6,9 @@ path = require "path"
 Sync = require "sync"
 events = require "events"
 emitter = new events.EventEmitter()
+FileUtils = require "file"
 {PSD} = require './lib/psd.js'
 
-class FileUtils
-  @mkdir_p = (p, mode="0777") ->
-    ps = path.normalize(p).split('/')
-    exists = path.existsSync p
-    if not exists
-      FileUtils.mkdir_p ps.slice(0,-1).join('/'), mode
-      fs.mkdirSync p, mode
 
 class Utils
   @process_photoshop_file = (design_directory) ->
