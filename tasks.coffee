@@ -4,7 +4,8 @@ AWS_S3 = AWS.load("amazon/s3").S3
 fs = require "fs"
 path = require "path"
 Sync = require "sync"
-
+events = require "events"
+emitter = new events.EventEmitter()
 
 class FileUtils
   @mkdir_p = (p, mode="0777") ->
@@ -33,28 +34,47 @@ class Store
 
     return @S3
   
-  @fetch_object_from_store = (store, key) ->
-    options = {
-      BucketName: store, 
-      ObjectName: key 
-    }
-    
-    s3 = Store.get_connection()
+  @fetch_next_object_from_store = (store, objects, filter) ->
+    object_name = objects.shift()
 
-    s3.GetObject options, (err, data) ->
-      dirname = path.dirname key
+    if object_name
+      # Add an one time listener to queue the next item when this object gets processed.
+      emitter.once 'object-done', () ->
+        Store.fetch_next_object_from_store store, objects, filter
+      
+      object_extname = path.extname object_name
+
+      if filter? and filter != object_extname
+        # skipping processing this object
+        emitter.emit 'object-done' 
+        return
+    
+      s3 = Store.get_connection()
+      
+      options = {
+        BucketName: store, 
+        ObjectName: object_name
+      }
+      
+      dirname = path.dirname object_name
       destination_dir = path.join "/tmp", "store", dirname
       FileUtils.mkdir_p destination_dir
 
-      basename = path.basename key
+      basename = path.basename object_name
       destination_file = path.join destination_dir, basename
-
-      fptr = fs.createWriteStream destination_file, {flags: 'w', encoding: 'binary', mode: '0666'}
-      fptr.write(data.Body)
-      console.log "Successfully written #{destination_file}"
+      
+      s3.GetObject options, (err, data) ->
+        fptr = fs.createWriteStream destination_file, {flags: 'w', encoding: 'binary', mode: '0666'}
+        fptr.write(data.Body)
+        console.log "Successfully written #{destination_file}"
+        
+        # This object has been fetched and saved. Signal object-done
+        emitter.emit 'object-done'
+    else
+      # We have come to the last object, so entire list of objects have been completed.
+      emitter.emit 'list-done'
     
-    
-  @fetch_directory_from_store = (store, prefix, filter = ".psd") ->
+  @fetch_directory_from_store = (store, prefix, filter = null) ->
     console.log "Fetching design from  #{store}"
     list_options = {
       BucketName: store,
@@ -62,20 +82,17 @@ class Store
     }
     
     s3 = Store.get_connection()
+    
+    emitter.addListener 'list-done', () ->
+      emitter.emit 'fetch-done'
 
     s3.ListObjects list_options, (err, data) ->
       try
-        objects = data.Body.ListBucketResult.Contents
-        for object in objects 
-          object_extname = path.extname object.Key
-          continue if filter? and filter != object_extname
-
-          Sync () -> 
-            Store.fetch_object_from_store.sync(null, store, object.Key)
+        raw_objects = data.Body.ListBucketResult.Contents
+        objects = (object.Key for object in raw_objects)
+        Store.fetch_next_object_from_store store, objects, filter
       catch error
         console.log error
-    
-    return
   
   @save_to_store = (design_path, design_store) ->
     console.log "Saving output to #{design_store}"
@@ -84,7 +101,10 @@ module.exports = {
   
   psdjsProcessorJob: (args, callback) ->
     prefix = "#{args.user}/#{args.design}"
-    Store.fetch_directory_from_store args.store, prefix, ".psd"
-    callback()
+
+    emitter.addListener 'fetch-done', () ->
+      callback()
+
+    Store.fetch_directory_from_store args.store, prefix
 }
 
