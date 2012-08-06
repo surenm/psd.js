@@ -109,9 +109,6 @@ class Store
     
     s3 = Store.get_connection()
     
-    emitter.addListener 'list-done', () ->
-      emitter.emit 'fetch-done'
-
     s3.ListObjects list_options, (err, data) ->
       try
         raw_objects = data.Body.ListBucketResult.Contents
