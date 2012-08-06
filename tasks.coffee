@@ -92,10 +92,13 @@ class Store
       s3.GetObject options, (err, data) ->
         fptr = fs.createWriteStream destination_file, {flags: 'w', encoding: 'binary', mode: '0666'}
         fptr.write(data.Body)
-        console.log "Successfully written #{destination_file}"
-        
-        # This object has been fetched and saved. Signal object-done
-        emitter.emit 'object-done'
+
+        fptr.on 'close', () ->
+          console.log "Successfully written #{destination_file}"
+          # This object has been fetched and saved. Signal object-done
+          emitter.emit 'object-done'
+          
+        fptr.end()
     else
       # We have come to the last object, so entire list of objects have been completed.
       emitter.emit 'fetch-done'
