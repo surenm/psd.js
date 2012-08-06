@@ -13,15 +13,17 @@ emitter = new events.EventEmitter()
 class Utils
   @process_photoshop_file = (design_directory) ->
     absolute_design_directory = path.join "/tmp", "store", design_directory
-    screenshot_png = path.join absolute_design_directory, 'output.png'
-    processed_json = path.join absolute_design_directory, 'output.json'
-    exported_images_dir = path.join absolute_design_directory, 'images'
+    processed_directory = path.join absolute_design_directory, "psdjsprocessed"
+    screenshot_png = path.join processed_directory, 'output.png'
+    processed_json = path.join processed_directory, 'output.json'
+    exported_images_dir = path.join processed_directory, 'images'
     
     FileUtils.mkdirsSync exported_images_dir
       
     files = fs.readdirSync absolute_design_directory
     for file in files
       if path.extname(file) == ".psd"
+        console.log "Found a psd file - #{file}"
         psd_file_path = path.join absolute_design_directory, file
         psd = PSD.fromFile psd_file_path
         psd.setOptions
@@ -35,6 +37,8 @@ class Utils
         for layer in psd.layers
           continue unless layer.image
           layer.image.toFileSync "#{exported_images_dir}/#{layer.name}.png"
+          
+        break
 
     emitter.emit 'processing-done'
 
