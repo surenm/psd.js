@@ -3,6 +3,9 @@ fs      = require 'fs'
 util    = require 'util'
 {jsmin} = require 'jsmin'
 sys = require "sys"
+path = require "path"
+
+
 targetName    = "psd"
 
 ###
@@ -182,4 +185,18 @@ task 'run:worker', 'Run workers by listening to global redis queue', ->
 task 'test:enqueue', 'Testing resque job queue by populating dummy objects', ->
   Resque = require "coffee-resque"
   connection = Resque.connect()
-  connection.enqueue 'psdjsProcessor', 'psdjsProcessorJob', [{"user": "suren@goyaka.com", "design": "Social_Media_Buttons_PSD_psd-5015d36e4588ce0008000001", "store": "store_production"}]
+  design_data = {
+    "user": "suren@goyaka.com", 
+    "design": "Social_Media_Buttons_PSD_psd-5015d36e4588ce0008000001", 
+    "store": "store_production"
+  }
+  connection.enqueue 'psdjsProcessor', 'psdjsProcessorJob', [design_data]
+  
+task 'test:walk', 'walking', ->
+  FileUtils = require "file"
+  test_folder = '/tmp/store/suren@goyaka.com/Social_Media_Buttons_PSD_psd-5015d36e4588ce0008000001/psdjsprocessed'
+  FileUtils.walk test_folder, (dummy, dirPath, dirs, files) ->
+    for file in files
+      relative_path = path.relative(path.join("/tmp", "store"), file)
+    
+    
