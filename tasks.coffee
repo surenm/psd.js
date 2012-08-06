@@ -155,7 +155,7 @@ class Store
 
 module.exports = {
   
-  psdjsProcessorJob: (args, callback) ->
+  PsdjsProcessorJob: (args, callback) ->
     prefix = "#{args.user}/#{args.design}"
     
     # An array of done events  

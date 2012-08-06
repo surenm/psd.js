@@ -174,7 +174,7 @@ task 'run:worker', 'Run workers by listening to global redis queue', ->
   Resque = require "coffee-resque"
   
   connection = Resque.connect()
-  worker = connection.worker "psdjsProcessor", ResqueTasks
+  worker = connection.worker "psdjs_processor", ResqueTasks
   worker.on 'error', (err, worker, queue, job) ->
     console.log "#{err} on running #{JSON.stringify(job.args)} on #{queue}"
   worker.on 'success', (worker, queue, job, result) -> 
@@ -190,7 +190,7 @@ task 'test:enqueue', 'Testing resque job queue by populating dummy objects', ->
     "design": "Social_Media_Buttons_PSD_psd-5015d36e4588ce0008000001", 
     "store": "store_production"
   }
-  connection.enqueue 'psdjsProcessor', 'psdjsProcessorJob', [design_data]
+  connection.enqueue 'psdjs_processor', 'PsdjsProcessorJob', [design_data]
   
 task 'test:walk', 'walking', ->
   FileUtils = require "file"
