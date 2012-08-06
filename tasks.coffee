@@ -16,9 +16,6 @@ class FileUtils
       FileUtils.mkdir_p ps.slice(0,-1).join('/'), mode
       fs.mkdirSync p, mode
 
-class Store
-  PRODUCTION = "store_prod"
-  STAGING = "store_staging"
 class Utils
   @process_photoshop_file = (design_directory) ->
     absolute_design_directory = path.join "/tmp", "store", design_directory
@@ -47,6 +44,7 @@ class Utils
 
     emitter.emit 'processing-done'
 
+class Store
   @S3 = null
 
   @get_connection = () ->
