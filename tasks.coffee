@@ -6,6 +6,7 @@ path = require "path"
 Sync = require "sync"
 events = require "events"
 emitter = new events.EventEmitter()
+{PSD} = require './lib/psd.js'
 
 class FileUtils
   @mkdir_p = (p, mode="0777") ->
@@ -18,6 +19,33 @@ class FileUtils
 class Store
   PRODUCTION = "store_prod"
   STAGING = "store_staging"
+class Utils
+  @process_photoshop_file = (design_directory) ->
+    absolute_design_directory = path.join "/tmp", "store", design_directory
+    screenshot_png = path.join absolute_design_directory, 'output.png'
+    processed_json = path.join absolute_design_directory, 'output.json'
+    exported_images_dir = path.join absolute_design_directory, 'images'
+    
+    FileUtils.mkdir_p exported_images_dir
+      
+    files = fs.readdirSync absolute_design_directory
+    for file in files
+      if path.extname(file) == ".psd"
+        psd_file_path = path.join absolute_design_directory, file
+        psd = PSD.fromFile psd_file_path
+        psd.setOptions
+          layerImages: true
+          onlyVisibleLayers: true
+
+        psd.parse()
+        psd.toFileSync screenshot_png
+        fs.writeFileSync processed_json, JSON.stringify(psd)
+        
+        for layer in psd.layers
+          continue unless layer.image
+          layer.image.toFileSync "#{exported_images_dir}/#{layer.name}.png"
+
+    emitter.emit 'processing-done'
 
   @S3 = null
 
