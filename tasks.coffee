@@ -145,11 +145,10 @@ class Store
   @save_to_store = (store, design_directory) ->
     files_to_put = []
     processed_directory = path.join '/tmp', 'store', design_directory, "psdjsprocessed"
-    console.log processed_directory
+    
     FileUtils.walkSync processed_directory, (dirPath, dirs, files) ->
       for file in files
         full_path = path.join dirPath, file
-        console.log full_path
         files_to_put.push full_path
 
     Store.save_next_object_to_store store, files_to_put    
