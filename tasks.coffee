@@ -5,10 +5,10 @@ fs = require "fs"
 path = require "path"
 Sync = require "sync"
 events = require "events"
-emitter = new events.EventEmitter()
 FileUtils = require "file"
 {PSD} = require './lib/psd.js'
 
+emitter = new events.EventEmitter()
 
 class Utils
   @process_photoshop_file = (design_directory) ->
