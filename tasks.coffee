@@ -105,6 +105,6 @@ module.exports = {
     emitter.addListener 'fetch-done', () ->
       callback()
 
-    Store.fetch_directory_from_store args.store, prefix
+    Store.fetch_directory_from_store args.store, prefix, ".psd"
 }
 
