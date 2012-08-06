@@ -113,9 +113,42 @@ class Store
         Store.fetch_next_object_from_store store, objects, filter
       catch error
         console.log error
+        
+  @save_next_object_to_store = (store, local_files) ->
+    local_source_file = local_files.shift()
+
+    emitter.once 'put-done', () ->
+      Store.save_next_object_to_store store, local_files
+
+    s3 = Store.get_connection()
+
+    if local_source_file
+      object_key = path.relative(path.join("/tmp", "store"), local_source_file)
+      buf = fs.readFileSync local_source_file
+      put_options = {
+        BucketName: store,
+        ObjectName: object_key,
+        ContentLength: buf.length,
+        Body: buf,
+      }
+      
+      s3.PutObject put_options, (err, data) ->
+        emitter.emit 'put-done'
+      
+    else 
+      emitter.emit 'saving-done'
   
-  @save_to_store = (design_path, design_store) ->
-    console.log "Saving output to #{design_store}"
+  @save_to_store = (store, design_directory) ->
+    files_to_put = []
+    processed_directory = path.join '/tmp', 'store', design_directory, "psdjsprocessed"
+    console.log processed_directory
+    FileUtils.walkSync processed_directory, (dirPath, dirs, files) ->
+      for file in files
+        full_path = path.join dirPath, file
+        console.log full_path
+        files_to_put.push full_path
+
+    Store.save_next_object_to_store store, files_to_put    
 
 module.exports = {
   
