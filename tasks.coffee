@@ -17,7 +17,7 @@ class Utils
     processed_json = path.join absolute_design_directory, 'output.json'
     exported_images_dir = path.join absolute_design_directory, 'images'
     
-    FileUtils.mkdir_p exported_images_dir
+    FileUtils.mkdirsSync exported_images_dir
       
     files = fs.readdirSync absolute_design_directory
     for file in files
@@ -78,7 +78,7 @@ class Store
       
       dirname = path.dirname object_name
       destination_dir = path.join "/tmp", "store", dirname
-      FileUtils.mkdir_p destination_dir
+      FileUtils.mkdirsSync destination_dir
 
       basename = path.basename object_name
       destination_file = path.join destination_dir, basename
