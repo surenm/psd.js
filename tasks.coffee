@@ -98,7 +98,7 @@ class Store
         emitter.emit 'object-done'
     else
       # We have come to the last object, so entire list of objects have been completed.
-      emitter.emit 'list-done'
+      emitter.emit 'fetch-done'
     
   @fetch_directory_from_store = (store, prefix, filter = null) ->
     console.log "Fetching design from  #{store}"
@@ -125,12 +125,8 @@ module.exports = {
   psdjsProcessorJob: (args, callback) ->
     prefix = "#{args.user}/#{args.design}"
     
-    # An array of done events
-    emitter.addListener 'list-done', () ->
-      emitter.emit 'fetch-done'
-    
+    # An array of done events  
     emitter.addListener 'fetch-done', () ->
-      #emitter.emit 'saving-done'
       Utils.process_photoshop_file prefix
       
     emitter.addListener 'processing-done', () ->
