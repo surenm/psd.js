@@ -101,8 +101,19 @@ module.exports = {
   
   psdjsProcessorJob: (args, callback) ->
     prefix = "#{args.user}/#{args.design}"
-
+    
+    # An array of done events
+    emitter.addListener 'list-done', () ->
+      emitter.emit 'fetch-done'
+    
     emitter.addListener 'fetch-done', () ->
+      #emitter.emit 'saving-done'
+      Utils.process_photoshop_file prefix
+      
+    emitter.addListener 'processing-done', () ->
+      emitter.emit 'saving-done'
+      
+    emitter.addListener 'saving-done', () ->
       callback()
 
     Store.fetch_directory_from_store args.store, prefix, ".psd"
