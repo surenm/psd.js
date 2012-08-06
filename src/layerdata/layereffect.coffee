@@ -59,7 +59,7 @@ class PSDEffectsDescriptor extends PSDDescriptor
     type = @file.readString(4)
 
     data = switch id
-      when "patternFill" then @parseLayerPatternOverlay()
+      when "patternFill" then console.log "patternfill"
       else super(id, type)
 
     data
