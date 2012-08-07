@@ -113,21 +113,22 @@ class Store
       BucketName: store,
       Prefix: prefix
     }
-    console.log list_options
     
-    s3 = Store.get_connection()
+    if store == "store_local"
+    else 
+      s3 = Store.get_connection()
     
-    s3.ListObjects list_options, (err, data) ->
-      try
-        raw_objects = data.Body.ListBucketResult.Contents
-        if typeof(raw_objects.Key) == "undefined"
-          objects = (object.Key for object in raw_objects)
-        else
-          objects = [raw_objects.Key]
+      s3.ListObjects list_options, (err, data) ->
+        try
+          raw_objects = data.Body.ListBucketResult.Contents
+          if typeof(raw_objects.Key) == "undefined"
+            objects = (object.Key for object in raw_objects)
+          else
+            objects = [raw_objects.Key]
 
-        Store.fetch_next_object_from_store store, objects, filter
-      catch error
-        console.log error
+          Store.fetch_next_object_from_store store, objects, filter
+        catch error
+          console.log error
         
   @save_next_object_to_store = (store, local_files) ->
     local_source_file = local_files.shift()
@@ -135,21 +136,24 @@ class Store
     emitter.once 'put-done', () ->
       Store.save_next_object_to_store store, local_files
 
-    s3 = Store.get_connection()
-
     if local_source_file
       object_key = path.relative(path.join("/tmp", "store"), local_source_file)
       buf = fs.readFileSync local_source_file
-      put_options = {
-        BucketName: store,
-        ObjectName: object_key,
-        ContentLength: buf.length,
-        Body: buf,
-      }
       
-      s3.PutObject put_options, (err, data) ->
-        emitter.emit 'put-done'
-      
+      if store == "store_local"
+        
+      else
+        s3 = Store.get_connection()
+        
+        put_options = {
+          BucketName: store,
+          ObjectName: object_key,
+          ContentLength: buf.length,
+          Body: buf,
+        }
+    
+        s3.PutObject put_options, (err, data) ->
+          emitter.emit 'put-done'
     else
       emitter.emit 'saving-done'
   
