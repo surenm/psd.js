@@ -382,7 +382,10 @@ class PSDImage
       buffer[i+3] = 255 - pixelData[i+3] # Why is this inverted?
 
     try
-      new Png buffer, @getImageWidth(), @getImageHeight(), 'rgba'
+      if @getImageWidth() != 0 and @getImageHeight() != 0
+        return new Png buffer, @getImageWidth(), @getImageHeight(), 'rgba'
+      else
+        return null
     catch e
       Log.debug e
       return null
