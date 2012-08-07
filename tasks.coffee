@@ -29,15 +29,22 @@ class Utils
         psd.setOptions
           layerImages: true
           onlyVisibleLayers: true
-
+        console.log "Starting to parse the file..."
         psd.parse()
+        console.log "Completed."
+        
+        console.log "Generating screenshot file..."
         psd.toFileSync screenshot_png
+
+        console.log "Generating processed JSON..."
         fs.writeFileSync processed_json, JSON.stringify(psd)
         
         for layer in psd.layers
-          continue unless layer.image
-          layer.image.toFileSync "#{exported_images_dir}/#{layer.name}.png"
-          
+          continue if not layer.image?
+          try
+            layer.image.toFileSync "#{exported_images_dir}/#{layer.name}.png"
+          catch error
+            console.log  "Error #{error} in generating image for #{layer.name}"
         break
 
     emitter.emit 'processing-done'
