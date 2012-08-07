@@ -163,10 +163,10 @@ module.exports = {
       Utils.process_photoshop_file prefix
       
     emitter.addListener 'processing-done', () ->
-      Store.save_to_store args.store, prefix
+      Store.save_to_store args.bucket, prefix
       
     emitter.addListener 'saving-done', () ->
       callback()
 
-    Store.fetch_directory_from_store args.store, prefix, ".psd"
+    Store.fetch_directory_from_store args.bucket, prefix, ".psd"
 }
