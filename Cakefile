@@ -1,10 +1,8 @@
 fs      = require 'fs'
 {exec, spawn}  = require 'child_process'
 util    = require 'util'
-{jsmin} = require 'jsmin'
 sys = require "sys"
 path = require "path"
-
 
 targetName    = "psd"
 
