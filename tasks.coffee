@@ -107,12 +107,14 @@ class Store
       BucketName: store,
       Prefix: prefix
     }
+    console.log list_options
     
     s3 = Store.get_connection()
     
     s3.ListObjects list_options, (err, data) ->
       try
         raw_objects = data.Body.ListBucketResult.Contents
+        console.log raw_objects
         objects = (object.Key for object in raw_objects)
         console.log "Found objects #{objects}..."
         Store.fetch_next_object_from_store store, objects, filter
