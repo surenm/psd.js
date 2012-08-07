@@ -159,13 +159,13 @@ module.exports = {
     prefix = "#{args.user}/#{args.design}"
     
     # An array of done events  
-    emitter.addListener 'fetch-done', () ->
+    emitter.once 'fetch-done', () ->
       Utils.process_photoshop_file prefix
       
-    emitter.addListener 'processing-done', () ->
+    emitter.once 'processing-done', () ->
       Store.save_to_store args.bucket, prefix
       
-    emitter.addListener 'saving-done', () ->
+    emitter.once 'saving-done', () ->
       callback()
 
     Store.fetch_directory_from_store args.bucket, prefix, ".psd"
