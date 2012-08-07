@@ -3,7 +3,6 @@ AMAZON = AWS.load('amazon/amazon')
 AWS_S3 = AWS.load("amazon/s3").S3
 fs = require "fs"
 path = require "path"
-Sync = require "sync"
 events = require "events"
 FileUtils = require "file"
 {PSD} = require './lib/psd.js'
