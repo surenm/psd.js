@@ -31,7 +31,6 @@ class Utils
           onlyVisibleLayers: true
         console.log "Starting to parse the file..."
         psd.parse()
-        console.log "Completed."
         
         console.log "Generating screenshot file..."
         psd.toFileSync screenshot_png
@@ -42,7 +41,8 @@ class Utils
         for layer in psd.layers
           continue if not layer.image?
           try
-            layer.image.toFileSync "#{exported_images_dir}/#{layer.name}.png"
+            layer_safe_name = layer.name.replace(/[^0-9a-zA-Z]/g,'_')
+            layer.image.toFileSync "#{exported_images_dir}/#{layer_safe_name}.png"
           catch error
             console.log  "Error #{error} in generating image for #{layer.name}"
         break
