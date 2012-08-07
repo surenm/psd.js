@@ -92,7 +92,7 @@ class Store
         fptr.write(data.Body)
 
         fptr.on 'close', () ->
-          console.log "Successfully written #{destination_file}"
+          console.log "Successfully fetched #{destination_file}"
           # This object has been fetched and saved. Signal object-done
           emitter.emit 'object-done'
           
@@ -114,6 +114,7 @@ class Store
       try
         raw_objects = data.Body.ListBucketResult.Contents
         objects = (object.Key for object in raw_objects)
+        console.log "Found objects #{objects}..."
         Store.fetch_next_object_from_store store, objects, filter
       catch error
         console.log error
@@ -139,7 +140,7 @@ class Store
       s3.PutObject put_options, (err, data) ->
         emitter.emit 'put-done'
       
-    else 
+    else
       emitter.emit 'saving-done'
   
   @save_to_store = (store, design_directory) ->
@@ -151,7 +152,7 @@ class Store
         full_path = path.join dirPath, file
         files_to_put.push full_path
 
-    Store.save_next_object_to_store store, files_to_put    
+    Store.save_next_object_to_store store, files_to_put
 
 module.exports = {
   
@@ -164,9 +165,11 @@ module.exports = {
     
     # An array of done events  
     emitter.once 'fetch-done', () ->
+      console.log "Beginning to process psd file"
       Utils.process_photoshop_file prefix
       
     emitter.once 'processing-done', () ->
+      console.log "Storing output files to store again"
       Store.save_to_store args.bucket, prefix
       
     emitter.once 'saving-done', () ->
