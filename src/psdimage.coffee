@@ -385,7 +385,7 @@ class PSDImage
       if @getImageWidth() != 0 and @getImageHeight() != 0
         return new Png buffer, @getImageWidth(), @getImageHeight(), 'rgba'
       else
-        return null
+        return new Png buffer, @header.cols, @header.rows, 'rgba'
     catch e
       Log.debug e
       return null
