@@ -158,6 +158,10 @@ module.exports = {
   PsdjsProcessorJob: (args, callback) ->
     prefix = "#{args.user}/#{args.design}"
     
+    emitter.removeAllListeners 'fetch-done'
+    emitter.removeAllListeners 'processing-done'
+    emitter.removeAllListeners 'saving-done'
+    
     # An array of done events  
     emitter.once 'fetch-done', () ->
       Utils.process_photoshop_file prefix
