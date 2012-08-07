@@ -1,4 +1,7 @@
 fs = require 'fs'
+path = require 'path'
+FileUtils = require "file"
+
 {exec} = require 'child_process'
 
 {PSD} = require __dirname + '/../lib/psd.js'
@@ -15,5 +18,9 @@ psd.setOptions
   onlyVisibleLayers: true
 
 psd.parse()
-psd.toFileSync('./output.png')
-fs.writeFileSync('./output.json', JSON.stringify(psd))
+psd_dirname   = path.dirname process.argv[2]
+processed_dir = path.join psd_dirname, "psdjsprocessed" 
+FileUtils.mkdirsSync processed_dir
+
+psd.toFileSync(path.join processed_dir, 'output.png')
+fs.writeFileSync(path.join(processed_dir, 'output.psdjs.json'), JSON.stringify(psd))
