@@ -124,7 +124,6 @@ task 'watch', 'Automatically recompile the CoffeeScript files when updated', ->
         invoke 'build'
         
 task 'build', 'Compile and minify all CoffeeScript source files', ->
-  finishListener 'js', -> invoke 'minify'
   invoke 'compile'
 
 task 'compile', 'Compile all CoffeeScript source files', (opts) ->
