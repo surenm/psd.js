@@ -3,3 +3,4 @@ sftp-config.json
 node_modules
 .cake_task_cache
 tasks.js
+local_constants.yml
