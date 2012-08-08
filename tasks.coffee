@@ -3,6 +3,7 @@
 Store = require "./src/store"
 Utils = require "./src/utils"
 EventsHandler = require "./src/events_handler"
+Resque = require "./src/resque"
 
 module.exports = {
   PsdjsProcessorJob: (args, callback) ->
@@ -22,6 +23,8 @@ module.exports = {
       Store.save_to_store args.bucket, prefix
       
     EventsHandler.emitter.once 'saving-done', () ->
+      connection = Resque.get_connection()
+      connection.enqueue "parser", "ParserJob", args.design
       callback()
 
     # fetch the psd file alone to be processed  
