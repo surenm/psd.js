@@ -200,4 +200,7 @@ task 'test:walk', 'walking', ->
     for file in files
       relative_path = path.relative(path.join("/tmp", "store"), file)
     
-    
+task 'test:config', 'config variables', ->
+  yaml = require "js-yaml"
+  config_file = require "./local_constants.yml"
+  console.log config_file

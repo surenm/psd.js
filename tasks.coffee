@@ -5,6 +5,8 @@ fs = require "fs"
 path = require "path"
 events = require "events"
 FileUtils = require "file"
+yaml = require "js-yaml"
+wrench = require 'wrench'
 {PSD} = require './lib/psd.js'
 
 emitter = new events.EventEmitter()
@@ -47,14 +49,18 @@ class Utils
         break
 
     emitter.emit 'processing-done'
+    
+  @get_local_constants = () ->
+    configs = require "./local_constants.yml"
+    return configs
 
 class Store
   @S3 = null
 
   @get_connection = () ->
-    aws_access_key_id = process.env.AWS_ACCESS_KEY_ID
-    aws_access_key_secret = process.env.AWS_SECRET_ACCESS_KEY
-    aws_region = AMAZON.US_EAST_1
+    aws_access_key_id = process.env.AWS_ACCESS_KEY_ID || ""
+    aws_access_key_secret = process.env.AWS_SECRET_ACCESS_KEY || ""
+    aws_region = AMAZON.US_EAST_1 || ""
     if not @S3?
       @S3 = new AWS_S3({
        'accessKeyId' : aws_access_key_id,
@@ -108,13 +114,19 @@ class Store
       emitter.emit 'fetch-done'
     
   @fetch_directory_from_store = (store, prefix, filter = null) ->
-    console.log "Fetching design from  #{store}"
+    console.log "Fetching design from #{store}"
     list_options = {
       BucketName: store,
       Prefix: prefix
     }
     
     if store == "store_local"
+      configs = Utils.get_local_constants()
+      local_src_dir = "#{configs.LOCAL_STORE}/#{prefix}"
+      local_destination_dir = path.join "/tmp", "store", prefix
+      FileUtils.mkdirsSync local_destination_dir
+      wrench.copyDirSyncRecursive local_src_dir, local_destination_dir
+      emitter.emit 'fetch-done'
     else 
       s3 = Store.get_connection()
     
@@ -140,20 +152,17 @@ class Store
       object_key = path.relative(path.join("/tmp", "store"), local_source_file)
       buf = fs.readFileSync local_source_file
       
-      if store == "store_local"
-        
-      else
-        s3 = Store.get_connection()
-        
-        put_options = {
-          BucketName: store,
-          ObjectName: object_key,
-          ContentLength: buf.length,
-          Body: buf,
-        }
-    
-        s3.PutObject put_options, (err, data) ->
-          emitter.emit 'put-done'
+      s3 = Store.get_connection()
+      
+      put_options = {
+        BucketName: store,
+        ObjectName: object_key,
+        ContentLength: buf.length,
+        Body: buf,
+      }
+  
+      s3.PutObject put_options, (err, data) ->
+        emitter.emit 'put-done'
     else
       emitter.emit 'saving-done'
   
@@ -161,12 +170,19 @@ class Store
     files_to_put = []
     processed_directory = path.join '/tmp', 'store', design_directory, "psdjsprocessed"
     
-    FileUtils.walkSync processed_directory, (dirPath, dirs, files) ->
-      for file in files
-        full_path = path.join dirPath, file
-        files_to_put.push full_path
+    if store == "store_local"
+      configs = Utils.get_local_constants()
+      local_destination_dir = "#{configs.LOCAL_STORE}/#{design_directory}/psdjsprocessed"
+      FileUtils.mkdirsSync local_destination_dir
+      wrench.copyDirSyncRecursive processed_directory, local_destination_dir
+      emitter.emit 'saving-done'
+    else
+      FileUtils.walkSync processed_directory, (dirPath, dirs, files) ->
+        for file in files
+          full_path = path.join dirPath, file
+          files_to_put.push full_path
 
-    Store.save_next_object_to_store store, files_to_put
+      Store.save_next_object_to_store store, files_to_put
 
 module.exports = {
   
