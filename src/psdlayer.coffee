@@ -368,6 +368,8 @@ class PSDLayer
       'blendMode'
       'adjustments'
       'visible'
+      'isFolder'
+      'isHidden'
     ]
 
     data = {}
