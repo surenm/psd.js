@@ -180,9 +180,12 @@ task 'run:worker', 'Run workers by listening to global redis queue', ->
       console.log err
   worker.on 'success', (worker, queue, job, result) ->
     console.log "Successfully ran #{JSON.stringify(job.args)} on #{queue}."
-  worker.on 'poll', (worker, queue, job) ->
-    console.log "Polling"
-  worker.start()
+
+  while true
+    try
+      worker.start()
+    catch err
+      // do nothing
     
     
 task 'test:enqueue', 'Testing resque job queue by populating dummy objects', ->
