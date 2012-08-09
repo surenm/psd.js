@@ -174,7 +174,10 @@ task 'run:worker', 'Run workers by listening to global redis queue', ->
   console.log connection
   worker = connection.worker "psdjs_processor", ResqueTasks
   worker.on 'error', (err, worker, queue, job) ->
-    console.log "#{err} on running #{JSON.stringify(job.args)} on #{queue}"
+    if jobs?
+      console.log "#{err} on running #{JSON.stringify(job.args)} on #{queue}"
+    else
+      console.log err
   worker.on 'success', (worker, queue, job, result) ->
     console.log "Successfully ran #{JSON.stringify(job.args)} on #{queue}."
   worker.start()
