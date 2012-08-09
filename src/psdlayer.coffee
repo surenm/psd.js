@@ -353,6 +353,7 @@ class PSDLayer
   toJSON: ->
     sections = [
       'layerId'
+      'idx'
       'name'
       'legacyName'
       'top'
