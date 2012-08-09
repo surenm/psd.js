@@ -171,7 +171,6 @@ task 'run:worker', 'Run workers by listening to global redis queue', ->
   Resque = require "./src/resque"
 
   connection = Resque.get_connection()
-  console.log connection
   worker = connection.worker "psdjs_processor", ResqueTasks
   worker.on 'error', (err, worker, queue, job) ->
     if jobs?
