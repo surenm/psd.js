@@ -185,7 +185,7 @@ task 'run:worker', 'Run workers by listening to global redis queue', ->
     try
       worker.start()
     catch err
-      // do nothing
+      #do nothing
     
     
 task 'test:enqueue', 'Testing resque job queue by populating dummy objects', ->
