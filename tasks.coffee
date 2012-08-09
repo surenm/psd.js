@@ -24,7 +24,8 @@ module.exports = {
       
     EventsHandler.emitter.once 'saving-done', () ->
       connection = Resque.get_connection()
-      connection.enqueue "psdjs_load", "PsdjsLoadJob", args.design
+      #connection.enqueue "psdjs_load", "PsdjsLoadJob", args.design
+      connection.enqueue "screenshot", "ScreenshotJob", args.design
       callback()
 
     # fetch the psd file alone to be processed  
