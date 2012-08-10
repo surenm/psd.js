@@ -64,7 +64,7 @@ class PSDLayerMask
         throw "Unlikely number of #{@numLayers} layers for #{@header['channels']} with #{layerInfoSize} layer info size. Giving up."
 
       Log.debug "Found #{@numLayers} layer(s)"
-
+      ###
       for i in [0...@numLayers]
         layer = new PSDLayer @file
         layer.parse(i)
@@ -81,6 +81,7 @@ class PSDLayerMask
         if @options.layerImages and ((@options.onlyVisibleLayers and layer.visible) or !@options.onlyVisibleLayers)
           layer.image.parse()
         else
+          console.log "Skipping.."
           layer.image.skip()
 
       # Layers are parsed in reverse order
@@ -92,7 +93,7 @@ class PSDLayerMask
 
     # Parse the global layer mask
     @parseGlobalMask()
-
+    ###
     # Temporarily skip the rest of layers & masks section
     @file.seek endLoc, false
     return
