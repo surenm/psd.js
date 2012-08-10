@@ -26,7 +26,7 @@ module.exports = {
         psd_file_path = path.join absolute_design_directory, file
         psd = PSD.fromFile psd_file_path
         psd.setOptions
-          layerImages: true
+          layerImages: false
           onlyVisibleLayers: true
         console.log "Starting to parse the file..."
         psd.parse()
@@ -36,7 +36,7 @@ module.exports = {
 
         console.log "Generating processed JSON..."
         fs.writeFileSync processed_json, JSON.stringify(psd)
-        
+        ###
         for layer in psd.layers
           continue if not layer.image?
           try
@@ -44,6 +44,7 @@ module.exports = {
             layer.image.toFileSync "#{exported_images_dir}/#{layer_safe_name}.png"
           catch error
             console.log  "Error #{error} in generating image for #{layer.name}"
+        ###
         break
 
     EventsHandler.emitter.emit 'processing-done'

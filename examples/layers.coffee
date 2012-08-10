@@ -14,7 +14,7 @@ if process.argv.length is 2
 
 psd = PSD.fromFile process.argv[2]
 psd.setOptions
-  layerImages: true
+  layerImages: false
   onlyVisibleLayers: true
 
 psd.parse()
@@ -26,6 +26,6 @@ psd.toFileSync(path.join processed_dir, 'output.png')
 fs.writeFileSync(path.join(processed_dir, 'output.psdjs.json'), JSON.stringify(psd))
 
 
-for layer in psd.layers
-  continue unless layer.image
-  layer.image.toFileSync "#{processed_dir}/#{layer.name}.png"
+#for layer in psd.layers
+#  continue unless layer.image
+#  layer.image.toFileSync "#{processed_dir}/#{layer.name}.png"
