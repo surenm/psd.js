@@ -120,6 +120,8 @@ task 'watch', 'Automatically recompile the CoffeeScript files when updated', ->
       if +curr.mtime isnt +prev.mtime
         util.log "#{csSrcDir}/#{jsFile}.coffee updated"
         invoke 'build'
+
+  invoke 'deploy'
         
 task 'build', 'Compile and minify all CoffeeScript source files', ->
   invoke 'compile'
@@ -203,3 +205,7 @@ task 'test:config', 'config variables', ->
   yaml = require "js-yaml"
   config_file = require "./local_constants.yml"
   console.log config_file
+
+task 'deploy', 'Copy files to transformer-web project', ->
+  exec 'cp lib/psd.js ../transformers-web/lib/psdjs'
+  exec 'cp package.json ../transformers-web/lib/psdjs'
