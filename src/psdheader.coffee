@@ -57,12 +57,12 @@ class PSDHeader
     # This must be 8BPS according to the spec, or else this is not a valid PSD 
     # file.
     if @sig isnt "8BPS"
-      throw "Not a PSD signature: #{@header['sig']}"
+      throw "Not a PSD signature: #{@sig}"
     
     # The spec only covers version 1 of PSDs. I believe this is the only 
     # version available at this time, anyways.
     if @version isnt 1
-      throw "Can not handle PSD version #{@header['version']}"
+      throw "Can not handle PSD version #{@version}"
 
     # Store the common mode name
     if 0 <= @mode < 16
