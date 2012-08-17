@@ -16,10 +16,8 @@
   "dependencies": {
     "png": "git://github.com/Goyaka/node-png.git",
     "coffee-script": "> 1.1.0",  
-    "jsmin": "1.0.1",
     "glob": ">= 3.1.9",
-    "png-js": ">= 0.1.0",
-    "docco": ">= 0.3.0"
+    "png-js": ">= 0.1.0"
   },
   "bugs": {
     "url": "https://github.com/meltingice/psd.js/issues"
