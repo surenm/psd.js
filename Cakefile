@@ -36,6 +36,7 @@ coffeeFiles   = [
   "psdlayer"
   "psdlayermask"
 
+  "layerdata/enginedataparser"
   "layerdata/blackwhite"
   "layerdata/brightnesscontrast"
   "layerdata/colorbalance"
