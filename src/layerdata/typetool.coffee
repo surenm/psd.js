@@ -41,6 +41,7 @@ class PSDTypeTool
       engineData += String.fromCharCode(char)
 
     @data.text.EngineData = engineData.replace /\u0000/g, ""
+    @data.parsedText = EngineDataParser.parseData(@data.text.EngineData)
 
     # This is a bit verbose
     #Log.debug "Text:", @data.text
