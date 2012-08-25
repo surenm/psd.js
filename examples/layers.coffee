@@ -1,6 +1,5 @@
 fs = require 'fs'
 path = require 'path'
-FileUtils = require "file"
 
 {exec} = require 'child_process'
 
