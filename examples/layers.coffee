@@ -13,16 +13,15 @@ if process.argv.length is 2
 
 psd = PSD.fromFile process.argv[2]
 psd.setOptions
-  layerImages: false
+  layerImages: true
   onlyVisibleLayers: true
 
 psd.parse()
 psd_dirname   = path.dirname process.argv[2]
-processed_dir = path.join psd_dirname, "psdjsprocessed" 
-FileUtils.mkdirsSync processed_dir
+#processed_dir = path.join psd_dirname, "psdjsprocessed" 
 
-psd.toFileSync(path.join processed_dir, 'output.png')
-fs.writeFileSync(path.join(processed_dir, 'output.psdjs.json'), JSON.stringify(psd))
+psd.toFileSync('./output.png')
+fs.writeFileSync('./output.psdjs.json', JSON.stringify(psd))
 
 
 #for layer in psd.layers
