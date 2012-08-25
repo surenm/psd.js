@@ -1,4 +1,22 @@
 class PSDTypeTool
+  engineDataRegex: [
+    {search: /\u0000/g, replace: ""}
+    {search: /<</g, replace: ' {'}
+    {search: />>/g, replace: '},'}
+    {search: /\/(\w+)\s+(\{)\s+/g, replace: '"$1": $2\n'} # "/Token {" followed by multiple lines
+    {search: /\/(\w+)\s+(\[)\s+/g, replace: '"$1": $2'} # "/token [" followed by multiple lines
+    {search: /"(\w+)":\s(\[.*\])\s+/g, replace: '"$1": "$2",\n'} #"/token [ a b ]"
+    {search: /\/(\w+)\s+([0-9]+\.[0-9]+|[0-9]+)\s+/g, replace: '"$1": $2,\n'} #"/token 0.0"
+    {search: /\/(\w+)\s+([0-9]+)\s+/g, replace: '"$1": $2,\n'}    # "/token 0"
+    {search: /\/(\w+)\s+(.*)\s/g, replace: '"$1": "$2",\n'}       # "/text hello world"
+    {search: /\(/g, replace: ''}  
+    {search: /\)/g, replace: ''}
+    {search: /\]/g, replace: '],'}
+    {search: /\,([\t\r\n]*)\}/g, replace: '$1}'}
+    {search: /\,([\t\r\n]*)\]/g, replace: '$1]'}
+    {search: /\(\u00FE\u00FF(.*)\)/g, replace: '"$1"'}
+  ]
+
   constructor: (@layer, @length) ->
     @file = @layer.file
     @data = {}
@@ -39,12 +57,14 @@ class PSDTypeTool
     engineData = ""
     for char in @data.text.EngineData
       engineData += String.fromCharCode(char)
-
-    @data.text.EngineData = engineData.replace /\u0000/g, ""
-    @data.parsedText = EngineDataParser.parseData(@data.text.EngineData)
-
-    # This is a bit verbose
-    #Log.debug "Text:", @data.text
+    
+    
+    for regex in @engineDataRegex
+      engineData = engineData.replace regex.search, regex.replace
+    
+    @data.text.EngineData = engineData
+    console.log engineData
+    Log.debug "Text:", @data.text
 
     warpVersion = @file.readShortInt()
     assert warpVersion is 1
@@ -53,7 +73,7 @@ class PSDTypeTool
     assert descriptorVersion is 16
 
     @data.warp = (new PSDDescriptor(@file)).parse()
-    #Log.debug "Warp:", @data.warp
+    Log.debug "Warp:", @data.warp
 
     [
       @data.left
