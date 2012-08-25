@@ -331,6 +331,28 @@ class PSDLayer
           @adjustments.effects = (new PSDEffectsInfo(@, length)).parse()
         when "selc"
           @adjustments.selectiveColor = (new PSDSelectiveColor(@, length)).parse()
+        when "vmsk"
+          version = @file.readInt()
+          flags = @file.readInt()
+          console.log version
+          console.log flags
+
+          type = @file.readShortInt()
+          console.log type
+          console.log @file.read 22
+
+          type = @file.readShortInt()
+          subpaths = @file.readShortInt()
+          for i in [1..subpaths]
+            for j in [1..3]
+              y = @file.readShortInt()
+              @file.read(3)
+
+              x = @file.readShortInt()
+              @file.read(3)
+              console.log "[#{x}, #{y}]"
+            console.log "----"
+          
         else  
           @file.seek length
           Log.debug("Skipping additional layer info with key #{key}")
