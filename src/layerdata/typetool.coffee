@@ -1,19 +1,34 @@
 class PSDTypeTool
   engineDataRegex: [
+    # Null characters
     {search: /\u0000/g, replace: ""}
+    
+    # fix hashes 
     {search: /<</g, replace: ' {'}
     {search: />>/g, replace: '},'}
-    {search: /\/(\w+)\s+(\{)\s+/g, replace: '"$1": $2\n'} # "/Token {" followed by multiple lines
-    {search: /\/(\w+)\s+(\[)\s+/g, replace: '"$1": $2'} # "/token [" followed by multiple lines
-    {search: /"(\w+)":\s(\[.*\])\s+/g, replace: '"$1": "$2",\n'} #"/token [ a b ]"
+    
+    # Fix strings
+    {search: /\(([^\)]*)\n([^\)]*)\)/, replace: '($1 $2)'}
+    {search: /\(/g, replace: '"'}  
+    {search: /\)/g, replace: '"'}
+    
+    # values within hashes
+    {search: /\/(\w+)\s+(\{)\s+/g, replace: '"$1": $2\n'} 
+    {search: /\/(\w+)\s+(\[)\s+/g, replace: '"$1": $2'} 
+    {search: /"(\w+)":\s(\[.*\])\s+/g, replace: '"$1": "$2",\n'}
     {search: /\/(\w+)\s+([0-9]+\.[0-9]+|[0-9]+)\s+/g, replace: '"$1": $2,\n'} #"/token 0.0"
     {search: /\/(\w+)\s+([0-9]+)\s+/g, replace: '"$1": $2,\n'}    # "/token 0"
-    {search: /\/(\w+)\s+(.*)\s/g, replace: '"$1": "$2",\n'}       # "/text hello world"
-    {search: /\(/g, replace: ''}  
-    {search: /\)/g, replace: ''}
+    {search: /\/(\w+)\s+(.*)\s/g, replace: '"$1": $2,\n'}       # "/text hello world"
+    
+    # fix array ends
     {search: /\]/g, replace: '],'}
+    
+    # Remove trailing commands 
     {search: /\,([\t\r\n]*)\}/g, replace: '$1}'}
     {search: /\,([\t\r\n]*)\]/g, replace: '$1]'}
+        
+    
+    # Dunno WTF this is
     {search: /\(\u00FE\u00FF(.*)\)/g, replace: '"$1"'}
   ]
 
@@ -57,13 +72,11 @@ class PSDTypeTool
     engineData = ""
     for char in @data.text.EngineData
       engineData += String.fromCharCode(char)
-    
-    
+      
     for regex in @engineDataRegex
       engineData = engineData.replace regex.search, regex.replace
     
     @data.text.EngineData = engineData
-    console.log engineData
     Log.debug "Text:", @data.text
 
     warpVersion = @file.readShortInt()
