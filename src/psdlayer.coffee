@@ -375,17 +375,9 @@ class PSDLayer
   toJSON: ->
     sections = [
       'layerId'
-      'idx'
       'name'
-      'legacyName'
-      'top'
-      'left'
-      'bottom'
-      'right'
-      'channels'
       'rows'
       'cols'
-      'channelsInfo'
       'mask'
       'layerType'
       'blendMode'
@@ -399,4 +391,6 @@ class PSDLayer
     for section in sections
       data[section] = @[section]
 
+    data['bounds'] = {'top': @top, 'bottom': @bottom, 'left': @left, 'right': @right}
+    
     data
