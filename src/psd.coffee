@@ -196,14 +196,13 @@ Root.PSD = class PSD
     @parseLayersMasks() unless @layerMask
 
     sections = [
-      'header'
       'layerMask'
     ]
 
-    data = resources: []
-
-    for resource in @resources
-      data.resources.push resource.toJSON()
+    data = {}
+    #data = resources: []
+    #for resource in @resources
+    #  data.resources.push resource.toJSON()
 
     for section in sections
       data[section] = @[section].toJSON()
