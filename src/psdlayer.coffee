@@ -241,6 +241,7 @@ class PSDLayer
         white: @file.readShortInt()
 
     pos = @file.tell()
+    
 
     @blendingRanges.numChannels = (length - 8) / 8
     assert @blendingRanges.numChannels > 0
@@ -372,14 +373,26 @@ class PSDLayer
       when 3 then @isHidden = true
 
   toJSON: ->
+    # calculate bounds
+    @bounds = {'top': @top, 'bottom': @bottom, 'left': @left, 'right': @right}
+
+    # calculate if the layer is clipping or not
+    if @blendMode.clipping == 0
+      @clipping = false
+    else 
+      @clipping = true
+    
+    @opacityPercentage = @blendMode.opacityPercentage
+      
     sections = [
       'layerId'
       'name'
       'rows'
       'cols'
-      'mask'
+      'bounds'
       'layerType'
-      'blendMode'
+      'opacityPercentage'
+      'clipping'
       'adjustments'
       'visible'
       'isFolder'
