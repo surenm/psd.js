@@ -57,11 +57,7 @@ class PSDEffectsInfo
 class PSDEffectsDescriptor extends PSDDescriptor
   parseItem: (id) ->
     type = @file.readString(4)
-
-    data = switch id
-      when "patternFill" then console.log "patternfill"
-      else super(id, type)
-
+    data = super(id, type)
     data
 
 class PSDLayerEffect

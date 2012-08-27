@@ -3,7 +3,7 @@ class PSDPattern
     @file = @layer.file
 
   parse: ->
-    version = @file.parseInt()
+    version = @file.readInt()
     assert version is 16
 
     (new PSDDescriptor(@file)).parse()
