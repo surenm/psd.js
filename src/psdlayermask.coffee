@@ -98,7 +98,7 @@ class PSDLayerMask
     return
 
     # We have more additional info to parse, especially beacuse this is PS >= 4.0
-    #@parseExtraInfo(endLoc) if @file.tell() < endLoc
+    @parseExtraInfo(endLoc) if @file.tell() < endLoc
 
   parseGlobalMask: ->
     length = @file.readInt()
@@ -139,7 +139,7 @@ class PSDLayerMask
 
       length = Util.pad2 length
 
-      Log.debug "Layer extra:", sig, key, length
+      console.log "Layer extra:", sig, key, length
 
       @file.seek length
 
