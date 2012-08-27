@@ -1,3 +1,20 @@
+# Markupwand's readme
+  * Install nodejs from source by downloading from nodejs website (http://nodejs.org/download/)
+  * Install npm 
+```
+curl -k https://npmjs.org/install.sh | bash 
+```
+
+  * Install coffeescript
+```
+curl -k https://npmjs.org/install.sh | bash 
+```
+  * Do a cake build in the psd.js folder
+```
+cake build
+```
+  * Done!
+
 # psd.js
 
 A Photoshop file format (PSD) parser written in Coffeescript/Javascript for both browsers and NodeJS implementations.
