@@ -403,6 +403,4 @@ class PSDLayer
     for section in sections
       data[section] = @[section]
 
-    data['bounds'] = {'top': @top, 'bottom': @bottom, 'left': @left, 'right': @right}
-    
     data
