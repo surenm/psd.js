@@ -1,4 +1,8 @@
 # Markupwand's readme
+  * Install libpng
+```
+sudo apt-get install libpng12-dev
+```
   * Install nodejs from source by downloading from nodejs website (http://nodejs.org/download/)
   * Install npm 
 ```
@@ -8,6 +12,10 @@ curl -k https://npmjs.org/install.sh | bash
   * Install coffeescript
 ```
 curl -k https://npmjs.org/install.sh | bash 
+```
+  * Do a npm install (npm install = bundle install, package.json = Gemfile)
+```
+npm install
 ```
   * Do a cake build in the psd.js folder
 ```
