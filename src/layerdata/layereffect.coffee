@@ -34,10 +34,10 @@ class PSDEffectsInfo
 
       Log.debug("Parsing effect layer with type #{type} and size #{size}")
 
-      effect =    
+      effect =
         switch type
           when "cmnS" then new PSDLayerEffectCommonStateInfo @file
-          when "dsdw" then new PSDDropDownLayerEffect @file     
+          when "dsdw" then new PSDDropDownLayerEffect @file
           when "isdw" then new PSDDropDownLayerEffect @file, true # inner drop shadow
 
       data = effect?.parse()
@@ -45,7 +45,7 @@ class PSDEffectsInfo
       left = (pos + size) - @file.tell()
       if left != 0
        Log.debug("Failed to parse effect layer with type #{type}")
-       @file.seek left 
+       @file.seek left
       else
         effects.push(data) unless type == "cmnS" # ignore commons state info
 
@@ -74,7 +74,7 @@ class PSDLayerEffect
    
 class PSDLayerEffectCommonStateInfo extends PSDLayerEffect
 
-  parse: -> 
+  parse: ->
     super()
     # always true
     @visible = @file.readBoolean()
