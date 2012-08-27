@@ -79,6 +79,24 @@ class Parser
       width: "#{border_object.size.value}px"
       type: PSDConstants.CONSTANTS[border_object.style]
 
+  @parseShadow: (shadow_object, shadow_type = "box") ->
+    opacity = parseFloat(shadow_object.opacity.value/100).toFixed(2)
+
+    distance = shadow_object.distance.value
+    angle = (Math.PI*shadow_object.localLightingAngle.value)/180
+    horizontal_offset = Math.round Math.abs distance * Math.sin(angle)
+    vertical_offset = Math.round Math.abs distance * Math.cos(angle)
+    
+    shadow =
+      color: this.parseColor shadow_object.color, opacity
+      horizontal_offset: "#{horizontal_offset}px"
+      vertical_offset: "#{vertical_offset}px"
+      blur: "#{shadow_object.blur.value}px"
+      spread: "#{shadow_object.noise.value}px"
+      type: "#{shadow_type}"
+
+    return shadow
+
   @parseEffects: (effects_object) ->
     layer_effects = Object.keys effects_object
     parsed_effects = {}
@@ -88,9 +106,9 @@ class Parser
 
       switch layer_effect
         when "dropShadow"
-          console.log effects_object[layer_effect]
+          parsed_effects.box_shadow = this.parseShadow effects_object['dropShadow']
         when "innerShadow"
-          console.log effects_object[layer_effect]
+          parsed_effects.inner_shadow = this.parseShadow effects_object['dropShadow'], "inset"
         when "frameFX"
           parsed_effects.border = this.parseBorder effects_object['frameFX']
         when "solidFill"
