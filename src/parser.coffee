@@ -70,3 +70,11 @@ class Parser
       name: pattern_object.pattern.name
 
     return pattern
+
+  @parseBorder: (border_object) ->
+    opacity = parseFloat(border_object.opacity.value/100).toFixed(2)
+
+    border =
+      color: this.parseColor border_object.color, opacity
+      width: "#{border_object.size.value}px"
+      type: PSDConstants.CONSTANTS[border_object.style]
