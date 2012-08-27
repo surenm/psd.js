@@ -62,3 +62,11 @@ class Parser
         console.log "Unhandled gradient type: #{gradient_type}"
 
     return gradient
+
+  @parsePattern: (pattern_object) ->
+    #TODO: the pattern is there somewhere. I am going to get it out one of these days
+    pattern =
+      uid: pattern_object.pattern.ID
+      name: pattern_object.pattern.name
+
+    return pattern

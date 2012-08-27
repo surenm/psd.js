@@ -6,4 +6,5 @@ class PSDPattern
     version = @file.readInt()
     assert version is 16
 
-    (new PSDDescriptor(@file)).parse()
+    descriptor = (new PSDDescriptor(@file)).parse()
+    return Parser.parsePattern descriptor
