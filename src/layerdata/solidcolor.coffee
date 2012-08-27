@@ -8,4 +8,7 @@ class PSDSolidColor
     assert version is 16
 
     # Just return the descriptor data
-    (new PSDDescriptor(@file)).parse()
+    descriptor = (new PSDDescriptor(@file)).parse()
+    fill_color = Parser.parseColor descriptor.color
+    return {"color": fill_color}
+    
