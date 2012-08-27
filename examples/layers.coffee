@@ -24,6 +24,7 @@ psd.toFileSync('./output.png')
 fs.writeFileSync('./output.psdjs.json', JSON.stringify(psd))
 
 
-#for layer in psd.layers
-#  continue unless layer.image
-#  layer.image.toFileSync "#{processed_dir}/#{layer.name}.png"
+exec "mkdir -p ./images", ->
+  for layer in psd.layers
+    continue unless layer.image
+    layer.image.toFileSync "./images/#{layer.name}.png"
