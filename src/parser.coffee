@@ -78,3 +78,27 @@ class Parser
       color: this.parseColor border_object.color, opacity
       width: "#{border_object.size.value}px"
       type: PSDConstants.CONSTANTS[border_object.style]
+
+  @parseEffects: (effects_object) ->
+    layer_effects = Object.keys effects_object
+    parsed_effects = {}
+    for layer_effect in layer_effects
+      if effects_object[layer_effect].enabled == false
+        continue
+
+      switch layer_effect
+        when "dropShadow"
+          console.log effects_object[layer_effect]
+        when "innerShadow"
+          console.log effects_object[layer_effect]
+        when "frameFX"
+          parsed_effects.border = this.parseBorder effects_object['frameFX']
+        when "solidFill"
+          opacity = parseFloat(effects_object['solidFill'].opacity.value/100).toFixed(2)
+          parsed_effects.solidFill = this.parseColor effects_object['solidFill'].color, opacity
+        when "gradientFill"
+          parsed_effects.gradientFill = this.parseGradient effects_object['gradientFill']
+        when "patternFill"
+          parsed_effects.patternFill = this.parsePattern effects_object['patternFill']
+
+    return parsed_effects
