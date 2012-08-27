@@ -6,3 +6,4 @@ tasks.js
 local_constants.yml
 examples/testcases/*
 examples/output*
+examples/images*
