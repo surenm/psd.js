@@ -11,7 +11,7 @@ class Parser
     
     if color_object.class.id == 1380401731
       
-      if parseInt(opacity) == 1 or parseInt(opacity) == 0
+      if parseInt(opacity*100) == 100 or parseInt(opacity*100) == 0
         rr = this.zeroFill parseInt(color_object.red).toString(16)
         gg = this.zeroFill parseInt(color_object.grain).toString(16)
         bb = this.zeroFill parseInt(color_object.blue).toString(16)
