@@ -12,7 +12,9 @@ class PSDEffectsInfo
     version = @file.readInt()
     assert version is 16
 
-    (new PSDEffectsDescriptor(@file)).parse()
+    descriptor = (new PSDEffectsDescriptor(@file)).parse()
+    effects = Parser.parseEffects descriptor
+    return effects
 
   parseLegacy: ->
     effects = []
