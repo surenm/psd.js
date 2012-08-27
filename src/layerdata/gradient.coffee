@@ -6,4 +6,6 @@ class PSDGradient
     version = @file.readInt()
     assert version is 16
 
-    (new PSDDescriptor(@file)).parse()
+    descriptor = (new PSDDescriptor(@file)).parse()
+    gradient = Parser.parseGradient descriptor
+    return gradient
