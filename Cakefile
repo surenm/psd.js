@@ -25,6 +25,7 @@ coffeeCoreOpts    = "-j #{targetName}.js -o #{csTargetDir} -c #{targetCoffee}.co
 coffeeFiles   = [
   "psdassert"
   "psdconstants"
+  "parser"
   
   "psd"
   "psdcolor"
