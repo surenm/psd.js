@@ -78,7 +78,6 @@ class PSDLayer
     @layerType = "normal"
     @blendingMode = "normal"
     @opacity = 255
-    @fillOpacity = 255
 
     @isFolder = false
     @isHidden = false
