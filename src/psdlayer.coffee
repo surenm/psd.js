@@ -325,7 +325,7 @@ class PSDLayer
         when "lsct"
           @readLayerSectionDivider()
         when "lrFX" # PS 5.0
-          @adjustments.legacyEffects = (new PSDEffectsInfo(@, length)).parseLegacy()
+          legacyEffects = (new PSDEffectsInfo(@, length)).parseLegacy()
           @file.read(2) # why these 2 bytes?
         when "lfx2" # PS 6.0
           @adjustments.effects = (new PSDEffectsInfo(@, length)).parse()
