@@ -353,7 +353,7 @@ class PSDLayer
         #      console.log "[#{x}, #{y}]"
         #    console.log "----"
         #  
-        else  
+        else
           @file.seek length
           Log.debug("Skipping additional layer info with key #{key}")
 
@@ -379,7 +379,7 @@ class PSDLayer
     # calculate if the layer is clipping or not
     if @blendMode.clipping == 0
       @clipping = false
-    else 
+    else
       @clipping = true
     
     @opacityPercentage = @blendMode.opacityPercentage
