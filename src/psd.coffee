@@ -200,9 +200,9 @@ Root.PSD = class PSD
     ]
 
     data = {}
-    #data = resources: []
-    #for resource in @resources
-    #  data.resources.push resource.toJSON()
+    data = resources: []
+    for resource in @resources
+      data.resources.push resource.toJSON()
 
     for section in sections
       data[section] = @[section].toJSON()
