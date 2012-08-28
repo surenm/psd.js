@@ -76,10 +76,9 @@ class PSDHeader
     @file.skipBlock "color mode data"
 
   toJSON: ->
-    data = {}
-    for section in HEADER_SECTIONS
-      data[section] = @[section]
+    data =
+      height: @rows
+      width: @cols
+      modename: @modename
 
-    # Some extra data
-    data.modename = @modename
-    data
+    return data

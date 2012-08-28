@@ -128,7 +128,6 @@ class PSDLayer
     # Alias
     @height = @rows
     @width = @cols
-
     # Sanity check
     if @bottom < @top or @right < @left or @channels > 64
       Log.debug "Somethings not right, attempting to skip layer."
@@ -390,6 +389,7 @@ class PSDLayer
       'rows'
       'cols'
       'bounds'
+      'mask'
       'layerType'
       'opacityPercentage'
       'clipping'
@@ -402,5 +402,7 @@ class PSDLayer
     data = {}
     for section in sections
       data[section] = @[section]
+
+    data["zindex"] = @idx
 
     data

@@ -206,6 +206,7 @@ Root.PSD = class PSD
     @parseLayersMasks() unless @layerMask
 
     sections = [
+      'header'
       'layerMask'
     ]
 

@@ -63,7 +63,7 @@ class PSDLayerMask
       if @numLayers * (18 + 6 * @header.channels) > layerInfoSize
         throw "Unlikely number of #{@numLayers} layers for #{@header['channels']} with #{layerInfoSize} layer info size. Giving up."
 
-      Log.debug "Found #{@numLayers} layer(s)"
+      console.log "Found #{@numLayers} layer(s)"
       
       for i in [0...@numLayers]
         layer = new PSDLayer @file
@@ -155,9 +155,6 @@ class PSDLayerMask
 
   toJSON: ->
     data =
-      mergedAlpha: @mergedAlpha
-      globalMask: @globalMask
-      extraInfo: @extras
       numLayers: @numLayers
       layers: []
 
