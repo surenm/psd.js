@@ -172,6 +172,16 @@ Root.PSD = class PSD
 
     result
 
+  hasClippingLayers: ->
+    return null if not @layers
+    clipping = 0
+    for layer in @layers
+      if layer.blendMode.clipping == 1
+        clipping++
+
+    return (clipping > 0)
+
+
   # Exports a flattened version to a file. For use in NodeJS.
   toFile: (filename, cb = ->) -> 
     @parseImageData() unless @image
