@@ -80,6 +80,9 @@ class Parser
       type: PSDConstants.CONSTANTS[border_object.style]
 
   @parseShadow: (shadow_object, shadow_type = "box") ->
+    if not shadow_object?
+      return null
+
     opacity = parseFloat(shadow_object.opacity.value/100).toFixed(2)
 
     distance = shadow_object.distance.value
@@ -99,11 +102,12 @@ class Parser
 
   @parseEffects: (effects_object) ->
     layer_effects = Object.keys effects_object
+    console.log layer_effects
     parsed_effects = {}
     for layer_effect in layer_effects
       if effects_object[layer_effect].enabled == false
         continue
-
+      
       switch layer_effect
         when "dropShadow"
           parsed_effects.box_shadow = this.parseShadow effects_object['dropShadow']
