@@ -102,7 +102,6 @@ class Parser
 
   @parseEffects: (effects_object) ->
     layer_effects = Object.keys effects_object
-    console.log layer_effects
     parsed_effects = {}
     for layer_effect in layer_effects
       if effects_object[layer_effect].enabled == false
