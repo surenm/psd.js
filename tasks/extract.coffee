@@ -1,6 +1,6 @@
 fs = require 'fs'
 path = require 'path'
-{PSD} = require './psd.js'
+{PSD} = require '../lib/psd.js'
 
 input_psd_file = process.argv[2]
 output_dir = process.argv[3]
