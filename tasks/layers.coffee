@@ -1,30 +1,44 @@
 fs = require 'fs'
 path = require 'path'
+{PSD} = require '../lib/psd.js'
 
-{exec} = require 'child_process'
+input_psd_file = process.argv[2]
+output_dir = "/tmp/psdjs"
+basename = "output"
 
-{PSD} = require __dirname + '/../lib/psd.js'
+console.log "Input psd file is #{input_psd_file}"
+console.log "Output directory is #{output_dir}"
 
-PSD.DEBUG = false
+psd = PSD.fromFile input_psd_file
 
-if process.argv.length is 2
-  console.log "Please specify an input file"
-  process.exit()
-
-psd = PSD.fromFile process.argv[2]
 psd.setOptions
   layerImages: true
   onlyVisibleLayers: true
 
+png_file = path.join output_dir, "#{basename}.png"
+design_file = path.join output_dir, "#{basename}.json"
+assets_directory = path.join output_dir, "assets"
+
+# Parse the photoshop file
 psd.parse()
-psd_dirname   = path.dirname process.argv[2]
-#processed_dir = path.join psd_dirname, "psdjsprocessed" 
 
-psd.toFileSync('./output.png')
-fs.writeFileSync('./output.psdjs.json', JSON.stringify(psd))
+#if psd.hasClippingLayers()
+#  clipping_layer_file = path.join output_dir, "has_clipping_layer"
+#  console.log "Input photoshop file has clipping layer. Sending for preprocessing"
+#  fs.writeFileSync clipping_layer_file, ""
+#  process.exit()
 
+# Save the processed output to processed json
+fs.writeFileSync design_file, JSON.stringify(psd)
 
-exec "mkdir -p ./images", ->
-  for layer in psd.layers
-    continue unless layer.image
-    layer.image.toFileSync "./images/#{layer.name}.png"
+# Save a screenshot of the photoshop file in PNG format
+psd.toFileSync png_file
+
+# Save individual layer assets
+for layer in psd.layers
+  continue unless layer.image
+  
+  image_name = layer.name.replace /[^0-9a-zA-Z]/g, '_'
+  image_file_name = path.join assets_directory, "#{image_name}_#{layer.layerId}.png"
+  layer.image.toFileSync image_file_name
+
