@@ -115,3 +115,4 @@ class PSDChannelImage extends PSDImage
   #  if @getImageDepth() is 8
   #    @parseUserMask8()
     
+module.exports = PSDChannelImage

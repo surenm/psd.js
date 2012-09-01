@@ -11,3 +11,5 @@ class PSDBrightnessContrast
 
     @data
   
+
+module.exports = PSDBrightnessContrast

@@ -172,3 +172,5 @@ class PSDTypeTool
     @data.antialias = @file.readBoolean()
 
     @data
+
+module.exports = PSDTypeTool

@@ -7,3 +7,5 @@ class PSDVibrance
     assert version is 16
 
     (new PSDDescriptor(@file)).parse()
+
+module.exports = PSDVibrance

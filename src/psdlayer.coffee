@@ -406,3 +406,5 @@ class PSDLayer
     data["zindex"] = @idx
 
     data
+
+module.exports = PSDLayer

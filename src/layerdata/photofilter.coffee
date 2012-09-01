@@ -15,3 +15,5 @@ class PSDPhotoFilter
     data.density = @file.readInt()
     data.preserveLuminosity = @file.readBoolean()
     data
+
+module.exports = PSDPhotoFilter

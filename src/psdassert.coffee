@@ -9,3 +9,5 @@ assert = do (assert) ->
     throw "Assertion error" unless actual is expected
 
   return assert
+
+module.exports = assert

@@ -9,3 +9,5 @@ class PSDExposure
     exposure: @file.parseInt()
     offset: @file.parseInt()
     gamma: @file.parseInt()
+
+module.exports = PSDExposure

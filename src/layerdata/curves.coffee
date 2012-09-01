@@ -1,3 +1,5 @@
+assert = require '../psdassert'
+
 class PSDCurves
   constructor: (@layer, @length) ->
     @file = @layer.file
@@ -69,3 +71,5 @@ class PSDCurves
 
     # Only returned the parsed data
     @data
+
+module.exports = PSDCurves

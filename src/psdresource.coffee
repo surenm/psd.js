@@ -406,3 +406,5 @@ class PSDResource
       data[section] = @[section]
 
     data
+
+module.exports = PSDResource

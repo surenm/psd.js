@@ -10,3 +10,5 @@ class PSDThreshold
     @file.seek 2 # padding?
 
     @data
+
+module.exports = PSDThreshold

@@ -219,3 +219,5 @@ Root.PSD = class PSD
       data[section] = @[section].toJSON()
 
     data
+
+module.exports = PSD

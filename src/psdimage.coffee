@@ -409,3 +409,5 @@ class PSDImage
     canvas = document.createElement 'canvas'
     @toCanvas canvas
     canvas.toDataURL "image/png"
+
+module.exports = PSDImage

@@ -42,3 +42,4 @@ class PSDHueSaturation
 
     @data
 
+module.exports = PSDHueSaturation

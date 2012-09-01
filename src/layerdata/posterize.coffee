@@ -11,3 +11,5 @@ class PSDPosterize
     @file.seek 2
 
     @data
+
+module.exports = PSDPosterize

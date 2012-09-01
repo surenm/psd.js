@@ -274,4 +274,4 @@ function JSPack()
   };
 };
 
-var jspack = new JSPack(); 
+module.exports = JSPack

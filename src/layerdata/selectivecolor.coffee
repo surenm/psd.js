@@ -26,3 +26,5 @@ class PSDSelectiveColor
       @data.blackCorrection.push @file.getShortInt()
 
     @data
+
+module.exports = PSDSelectiveColor

@@ -9,3 +9,5 @@ class PSDGradient
     descriptor = (new PSDDescriptor(@file)).parse()
     gradient = Parser.parseGradient descriptor
     return gradient
+
+module.exports = PSDGradient

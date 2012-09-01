@@ -138,3 +138,5 @@ class PSDDropDownLayerEffect extends PSDLayerEffect
       data[key] = val
 
     data
+
+module.exports = PSDEffectsInfo

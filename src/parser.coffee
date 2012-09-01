@@ -123,3 +123,5 @@ class Parser
           parsed_effects.patternFill = this.parsePattern effects_object['patternFill']
 
     return parsed_effects
+
+module.exports = Parser

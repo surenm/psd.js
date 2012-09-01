@@ -17,4 +17,4 @@ class EngineDataParser
     if currentToken == ">>" and not parent_is_array
       return 
       
-
+module.exports = EngineDataParser

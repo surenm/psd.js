@@ -13,3 +13,5 @@ class PSDColorBalance
       @data.yellowBlue.push @file.getShortInt()
 
     @data
+
+module.exports = PSDColorBalance

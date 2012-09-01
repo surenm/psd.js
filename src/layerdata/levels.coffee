@@ -55,3 +55,5 @@ class PSDLevels
         assert record.gamma >= 0.1 and record.gamma <= 9.99
 
       @data.records.push record
+
+module.exports = PSDLevels

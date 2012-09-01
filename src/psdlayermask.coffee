@@ -162,3 +162,5 @@ class PSDLayerMask
       data.layers.push layer.toJSON()
 
     data
+
+module.exports = PSDLayerMask

@@ -419,3 +419,5 @@ PSD.PSDColor = class PSDColor
         dstColor = 0x00FFFFFF
 
     dstColor
+
+module.exports = PSDColor

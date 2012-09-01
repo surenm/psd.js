@@ -8,3 +8,5 @@ class PSDPattern
 
     descriptor = (new PSDDescriptor(@file)).parse()
     return Parser.parsePattern descriptor
+
+module.exports = PSDPattern

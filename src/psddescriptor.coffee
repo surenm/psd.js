@@ -162,3 +162,5 @@ class PSDDescriptor
     value = @file.readDouble()
 
     id: unitID, unit: unit, value: value
+
+module.exports = PSDDescriptor

@@ -1683,3 +1683,5 @@ class PSDConstants
   '1517307246': 'zip',
   '1515869305': 'zigZagType',
   }
+  
+module.exports = PSDConstants

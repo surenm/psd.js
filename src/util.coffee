@@ -51,3 +51,5 @@ class Util
         if byte < 0x80 then String.fromCharCode byte
         else high_chars_unicode.charAt byte - 0x80
       char_array.join ''
+
+module.exports = Util

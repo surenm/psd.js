@@ -118,3 +118,5 @@ class PSDFile
     @seek(n) if n # relative
 
     Log.debug "Skipped #{desc} with #{n} bytes"
+
+module.exports = PSDFile

@@ -82,3 +82,5 @@ class PSDHeader
       modename: @modename
 
     return data
+    
+module.exports = PSDHeader
