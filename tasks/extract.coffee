@@ -1,6 +1,6 @@
 fs = require 'fs'
 path = require 'path'
-{PSD} = require '../lib/psd.js'
+PSD = require '../src/psd'
 
 input_psd_file = process.argv[2]
 output_dir = process.argv[3]
@@ -41,4 +41,3 @@ for layer in psd.layers
   image_name = layer.name.replace /[^0-9a-zA-Z]/g, '_'
   image_file_name = path.join assets_directory, "#{image_name}_#{layer.layerId}.png"
   layer.image.toFileSync image_file_name
-
