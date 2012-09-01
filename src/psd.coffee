@@ -1,12 +1,14 @@
-# NodeJS or browser?
-if exports?
-  Root = exports
-  fs = require 'fs'
-else
-  Root = window
+fs = require 'fs'
+
+PSDFile = require('./psdfile')
+PSDHeader = require('./psdheader')
+PSDResource = require('./psdresource')
+PSDLayerMask = require('./psdlayermask')
+PSDImage = require('./psdimage')
+Log = require('./log')
 
 # Create our class and add to global scope
-Root.PSD = class PSD
+class PSD
   # Version number
   @VERSION = "0.4.5"
 

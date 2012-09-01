@@ -1,3 +1,5 @@
+JSPack = require('../deps/jspack')
+Log = require('./log')
 # Simulation and abstraction of a disk-based file.
 # Provides methods to read the raw binary file data, which is stored in a 
 # variable instead of read from disk. A lot of these functions are from C,
@@ -108,7 +110,9 @@ class PSDFile
   # Reads from the file given the unpack format string. Format string codes 
   # can be easily referenced 
   # [from the Python docs](http://docs.python.org/library/struct.html#format-characters)
-  readf: (format) -> jspack.Unpack format, @read(jspack.CalcLength(format))
+  readf: (format) ->
+    jspack = new JSPack()
+    jspack.Unpack format, @read(jspack.CalcLength(format))
 
   # Skips a block, assuming the next byte describes the size of the section.
   # An optional description is given to explain why we are skipping this block

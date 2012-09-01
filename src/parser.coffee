@@ -1,3 +1,6 @@
+PSDConstants = require './psdconstants'
+Log = require './log'
+
 class Parser
   @zeroFill: (number, width=2) ->
     width -= (number.toString().length - /\./.test(number))

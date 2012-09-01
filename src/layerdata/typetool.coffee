@@ -1,3 +1,8 @@
+PSDDescriptor = require '../psddescriptor'
+Parser = require '../parser'
+assert = require '../psdassert'
+Log = require '../log'
+
 class PSDTypeTool
   engineDataRegex: [
     # Null characters

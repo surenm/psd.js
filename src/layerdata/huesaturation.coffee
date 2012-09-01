@@ -1,3 +1,5 @@
+assert = require '../psdassert'
+
 class PSDHueSaturation
   constructor: (@layer, @length) ->
     @file = @layer.file

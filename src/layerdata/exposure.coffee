@@ -1,3 +1,5 @@
+assert = require '../psdassert'
+
 class PSDExposure
   constructor: (@layer, @length) ->
     @file = @layer.file

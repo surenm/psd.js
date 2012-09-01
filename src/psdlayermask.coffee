@@ -1,3 +1,9 @@
+Log = require './log'
+Util = require './util'
+PSDLayer = require './psdlayer'
+PSDChannelImage = require './psdchannelimage'
+assert = require './psdassert'
+  
 class PSDLayerMask
   constructor: (@file, @header, @options) ->
     # Array to hold all of the layers

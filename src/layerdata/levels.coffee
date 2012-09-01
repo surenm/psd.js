@@ -1,3 +1,5 @@
+assert = require '../psdassert'
+
 class PSDLevels
   constructor: (@layer, @length) ->
     @file = @layer.file

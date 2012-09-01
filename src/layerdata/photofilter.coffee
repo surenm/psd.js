@@ -1,3 +1,5 @@
+assert = require '../psdassert'
+
 class PSDPhotoFilter
   constructor: (@layer, @length) ->
     @file = @layer.file

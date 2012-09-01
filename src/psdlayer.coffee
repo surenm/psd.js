@@ -1,3 +1,26 @@
+assert = require('./psdassert')
+Log = require('./log')
+Util = require('./util')
+
+PSDBlackWhite = require('./layerdata/blackwhite')
+PSDBrightnessContrast= require('./layerdata/brightnesscontrast')
+PSDColorBalance = require('./layerdata/colorbalance')
+PSDCurves = require('./layerdata/curves')
+PSDExposure = require('./layerdata/exposure')
+PSDGradient = require('./layerdata/gradient')
+PSDHueSaturation = require('./layerdata/huesaturation')
+PSDInvert = require('./layerdata/invert')
+PSDEffectsInfo = require('./layerdata/layereffect')
+PSDLevels = require('./layerdata/levels')
+PSDPattern = require('./layerdata/pattern')
+PSDPosterize = require('./layerdata/posterize')
+PSDPhotoFilter = require('./layerdata/photofilter')
+PSDSelectiveColor = require('./layerdata/selectivecolor')
+PSDSolidColor = require('./layerdata/solidcolor')
+PSDThreshold = require('./layerdata/threshold')
+PSDTypeTool = require('./layerdata/typetool')
+PSDVibrance = require('./layerdata/vibrance')
+
 class PSDLayer
   CHANNEL_SUFFIXES =
     '-2': 'layer mask'

@@ -1,3 +1,5 @@
+Log = require './log'
+PSDConstants = require './psdconstants'
 class PSDDescriptor
   constructor: (@file) ->
 

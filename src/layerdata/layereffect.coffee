@@ -1,3 +1,7 @@
+PSDDescriptor = require '../psddescriptor'
+Parser = require '../parser'
+assert = require '../psdassert'
+Log = require '../log'
 # libpsd has effect layer parsing 
 # see https://github.com/alco/psdump/blob/master/libpsd-0.9
 

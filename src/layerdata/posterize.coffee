@@ -1,3 +1,5 @@
+assert = require '../psdassert'
+
 class PSDPosterize
   constructor: (@layer, @length) ->
     @file = @layer.file

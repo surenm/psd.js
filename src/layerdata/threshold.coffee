@@ -1,3 +1,5 @@
+assert = require '../psdassert'
+
 class PSDThreshold
   constructor: (@layer, @length) ->
     @file = @layer.file

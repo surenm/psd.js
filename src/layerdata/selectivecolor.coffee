@@ -1,3 +1,5 @@
+assert = require '../psdassert'
+
 class PSDSelectiveColor
   constructor: (@layer, @length) ->
     @file = @layer.file

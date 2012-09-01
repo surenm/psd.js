@@ -1,3 +1,7 @@
+PSDDescriptor = require '../psddescriptor'
+Parser = require '../parser'
+assert = require '../psdassert'
+
 class PSDGradient
   constructor: (@layer, @length) ->
     @file = @layer.file

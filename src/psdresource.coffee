@@ -1,3 +1,6 @@
+Log = require('./log')
+Util = require('./util')
+
 class PSDResource
   RESOURCE_DESCRIPTIONS =
     1000: 

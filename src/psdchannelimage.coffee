@@ -1,3 +1,5 @@
+PSDImage = require './psdimage'
+Log = require './log'
 # PSD files also store merged image data for each individual layer.
 # Unfortunately, parsing this image data is a bit different than parsing
 # the overall merged image data at the end of the file. The main difference
