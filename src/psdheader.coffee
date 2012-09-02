@@ -52,7 +52,9 @@ class PSDHeader
     @[section] = data.shift() for section in HEADER_SECTIONS
 
     # Store size in an easy to use place for later
-    @size = [@rows, @cols]
+    @size = 
+      height: @rows
+      width: @cols
 
     # This must be 8BPS according to the spec, or else this is not a valid PSD 
     # file.
