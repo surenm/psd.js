@@ -72,7 +72,7 @@ class PSDLayerMask
       console.log "Found #{@numLayers} layer(s)"
       
       for i in [0...@numLayers]
-        layer = new PSDLayer @file
+        layer = new PSDLayer @file, @header
         layer.parse(i)
         @layers.push layer
 
