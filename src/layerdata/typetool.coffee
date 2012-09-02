@@ -28,11 +28,10 @@ class PSDTypeTool
     # fix array ends
     {search: /\]/g, replace: '],'}
     
-    # Remove trailing commands 
+    # Remove trailing comma
     {search: /\,([\t\r\n]*)\}/g, replace: '$1}'}
     {search: /\,([\t\r\n]*)\]/g, replace: '$1]'}
         
-    
     # Dunno WTF this is
     {search: /\(\u00FE\u00FF(.*)\)/g, replace: '"$1"'}
   ]
