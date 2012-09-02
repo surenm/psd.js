@@ -1,5 +1,6 @@
 PSDConstants = require './psdconstants'
 Log = require './log'
+Shape = require('./shape')
 
 class Parser
   @zeroFill: (number, width=2) ->
@@ -109,7 +110,7 @@ class Parser
     for layer_effect in layer_effects
       if effects_object[layer_effect].enabled == false
         continue
-      
+
       switch layer_effect
         when "dropShadow"
           parsed_effects.box_shadow = this.parseShadow effects_object['dropShadow']
@@ -126,5 +127,10 @@ class Parser
           parsed_effects.patternFill = this.parsePattern effects_object['patternFill']
 
     return parsed_effects
-
+  
+  @parsePathItem: (pathItem) ->
+    shape = new Shape pathItem.subPathItems
+    shape.parse()
+    return shape
+    
 module.exports = Parser
