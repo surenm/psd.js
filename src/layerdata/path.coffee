@@ -11,7 +11,7 @@ class PSDPath
     @image_width = @size.width
   
   parse: () ->
-    shapes = []
+    pathItems = []
 
     version = @file.readInt()    
     Log.debug "Photoshop version: #{version}"
@@ -29,8 +29,12 @@ class PSDPath
           Log.debug "Path had #{path.length} points"
           record += path.length
 
-          Log.debug path
-          shapes.push path
+          Log.debug_path
+          pathItem = 
+            closed: true
+            subPathItems: path
+          
+          pathItems.push pathItem
         when 3
           Log.debug "Open subpath length record"
           path =this.parse_subpath_record @file
@@ -38,7 +42,11 @@ class PSDPath
           record += path.length + 1
           
           Log.debug path
-          shapes.push path
+          pathItem = 
+            closed: false
+            subPathItems: path
+            
+          pathItems.push pathItem
         when 6
           Log.debug "Path fill rule record"
           filler = @file.read 24
@@ -49,7 +57,10 @@ class PSDPath
           Log.debug "Initial fill record"
           filler = @file.read 24
       record++
-    
+      
+    shapes = []
+    for pathItem in pathItems
+      shapes.push Parser.parsePathItem(pathItem)
     return shapes
     
   parse_subpath_record: (@file) ->
