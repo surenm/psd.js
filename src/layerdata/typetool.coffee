@@ -98,7 +98,8 @@ class PSDTypeTool
     last_pos = engineData.lastIndexOf(',')
     engineData = engineData.substring 0, last_pos 
     
-    @data.text.EngineData = engineData
+    engineJSON = eval '(' + engineData + ')'
+    @data.text.EngineData = engineJSON
     Log.debug "Text:", @data.text
 
     warpVersion = @file.readShortInt()
