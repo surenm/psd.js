@@ -30,7 +30,28 @@ class Shape
       when 8
         if this.isRoundedRectangle()
           @type = Shape.ROUNDED_RECTANGLE
+    
+    # Calculate the bounds for this shape
+    xs = []
+    ys = []
+    for item in @subPathItems
+      xs.push item[0].x, item[1].x, item[2].x
+      ys.push item[0].y, item[1].y, item[2].y
       
+    x_min = Math.min.apply null, xs 
+    y_min = Math.min.apply null, ys
+    x_max = Math.max.apply null, xs
+    y_max = Math.max.apply null, ys
+    
+    @bounds = 
+      top: y_min
+      left: x_min
+      bottom: y_max
+      right: x_max
+    
+    @width = "#{y_max - y_min}px"
+    @height = "#{x_max - x_min}px"
+     
   parse: () ->
     switch @type
       when Shape.LINE
@@ -112,77 +133,34 @@ class Shape
     y_min = Math.min first_point.y, second_point.y
     y_max = Math.max first_point.y, second_point.y
     
-    bounds = 
-      top: y_min
-      left: x_min
-      bottom: y_max
-      right: x_max
-  
     length = Math.sqrt(Math.pow(x_max-x_min,2) + Math.pow(y_max-y_min,2))
 
     @shape = 
       type: @type
-      bounds: bounds
+      bounds: @bounds
       length: "#{length}px"
 
   parseRectangle: () ->
-    first_point = (new PointRecord @subPathItems[0]).toPoint()
-    second_point = (new PointRecord @subPathItems[1]).toPoint()
-    third_point = (new PointRecord @subPathItems[2]).toPoint()
-    fourth_point = (new PointRecord @subPathItems[3]).toPoint()
-    
-    xs = [first_point.x, second_point.x, third_point.x, fourth_point.x]
-    ys = [first_point.y, second_point.y, third_point.y, fourth_point.y]
-    
-    x_min = Math.min.apply null, xs 
-    y_min = Math.min.apply null, ys
-    x_max = Math.max.apply null, xs
-    y_max = Math.max.apply null, ys
-    
-    bounds = 
-      top: y_min
-      left: x_min
-      bottom: y_max
-      right: x_max
-    
     @shape = 
       type: @type
-      bounds: bounds
-      width: "#{y_max - y_min}px"
-      height: "#{x_max - x_min}px"
+      bounds: @bounds
+      width: @width
+      height: @height
 
   parseRoundedRectangle: () ->
-    xs = []
-    ys = []
-    for item in @subPathItems
-      xs.push item[0].x, item[1].x, item[2].x
-      ys.push item[0].y, item[1].y, item[2].y
-      
-    x_min = Math.min.apply null, xs 
-    y_min = Math.min.apply null, ys
-    x_max = Math.max.apply null, xs
-    y_max = Math.max.apply null, ys
-    
     curvature_points = [
       new PointRecord @subPathItems[0]
       new PointRecord @subPathItems[1]
     ]
 
     curvature = curvature_points[0].getCurvature() + curvature_points[1].getCurvature()
-   
-    bounds = 
-      top: y_min
-      left: x_min
-      bottom: y_max
-      right: x_max
-    
+       
     @shape = 
       type: @type
-      bounds: bounds
-      width: "#{y_max - y_min}px"
-      height: "#{x_max - x_min}px"
+      bounds: @bounds
+      width: @width
+      height: @height
       curvature: "#{curvature}px"
-  
   parseEllipse: () ->
     return null
   
