@@ -28,6 +28,7 @@ class PSDTypeTool
     {search: /\/(\w+)\s+(\[)\s+/g, replace: '"$1": $2'} 
     {search: /"(\w+)":\s(\[.*\])\s+/g, replace: '"$1": "$2",\n'}
     {search: /\/(\w+)\s+([0-9]+\.[0-9]+|[0-9]+)\s+/g, replace: '"$1": $2,\n'} #"/token 0.0"
+    {search: /\/(\w+)\s+\.([0-9]+|[0-9]+)\s+/g, replace: '"$1": 0.$2,\n'} #"/token .0"
     {search: /\/(\w+)\s+([0-9]+)\s+/g, replace: '"$1": $2,\n'}    # "/token 0"
     {search: /\/(\w+)\s+(.*)\s/g, replace: '"$1": $2,\n'}       # "/text hello world"
     
