@@ -1,6 +1,6 @@
 fs = require 'fs'
 Log = require './log'
-Util = require './Util'
+Util = require './util'
 
 # A PSDImage stores parsed image data for images contained within the PSD, and
 # for the PSD itself.
