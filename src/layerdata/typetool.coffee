@@ -91,8 +91,12 @@ class PSDTypeTool
       engineData = engineData.replace match, replacement
 
     matches = engineData.match /\(([^\)]+)\)/g
+    
     for regex in @engineDataRegex
       engineData = engineData.replace regex.search, regex.replace
+      
+    last_pos = engineData.lastIndexOf(',')
+    engineData = engineData.substring 0, last_pos 
     
     @data.text.EngineData = engineData
     Log.debug "Text:", @data.text
