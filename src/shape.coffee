@@ -4,8 +4,7 @@ class Shape
   @LINE = "LINE"
   @RECTANGLE = "RECTANGLE"
   @ROUNDED_RECTANGLE = "ROUNDED_RECTANGLE"
-  @ELLIPSE = "ELLIPSE"
-  @COMPLEX = "COMPLEX"
+  @COMPLEX = "GENERIC"
   
   constructor: (@subPathItems) ->
     # By default all Shape are complex
@@ -21,8 +20,6 @@ class Shape
         # Could be a rectangle or ellipse
         if this.isRectangle()
           @type = Shape.RECTANGLE
-        else if this.isEllipse()
-          @type = Shape.ELLIPSE
       when 6
         #  could be rounded rectangle
         if this.isRoundedRectangle()
@@ -60,12 +57,9 @@ class Shape
         return this.parseRectangle()
       when Shape.ROUNDED_RECTANGLE
         return this.parseRoundedRectangle()
-      when Shape.ELLIPSE
-        return this.parseEllipse()
       when Shape.COMPLEX
         return this.parseGenericShape()
-  
-      
+        
   isLine: () ->
     first_subpath = new PointRecord @subPathItems[0]
     second_subpath = new PointRecord @subPathItems[1]
@@ -161,8 +155,6 @@ class Shape
       width: @width
       height: @height
       curvature: "#{curvature}px"
-  parseEllipse: () ->
-    return null
   
   parseGenericShape: () ->
     return null
