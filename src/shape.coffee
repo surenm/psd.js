@@ -155,8 +155,15 @@ class Shape
       width: @width
       height: @height
       curvature: "#{curvature}px"
-  
-  parseGenericShape: () ->
+    
+  parseGenericShape: () ->    
+    @shape = 
+      type: @type
+      bounds: @bounds
+      width: @width
+      height: @height
+      points: @subPathItems.length
+    
     return null
 
   toJSON: () ->
