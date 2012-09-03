@@ -84,6 +84,13 @@ class PSDTypeTool
     for char in @data.text.EngineData
       engineData += String.fromCharCode(char)
       
+    engineData = engineData.replace /\\\)/g, ""
+    matches = engineData.match /\(([^\)]+)\)/g
+    for match in matches
+      replacement = match.replace /[\n\r]/g, "\\n"
+      engineData = engineData.replace match, replacement
+
+    matches = engineData.match /\(([^\)]+)\)/g
     for regex in @engineDataRegex
       engineData = engineData.replace regex.search, regex.replace
     
