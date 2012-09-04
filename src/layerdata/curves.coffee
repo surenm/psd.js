@@ -39,6 +39,9 @@ class PSDCurves
       for j in [0...@data.curve[i].pointCount]
         # Curve points. Each point is a pair of short ints where the
         # first number is the output value and the second is the input.
+        @data.curve[i].outputValue = [] if not @data.curve[i].outputValue?
+        @data.curve[i].inputValue = [] if not @data.curve[i].inputValue?
+          
         @data.curve[i].outputValue[j] = @file.readShortInt()
         @data.curve[i].inputValue[j] = @file.readShortInt()
 
