@@ -1,3 +1,4 @@
+Util = require('./util')
 # Tons of color conversion functions.
 # Borrowed directly from CamanJS.
 class PSDColor
