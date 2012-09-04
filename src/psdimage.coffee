@@ -1,6 +1,7 @@
 fs = require 'fs'
 Log = require './log'
 Util = require './util'
+PSDColor = require './psdcolor'
 
 # A PSDImage stores parsed image data for images contained within the PSD, and
 # for the PSD itself.

@@ -1,6 +1,6 @@
 # Tons of color conversion functions.
 # Borrowed directly from CamanJS.
-PSD.PSDColor = class PSDColor
+class PSDColor
   # Converts the hex representation of a color to RGB values.
   # Hex value can optionally start with the hash (#).
   #
