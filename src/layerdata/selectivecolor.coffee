@@ -10,11 +10,11 @@ class PSDSelectiveColor
       blackCorrection: []
 
   parse: ->
-    version = @file.getShortInt()
+    version = @file.readShortInt()
     assert version is 1
 
     # 0 = relative mode, 1 = absolute mode
-    @data.correctionMethod = @file.getShortInt()
+    @data.correctionMethod = @file.readShortInt()
 
     # Ten 8 byte plate correction records
     # First record is ignored and reserved for future use
@@ -22,10 +22,10 @@ class PSDSelectiveColor
     # values in the image, in the order: reds, yellows, greens, cyans,
     # blues, magentas, whites, neutrals, blacks.
     for i in [0...10]
-      @data.cyanCorrection.push @file.getShortInt()
-      @data.magentaCorrection.push @file.getShortInt()
-      @data.yellowCorrection.push @file.getShortInt()
-      @data.blackCorrection.push @file.getShortInt()
+      @data.cyanCorrection.push @file.readShortInt()
+      @data.magentaCorrection.push @file.readShortInt()
+      @data.yellowCorrection.push @file.readShortInt()
+      @data.blackCorrection.push @file.readShortInt()
 
     @data
 

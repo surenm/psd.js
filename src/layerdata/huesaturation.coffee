@@ -5,7 +5,7 @@ class PSDHueSaturation
     @file = @layer.file
 
   parse: ->
-    version = @file.getShortInt()
+    version = @file.readShortInt()
     assert version is 2
 
     @data.colorization = @file.readBoolean()
@@ -21,13 +21,13 @@ class PSDHueSaturation
     # Hue: [-100, 100]
     # Saturation: [0, 100]
     # Lightness: [-100, 1000]
-    @data.hue = @file.getShortInt()
-    @data.saturation = @file.getShortInt()
-    @data.lightness = @file.getShortInt()
+    @data.hue = @file.readShortInt()
+    @data.saturation = @file.readShortInt()
+    @data.lightness = @file.readShortInt()
 
-    @data.masterHue = @file.getShortInt()
-    @data.masterSaturation = @file.getShortInt()
-    @data.masterLightness = @file.getShortInt()
+    @data.masterHue = @file.readShortInt()
+    @data.masterSaturation = @file.readShortInt()
+    @data.masterLightness = @file.readShortInt()
 
     # 6 sets of 14 bytes (4 range values followed by 3 settings values)
     @data.rangeValues = []
@@ -37,10 +37,10 @@ class PSDHueSaturation
       @data.settingValues[i] = []
 
       # For RGB and CMYK
-      @data.rangeValues[i][j] = @file.getShortInt() for j in [0...4]
+      @data.rangeValues[i][j] = @file.readShortInt() for j in [0...4]
 
       # For Lab color
-      @data.settingValues[i][j] = @file.getShortInt() for j in [0...3]
+      @data.settingValues[i][j] = @file.readShortInt() for j in [0...3]
 
     @data
 

@@ -4,10 +4,10 @@ class PSDBrightnessContrast
     @data = {}
 
   parse: ->
-    @data.brightness = @file.getShortInt()
-    @data.contrast = @file.getShortInt()
-    @data.meanValue = @file.getShortInt()
-    @data.labColor = @file.getShortInt()
+    @data.brightness = @file.readShortInt()
+    @data.contrast = @file.readShortInt()
+    @data.meanValue = @file.readShortInt()
+    @data.labColor = @file.readShortInt()
 
     @data
   

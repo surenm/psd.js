@@ -32,7 +32,7 @@ class PSDCurves
 
           count++
 
-      @data.curve[i].pointCount = @file.getShortInt()
+      @data.curve[i].pointCount = @file.readShortInt()
       assert @data.curve[i].pointCount >= 2
       assert @data.curve[i].pointCount <= 19
 
@@ -64,8 +64,8 @@ class PSDCurves
         assert pointCount is @data.curve[i].pointCount
 
         for j in [0...pointCount]
-          outputValue = @file.getShortInt()
-          inputValue = @file.getShortInt()
+          outputValue = @file.readShortInt()
+          inputValue = @file.readShortInt()
           assert.equal outputValue, @data.curve[i].outputValue[j]
           assert.equal inputValue, @data.curve[i].inputValue[j]
 

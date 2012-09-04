@@ -8,9 +8,9 @@ class PSDColorBalance
 
   parse: ->
     for i in [0...3]
-      @data.cyanRed.push @file.getShortInt()
-      @data.magentaGreen.push @file.getShortInt()
-      @data.yellowBlue.push @file.getShortInt()
+      @data.cyanRed.push @file.readShortInt()
+      @data.magentaGreen.push @file.readShortInt()
+      @data.yellowBlue.push @file.readShortInt()
 
     @data
 
