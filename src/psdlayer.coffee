@@ -376,8 +376,14 @@ class PSDLayer
       when 3 then @isHidden = true
 
   toJSON: ->
-    # calculate bounds
     @bounds = {'top': @top, 'bottom': @bottom, 'left': @left, 'right': @right}
+
+    # calculate bounds
+    if @top == 0 and @bottom == 0 and @left == 0 and @right == 0
+      # this happens sometimes with layers that has shapes
+      # TODO: return a superbound of bounds of all the pathItems
+      if @adjustments.pathItems?
+        @bounds = @adjustments.pathItems[0].bounds
 
     # calculate if the layer is clipping or not
     if @blendMode.clipping == 0
