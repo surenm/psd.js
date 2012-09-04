@@ -83,8 +83,11 @@ class PSDTypeTool
     engineData = ""
     for char in @data.text.EngineData
       engineData += String.fromCharCode(char)
-      
+
+    # TODO: Fix what happens the string contains a '(' or ')'
+    engineData = engineData.replace /\\\(/g, ""      
     engineData = engineData.replace /\\\)/g, ""
+    
     matches = engineData.match /\(([^\)]+)\)/g
     for match in matches
       replacement = match.replace /[\n\r]/g, "\\n"
