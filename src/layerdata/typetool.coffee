@@ -90,7 +90,11 @@ class PSDTypeTool
     
     matches = engineData.match /\(([^\)]+)\)/g
     for match in matches
+      # Replace new line characters with escaped new line
       replacement = match.replace /[\n\r]/g, "\\n"
+      
+      # FIXME: Replace double quotes within text to single quotes
+      replacement = replacement.replace /"/g, "'"
       engineData = engineData.replace match, replacement
 
     matches = engineData.match /\(([^\)]+)\)/g
