@@ -105,8 +105,14 @@ class PSDTypeTool
     last_pos = engineData.lastIndexOf(',')
     engineData = engineData.substring 0, last_pos 
     
-    engineJSON = eval '(' + engineData + ')'
-    @data.text.EngineData = engineJSON
+    try
+      engineJSON = eval '(' + engineData + ')'
+      @data.text.textItem = engineJSON
+      @data.text.EngineData = null
+    catch err
+      @data.text.EngineData = engineData
+      console.log err
+
     Log.debug "Text:", @data.text
 
     warpVersion = @file.readShortInt()
