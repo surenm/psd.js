@@ -253,6 +253,10 @@ class PSDLayer
 
   parseBlendingRanges: ->
     length = @file.readInt()
+    
+    # Not sure why this happens but this could be empty, in which case just return
+    if length == 0 
+      return
 
     # First, the grey blend. This is irrelevant for Lab & Greyscale.
     @blendingRanges.grey =
