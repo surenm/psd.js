@@ -1,6 +1,6 @@
 PointRecord = require './pointrecord'
     
-class Shape
+class ShapeParser
   @LINE = "LINE"
   @RECTANGLE = "RECTANGLE"
   @ROUNDED_RECTANGLE = "ROUNDED_RECTANGLE"
@@ -8,25 +8,25 @@ class Shape
   
   constructor: (@subPathItems) ->
     # By default all Shape are complex
-    @type = Shape.COMPLEX
+    @type = ShapeParser.COMPLEX
     
     # Now find out if the Shape fall under any of this category
     switch @subPathItems.length
       when 2
         # could be a line
         if this.isLine()
-          @type = Shape.LINE
+          @type = ShapeParser.LINE
       when 4
         # Could be a rectangle or ellipse
         if this.isRectangle()
-          @type = Shape.RECTANGLE
+          @type = ShapeParser.RECTANGLE
       when 6
         #  could be rounded rectangle
         if this.isRoundedRectangle()
-          @type = Shape.ROUNDED_RECTANGLE
+          @type = ShapeParser.ROUNDED_RECTANGLE
       when 8
         if this.isRoundedRectangle()
-          @type = Shape.ROUNDED_RECTANGLE
+          @type = ShapeParser.ROUNDED_RECTANGLE
     
     # Calculate the bounds for this shape
     xs = []
@@ -51,13 +51,13 @@ class Shape
      
   parse: () ->
     switch @type
-      when Shape.LINE
+      when ShapeParser.LINE
         return this.parseLine()
-      when Shape.RECTANGLE
+      when ShapeParser.RECTANGLE
         return this.parseRectangle()
-      when Shape.ROUNDED_RECTANGLE
+      when ShapeParser.ROUNDED_RECTANGLE
         return this.parseRoundedRectangle()
-      when Shape.COMPLEX
+      when ShapeParser.COMPLEX
         return this.parseGenericShape()
         
   isLine: () ->
@@ -163,10 +163,8 @@ class Shape
       width: @width
       height: @height
       points: @subPathItems.length
-    
-    return null
 
   toJSON: () ->
     return @shape
 
-module.exports = Shape
+module.exports = ShapeParser
