@@ -84,15 +84,18 @@ class PSDPath
     return beizer_knot
 
   parse_point_record: (@file) ->
-    decimal = parseInt(@file.read(1)) * 255
+    decimal = parseInt(@file.read(1))
     fraction = parseInt(@file.read(3))
+    if decimal == 255
+      decimal = -1
+    y = Math.round ((decimal*255+fraction)*@image_height)/255
+    
+    decimal = parseInt(@file.read(1))
+    fraction = parseInt(@file.read(3))
+    if decimal == 255
+      decimal = -1
+    x = Math.round ((decimal*255+fraction)*@image_height)/255
 
-    y = Math.round ((decimal+fraction)*@image_height)/255
-    
-    decimal = parseInt(@file.read(1)) * 255
-    fraction = parseInt(@file.read(3))
-    
-    x = Math.round ((decimal+fraction)*@image_width)/255
     return {x: x, y: y}
 
 module.exports = PSDPath
