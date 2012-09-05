@@ -386,44 +386,58 @@ class PSDLayer
       when 3 then @isHidden = true
 
   toJSON: ->
-    @bounds = {'top': @top, 'bottom': @bottom, 'left': @left, 'right': @right}
+    data = {}
+    data.uid = @layerId
+    data.name = @name
+    data.height = @rows
+    data.width  = @cols
+    data.zindex = @idx
+    data.opacity = @blendMode.opacityPercentage
+    
+    data.bounds = {'top': @top, 'bottom': @bottom, 'left': @left, 'right': @right}
 
     # calculate bounds
     if @top == 0 and @bottom == 0 and @left == 0 and @right == 0
       # this happens sometimes with layers that has shapes
       # TODO: return a superbound of bounds of all the pathItems
       if @adjustments.pathItems?
-        @bounds = @adjustments.pathItems[0].bounds
-
+        data.bounds = @adjustments.pathItems[0].bounds
+    
+    # Calculate layer type
+    data.type = LAYER_TYPES.NORMAL
+    
     # calculate if the layer is clipping or not
     if @blendMode.clipping == 0
-      @clipping = false
+      data.clipping = false
     else
-      @clipping = true
-    
-    @opacityPercentage = @blendMode.opacityPercentage
+      data.clipping = true
       
-    sections = [
-      'layerId'
-      'name'
-      'rows'
-      'cols'
-      'bounds'
-      'mask'
-      'layerType'
-      'opacityPercentage'
-      'clipping'
-      'adjustments'
-      'visible'
-      'isFolder'
-      'isHidden'
-    ]
+    # Does the layer have text data
+    if @adjustments.typeTool?
+      data.text = @adjustments.typeTool
+      data.type = LAYER_TYPES.TEXT
+    
+    # Does the layer has pathItems
+    if @adjustments.pathItems?
+      data.shapes = @adjustments.pathItems
+      if data.shapes.length == 1
+        data.type = LAYER_TYPES.SHAPE
+  
+    # Add style effects
+    styles = {}
 
-    data = {}
-    for section in sections
-      data[section] = @[section]
+    # Move everything in styles but for effects, typeTool or pathItems. They belong elswhere
+    if @adjustments?
+      for style in Object.keys(@adjustments)
+        if style != "effects" and style != "typeTool" and style != "pathItems"
+          styles[style] = @adjustments[style]
 
-    data["zindex"] = @idx
+    # effects directly belong to styles
+    if @adjustments.effects?
+      for effect in Object.keys(@adjustments.effects)
+        styles[effect] = @adjustments.effects[effect]
+        
+    data.styles = styles
 
     data
 
