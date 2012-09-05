@@ -158,10 +158,58 @@ class PSDLayerMask
         groupLayer = null
       else
         layer.groupLayer = groupLayer
+  
+  prune_hidden_layers: (layers) ->
+    layers.reverse()
+    layer_sets = {}
+    layer_visibility_status = {}
+    
+    current_layer_sets = [0] # 0th layer actually denotes the entire psd file
+    
+    for layer in layers
+      layer_id = layer.layerId
+
+      layer_visibility_status[layer_id] = layer.visible
+
+      # if this is a layerset end, then remove the last layerset from current_layer_sets
+      if layer.layerType == "bounding section divider"
+        layer_visibility_status[layer_id] = 0
+        current_layer_sets.pop()
+        continue
+
+      # Its a regular layer, push all the layers into the last item in the current_layer_set
+      current_layer_set = current_layer_sets[current_layer_sets.length - 1]
+      if not layer_sets[current_layer_set]?
+        layer_sets[current_layer_set] = []
+
+      layer_sets[current_layer_set].push layer_id
+
+      # if the current layer is folder, add to current_layer_sets
+      if layer.isFolder
+        current_layer_sets.push layer.layerId
+    
+    layer_keys = Object.keys layer_visibility_status
+    for layer in layer_keys
+      visible = layer_visibility_status[layer]
+      if visible == 0
+        layer_visibility_status[layer] = 0
+        children_layers = layer_sets[layer] || []
+        for child_layer in children_layers 
+          layer_visibility_status[child_layer] = 0
+
+    layers_after_pruning = []
+    for layer in layers
+      layer_id = layer.layerId
+      if layer_visibility_status[layer_id] == 1 and layer.layerType != "open folder"
+        layers_after_pruning.push layer
+    
+    console.log "#{layers_after_pruning.length} Layers are visible"
+    return layers_after_pruning
 
   toJSON: ->
     data =
       numLayers: @numLayers
+      visibleLayers: @layers.length
       layers: []
 
     for layer in @layers
