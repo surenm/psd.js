@@ -71,10 +71,13 @@ class PSDLayerMask
 
       console.log "Found #{@numLayers} layer(s)"
       
+      raw_layers = []
       for i in [0...@numLayers]
         layer = new PSDLayer @file, @header
         layer.parse(i)
-        @layers.push layer
+        raw_layers.push layer
+      
+      @layers = this.prune_hidden_layers raw_layers
 
       for layer in @layers
         if layer.isFolder or layer.isHidden
