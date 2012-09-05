@@ -92,6 +92,12 @@ class PSDLayer
     "Tahoma"
   ]
 
+  LAYER_TYPES = 
+    TEXT: "text"
+    SHAPE: "shape"
+    NORMAL: "normal"
+  
+
   constructor: (@file, @header = null) ->
     @image = null
     @mask = {}
