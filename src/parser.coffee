@@ -1,6 +1,7 @@
 PSDConstants = require './psdconstants'
 Log = require './log'
-Shape = require('./shape')
+ShapeParser = require './shapeparser'
+TextParser = require './textparser'
 
 class Parser
   @zeroFill: (number, width=2) ->
@@ -129,8 +130,13 @@ class Parser
     return parsed_effects
   
   @parsePathItem: (pathItem) ->
-    shape = new Shape pathItem.subPathItems
+    shape = new ShapeParser pathItem.subPathItems
     shape.parse()
     return shape
+  
+  @parseTextItem: (textItem) ->
+    text = new TextParser textItem
+    text.parse()
+    return text
     
 module.exports = Parser
