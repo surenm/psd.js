@@ -131,7 +131,8 @@ class PSDTypeTool
       @data.bottom
     ] = @file.readf ">4d"
 
-    @data
+    @text = Parser.parseTextItem @data.text.textItem
+    return @text
 
   parseLegacy: ->
     #
