@@ -319,53 +319,54 @@ class PSDLayer
           @adjustments.gradient = (new PSDGradient(@, length)).parse()
         when "PtFl"
           @adjustments.pattern = (new PSDPattern(@, length)).parse()
-        when "brit"
-          @adjustments.brightnessContrast = (new PSDBrightnessContrast(@, length)).parse()
-        when "levl"
-          @adjustments.levels = (new PSDLevels(@, length)).parse()
-        when "curv"
-          @adjustments.curves = (new PSDCurves(@, length)).parse()
-        when "expA"
-          @adjustments.exposure = (new PSDExposure(@, length)).parse()
-        when "vibA"
-          @adjustments.vibrance = (new PSDVibrance(@, length)).parse()
-        when "hue2" # PS >= 5.0
-          @adjustments.hueSaturation = (new PSDHueSaturation(@, length)).parse()
-        when "blnc"
-          @adjustments.colorBalance = (new PSDColorBalance(@, length)).parse()
-        when "blwh"
-          @adjustments.blackWhite = (new PSDBlackWhite(@, length)).parse()
-        when "phfl"
-          @adjustments.photoFilter = (new PSDPhotoFilter(@, length)).parse()
-        when "thrs"
-          @adjustments.threshold = (new PSDThreshold(@, length)).parse()
-        when "nvrt"
-          @adjustments.invert = (new PSDInvert(@, length)).parse()
-        when "post"
-          @adjustments.posterize = (new PSDPosterize(@, length)).parse()
         when "tySh" # PS <= 5
           @adjustments.typeTool = (new PSDTypeTool(@, length)).parse(true)
         when "TySh" # PS >= 6
           @adjustments.typeTool = (new PSDTypeTool(@, length)).parse()
-        when "luni" # PS >= 5.0
-          @name = @file.readUnicodeString()
-
-          # This seems to be padded with null bytes (by 4?), but the easiest
-          # thing to do is to simply jump to the end of this section.
-          @file.seek pos + length, false
+        when "lrFX" # PS 5.0
+            legacyEffects = (new PSDEffectsInfo(@, length)).parseLegacy()
+            @file.read(2) # why these 2 bytes?
+        when "lfx2" # PS 6.0
+          @adjustments.effects = (new PSDEffectsInfo(@, length)).parse()
+        when "vmsk"
+          @adjustments.pathItems = (new PSDPath(@, length)).parse()
         when "lyid"
           @layerId = @file.readInt()
         when "lsct"
           @readLayerSectionDivider()
-        when "lrFX" # PS 5.0
-          legacyEffects = (new PSDEffectsInfo(@, length)).parseLegacy()
-          @file.read(2) # why these 2 bytes?
-        when "lfx2" # PS 6.0
-          @adjustments.effects = (new PSDEffectsInfo(@, length)).parse()
-        when "selc"
-          @adjustments.selectiveColor = (new PSDSelectiveColor(@, length)).parse()
-        when "vmsk"
-          @adjustments.pathItems = (new PSDPath(@, length)).parse()
+        #when "brit"
+        #  @adjustments.brightnessContrast = (new PSDBrightnessContrast(@, length)).parse()
+        #when "levl"
+        #  @adjustments.levels = (new PSDLevels(@, length)).parse()
+        #when "curv"
+        #  @adjustments.curves = (new PSDCurves(@, length)).parse()
+        #when "expA"
+        #  @adjustments.exposure = (new PSDExposure(@, length)).parse()
+        #when "vibA"
+        #  @adjustments.vibrance = (new PSDVibrance(@, length)).parse()
+        #when "hue2" # PS >= 5.0
+        #  @adjustments.hueSaturation = (new PSDHueSaturation(@, length)).parse()
+        #when "blnc"
+        #  @adjustments.colorBalance = (new PSDColorBalance(@, length)).parse()
+        #when "blwh"
+        #  @adjustments.blackWhite = (new PSDBlackWhite(@, length)).parse()
+        #when "phfl"
+        #  @adjustments.photoFilter = (new PSDPhotoFilter(@, length)).parse()
+        #when "thrs"
+        #  @adjustments.threshold = (new PSDThreshold(@, length)).parse()
+        #when "nvrt"
+        #  @adjustments.invert = (new PSDInvert(@, length)).parse()
+        #when "post"
+        #  @adjustments.posterize = (new PSDPosterize(@, length)).parse()
+        #
+        #when "luni" # PS >= 5.0
+        #  @name = @file.readUnicodeString()
+        #
+        #  # This seems to be padded with null bytes (by 4?), but the easiest
+        #  # thing to do is to simply jump to the end of this section.
+        #  @file.seek pos + length, false
+        #when "selc"
+        #  @adjustments.selectiveColor = (new PSDSelectiveColor(@, length)).parse()
         else
           @file.seek length
           Log.debug("Skipping additional layer info with key #{key}")
