@@ -314,7 +314,7 @@ class PSDLayer
       Log.debug("Extra layer info: key = #{key}, length = #{length}")
       switch key
         when "SoCo"
-          @adjustments.solidColor = (new PSDSolidColor(@, length)).parse()
+          @adjustments.solid_color = (new PSDSolidColor(@, length)).parse()
         when "GdFl"
           @adjustments.gradient = (new PSDGradient(@, length)).parse()
         when "PtFl"
