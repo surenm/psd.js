@@ -71,14 +71,13 @@ class PSDLayerMask
 
       console.log "Found #{@numLayers} layer(s)"
       
-      raw_layers = []
+      layers_copy = []
       for i in [0...@numLayers]
         layer = new PSDLayer @file, @header
         layer.parse(i)
-        raw_layers.push layer
+        @layers.push layer
+        layers_copy.push layer
       
-      @layers = this.prune_hidden_layers raw_layers
-
       for layer in @layers
         if layer.isFolder or layer.isHidden
           # Layer contains no image data. Skip ahead.
@@ -93,8 +92,7 @@ class PSDLayerMask
           layer.image.skip()
 
       # Layers are parsed in reverse order
-      @layers.reverse()
-      @groupLayers()
+      #@layers.reverse()
 
     # In case there are filler zeros
     @file.seek pos + layerInfoSize, false
@@ -104,6 +102,8 @@ class PSDLayerMask
   
     # Temporarily skip the rest of layers & masks section
     @file.seek endLoc, false
+      
+    @visible_layers = this.prune_hidden_layers layers_copy
     return
 
     # We have more additional info to parse, especially beacuse this is PS >= 4.0
@@ -212,10 +212,10 @@ class PSDLayerMask
   toJSON: ->
     data =
       numLayers: @numLayers
-      visibleLayers: @layers.length
+      visibleLayers: @visible_layers.length
       layers: []
 
-    for layer in @layers
+    for layer in @visible_layers
       data.layers.push layer.toJSON()
 
     data
