@@ -12,6 +12,6 @@ class PSDSolidColor
 
     descriptor = (new PSDDescriptor(@file)).parse()
     fill_color = Parser.parseColor descriptor.color
-    return {"color": fill_color}
+    return fill_color
 
 module.exports = PSDSolidColor
