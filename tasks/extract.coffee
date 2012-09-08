@@ -18,6 +18,7 @@ psd.setOptions
 png_file = path.join output_dir, "#{basename}.png"
 design_file = path.join output_dir, "#{basename}.json"
 assets_directory = path.join output_dir, "assets"
+images_directory = path.join assets_directory, "images"
 
 # Parse the photoshop file
 psd.parse()
@@ -39,5 +40,5 @@ for layer in psd.layers
   continue unless layer.image
   
   image_name = layer.name.replace /[^0-9a-zA-Z]/g, '_'
-  image_file_name = path.join assets_directory, "#{image_name}_#{layer.layerId}.png"
+  image_file_name = path.join images_directory, "#{image_name}_#{layer.layerId}.png"
   layer.image.toFileSync image_file_name
