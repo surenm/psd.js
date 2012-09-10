@@ -2,14 +2,9 @@ PSDConstants = require './psdconstants'
 Log = require './log'
 ShapeParser = require './shapeparser'
 TextParser = require './textparser'
+Util = require './util'
 
 class Parser
-  @zeroFill: (number, width=2) ->
-    width -= (number.toString().length - /\./.test(number))
-    if (width > 0)
-      return new Array(width + 1).join('0') + number
-    return number + ""
-
   
   @parseColor: (color_object, opacity = 1.00) ->
     # Color objects could be in many color modes. Handling RGB color modes for now
@@ -17,9 +12,9 @@ class Parser
     if color_object.class.id == 1380401731
       
       if parseInt(opacity*100) == 100 or parseInt(opacity*100) == 0
-        rr = this.zeroFill parseInt(color_object.red).toString(16)
-        gg = this.zeroFill parseInt(color_object.grain).toString(16)
-        bb = this.zeroFill parseInt(color_object.blue).toString(16)
+        rr = Util.zeroFill parseInt(color_object.red).toString(16)
+        gg = Util.zeroFill parseInt(color_object.grain).toString(16)
+        bb = Util.zeroFill parseInt(color_object.blue).toString(16)
         color_string = "##{rr}#{gg}#{bb}"
       else
         rhex = parseInt(color_object.red)

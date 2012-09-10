@@ -52,4 +52,10 @@ class Util
         else high_chars_unicode.charAt byte - 0x80
       char_array.join ''
 
+  @zeroFill: (number, width=2) ->
+    width -= (number.toString().length - /\./.test(number))
+    if (width > 0)
+      return new Array(width + 1).join('0') + number
+    return number + ""
+
 module.exports = Util
