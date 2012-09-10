@@ -8,18 +8,33 @@ class TextParser
     raw_font_set = @textItem.DocumentResources.FontSet
     @font_set = this.parseFontSet raw_font_set
     
-    @style_run = @textItem.EngineDict.StyleRun
-    @style_sheets = @style_run.RunArray
     
+    @style_sheets = @textItem.EngineDict.StyleRun.RunArray
+
+    style_lengths_str = @textItem.EngineDict.StyleRun.RunLengthArray
+    value = style_lengths_str.match(/\[(.*)\]/g)
+    value = value[0].replace '[', ''
+    value = value.replace ']', ''
+    @style_lengths = value.split ' '
+    @style_lengths.splice -1
     
-  parse: () ->
-    @font_styles = []
+    console.log @style_lengths
+    
+
+  parse: () ->    
+    styles = []
     for style_sheet in @style_sheets
        font_style = this.parseStyleSheet style_sheet.StyleSheet.StyleSheetData
-       @font_styles.push font_style
+       styles.push font_style
+
+    @fonts = []   
+    for pos in [0..styles.length-1]
+      font = 
+        styles: styles[pos]
+        pos: @style_lengths[pos]
     
-    @font_styles
-    
+      @fonts.push font
+       
   
   parseStyleSheet: (stylesheet_object) ->
     font_id = stylesheet_object.Font
@@ -79,6 +94,6 @@ class TextParser
     return color_string
   
   toJSON: () ->
-    return { text: @text, styles: @font_styles }
+    return { text: @text, styles: @fonts }
   
 module.exports = TextParser
