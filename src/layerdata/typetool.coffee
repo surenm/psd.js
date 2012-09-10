@@ -14,7 +14,7 @@ class PSDTypeTool
     {search: />>/g, replace: '},'}
     
     # Fix strings
-    {search: /\(/g, replace: '"'}  
+    {search: /\(../g, replace: '"'}  
     {search: /\)/g, replace: '"'}
     
     # These lines has some unicode strings that the JSON doesn't agree with
