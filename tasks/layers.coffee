@@ -9,6 +9,12 @@ basename = "output"
 console.log "Input psd file is #{input_psd_file}"
 console.log "Output directory is #{output_dir}"
 
+if not fs.existsSync '/tmp/psdjs'
+  fs.mkdirSync '/tmp/psdjs'
+
+if not fs.existsSync '/tmp/psdjs/assets'
+  fs.mkdirSync '/tmp/psdjs/assets'
+
 psd = PSD.fromFile input_psd_file
 
 psd.setOptions
