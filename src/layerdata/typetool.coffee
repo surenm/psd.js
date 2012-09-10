@@ -107,8 +107,7 @@ class PSDTypeTool
     
     try
       engineJSON = eval '(' + engineData + ')'
-      @data.text.textItem = engineJSON
-      @data.text.EngineData = null
+      @data.text.EngineData = engineJSON
     catch err
       @data.text.EngineData = engineData
       console.log err
@@ -131,7 +130,8 @@ class PSDTypeTool
       @data.bottom
     ] = @file.readf ">4d"
 
-    @text = Parser.parseTextItem @data.text.textItem
+    @text = Parser.parseTextItem @data.text.EngineData
+    
     return @text
 
   parseLegacy: ->
