@@ -17,8 +17,10 @@ psd.setOptions
 
 png_file = path.join output_dir, "#{basename}.png"
 design_file = path.join output_dir, "#{basename}.json"
-assets_directory = path.join output_dir, "assets"
-images_directory = path.join assets_directory, "images"
+images_directory = path.join output_dir, "assets", "images"
+
+if not fs.existsSync images_directory
+  fs.mkdirSync images_directory
 
 # Parse the photoshop file
 psd.parse()
