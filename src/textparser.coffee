@@ -7,43 +7,59 @@ class TextParser
     
     raw_font_set = @textItem.DocumentResources.FontSet
     @font_set = this.parseFontSet raw_font_set
-    
-    
+        
     @style_sheets = @textItem.EngineDict.StyleRun.RunArray
 
+  parse: () ->
+    this.parseTextArray()
+    this.parseStyleArray()
+
+    @text_objects = []
+    for pos in [0..@style_array.length-1]
+      text_object = 
+        styles: @style_array[pos]
+        text: @text_array[pos]
+    
+      @text_objects.push text_object
+
+  parseTextArray: () ->
     style_lengths_str = @textItem.EngineDict.StyleRun.RunLengthArray
     value = style_lengths_str.match(/\[(.*)\]/g)
     value = value[0].replace '[', ''
     value = value.replace ']', ''
     @style_lengths = value.split ' '
     @style_lengths.splice -1
-    
-    console.log @style_lengths
-    
+    for i in [0..@style_lengths.length-1]
+      @style_lengths[i] = parseInt(@style_lengths[i])
 
-  parse: () ->    
-    styles = []
+    @style_positions = [0]
+    for i in [0..@style_lengths.length-1]
+      @style_positions.push @style_lengths[i] + @style_positions[i]
+
+    array_starts = @style_positions.slice 0
+    array_ends = @style_positions.slice 0
+
+    array_starts.pop()
+    array_ends.shift()
+    
+    @text_array = []
+    for i in [0..array_starts.length-1]
+      str = @text.substring array_starts[i], array_ends[i]
+      @text_array.push str
+
+  parseStyleArray: () ->
+    @style_array = []
     for style_sheet in @style_sheets
-       font_style = this.parseStyleSheet style_sheet.StyleSheet.StyleSheetData
-       styles.push font_style
-
-    @fonts = []   
-    for pos in [0..styles.length-1]
-      font = 
-        styles: styles[pos]
-        pos: @style_lengths[pos]
+      stylesheet_object = style_sheet.StyleSheet.StyleSheetData
+      font_id = stylesheet_object.Font
+      properties = {}
     
-      @fonts.push font
-       
-  
-  parseStyleSheet: (stylesheet_object) ->
-    font_id = stylesheet_object.Font
-    properties = @font_set[font_id]
+      for key in Object.keys(@font_set[font_id])
+        properties[key] = @font_set[font_id][key]
       
-    properties['font-size'] = "#{stylesheet_object.FontSize}px"
-    properties['color'] = this.parseTextColor stylesheet_object.FillColor
-    
-    return properties
+      properties['font-size'] = "#{stylesheet_object.FontSize}px"
+      properties['color'] = this.parseTextColor stylesheet_object.FillColor
+      @style_array.push properties
   
   parseFontSet: (raw_font_set) ->
     fonts = []
@@ -54,6 +70,7 @@ class TextParser
       font_properties['font-family'] = parts[0]
       
       font_style = parts[1] if parts[1]?
+
       switch font_style
         when "Bold"
           font_properties['font-weight'] = "bold"
@@ -64,7 +81,7 @@ class TextParser
           font_properties['font-style'] = "italic"
         when 'Regular'
           font_properties['font-weight'] = "normal"
-      
+
       fonts.push font_properties
     
     return fonts
@@ -94,6 +111,6 @@ class TextParser
     return color_string
   
   toJSON: () ->
-    return { text: @text, styles: @fonts }
+    return @text_objects
   
 module.exports = TextParser
