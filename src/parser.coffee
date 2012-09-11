@@ -90,13 +90,15 @@ class Parser
     horizontal_offset = Math.round Math.abs distance * Math.sin(angle)
     vertical_offset = Math.round Math.abs distance * Math.cos(angle)
     
+    inset = if shadow_type == "box" then "inset" else ""
+
     shadow =
       color: this.parseColor shadow_object.color, opacity
       horizontal_offset: "#{horizontal_offset}px"
       vertical_offset: "#{vertical_offset}px"
       blur: "#{shadow_object.blur.value}px"
       spread: "#{shadow_object.noise.value}px"
-      type: "#{shadow_type}"
+      type: "#{inset}"
 
     return shadow
 
@@ -108,10 +110,17 @@ class Parser
         continue
 
       switch layer_effect
-        when "dropShadow"
-          parsed_effects.box_shadow = this.parseShadow effects_object['dropShadow']
-        when "innerShadow"
-          parsed_effects.inner_shadow = this.parseShadow effects_object['dropShadow'], "inset"
+        when "dropShadow", "innerShadow"
+          if !parsed_effects.box_shadow?
+            parsed_effects.box_shadow = []
+
+          if layer_effect == "innerShadow"
+            shadow_type = "inset" 
+          else 
+            shadow_type = "box"
+
+
+          parsed_effects.box_shadow.push this.parseShadow effects_object['dropShadow'], shadow_type
         when "frameFX"
           parsed_effects.border = this.parseBorder effects_object['frameFX']
         when "solidFill"
