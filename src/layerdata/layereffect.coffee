@@ -132,7 +132,8 @@ class PSDDropDownLayerEffect extends PSDLayerEffect
     @enabled = @file.readBoolean()
     @useAngleInAllFX = @file.readBoolean()
     
-    [@opacity] = @file.read(1) 
+    [opacity_value] = @file.read(1)
+    @opacity = Math.round(opacity_value*100/255)
     
     @nativeColor = @getSpaceColor() if @version == 2
 
