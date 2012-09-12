@@ -108,9 +108,13 @@ class Parser
 
       switch layer_effect
         when "dropShadow"
-          parsed_effects.drop_shadow = this.parseShadow effects_object['dropShadow']
+          if not parsed_effects.shadows?
+            parsed_effects.shadows = {}
+          parsed_effects.shadows.drop_shadow = this.parseShadow effects_object['dropShadow']
         when "innerShadow"
-          parsed_effects.inner_shadow = this.parseShadow effects_object['innerShadow']
+          if not parsed_effects.shadows?
+            parsed_effects.shadows = {}
+          parsed_effects.shadows.inner_shadow = this.parseShadow effects_object['innerShadow']
         when "frameFX"
           parsed_effects.border = this.parseBorder effects_object['frameFX']
         when "solidFill"
