@@ -413,16 +413,19 @@ class PSDLayer
     else
       data.clipping = true
       
-    # Does the layer have text data
+    
     if @adjustments.typeTool?
+      # Does the layer have text data
       data.text = @adjustments.typeTool
       data.type = LAYER_TYPES.TEXT
     
-    # Does the layer has pathItems
-    if @adjustments.pathItems?
+    else if @adjustments.pathItems?
+      # Does the layer has pathItems
       data.shapes = @adjustments.pathItems
       if data.shapes.length == 1
         data.type = LAYER_TYPES.SHAPE
+    else
+      data.type = LAYER_TYPES.NORMAL
   
     # Add style effects
     styles = {}
