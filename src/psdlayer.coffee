@@ -324,8 +324,8 @@ class PSDLayer
         when "TySh" # PS >= 6
           @adjustments.typeTool = (new PSDTypeTool(@, length)).parse()
         when "lrFX" # PS 5.0
-            legacyEffects = (new PSDEffectsInfo(@, length)).parseLegacy()
-            @file.read(2) # why these 2 bytes?
+          legacyEffects = (new PSDEffectsInfo(@, length)).parseLegacy()
+          @file.read(2) # why these 2 bytes?
         when "lfx2" # PS 6.0
           @adjustments.effects = (new PSDEffectsInfo(@, length)).parse()
         when "vmsk"
