@@ -421,9 +421,11 @@ class PSDLayer
     
     else if @adjustments.pathItems?
       # Does the layer has pathItems
-      data.shapes = @adjustments.pathItems
-      if data.shapes.length == 1
-        data.type = LAYER_TYPES.SHAPE
+      if @adjustments.pathItems.length == 1
+        data.shape = @adjustments.pathItems[0]
+      else
+        data.type = LAYER_TYPES.NORMAL
+        data.shapes = @adjustments.pathItems
     else
       data.type = LAYER_TYPES.NORMAL
   
