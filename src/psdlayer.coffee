@@ -134,6 +134,19 @@ class PSDLayer
     @parseBlendingRanges()
     @parseLegacyLayerName()
     @parseExtraData()
+    
+    if @top == 0 and @bottom == 0 and @left == 0 and @right == 0
+      # this happens sometimes with layers that has shapes
+      # TODO: return a superbound of bounds of all the pathItems
+      if @adjustments.pathItems?
+        bounds = @adjustments.pathItems[0].bounds
+        @top = bounds.top
+        @bottom = bounds.bottom
+        @left = bounds.left
+        @right = bounds.right
+        @rows = @bottom - @top
+        @cols = @right - @left
+      
 
     @name = @legacyName unless @name?
 
