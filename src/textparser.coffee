@@ -1,13 +1,10 @@
 Util = require './util'
 
 class TextParser
-  constructor: (@textItem) ->
-    @text = @textItem.EngineDict.Editor.Text
-    @text = @text.substring(0, @text.length-1)
-    
+  constructor: (@textItem, @utf_encoded_string) ->
     raw_font_set = @textItem.DocumentResources.FontSet
+    @text = this.parseUnicodeEncodedString utf_encoded_string
     @font_set = this.parseFontSet raw_font_set
-        
     @style_sheets = @textItem.EngineDict.StyleRun.RunArray
 
   parse: () ->
@@ -21,6 +18,23 @@ class TextParser
         text: @text_array[pos]
     
       @text_objects.push text_object
+
+  parseUnicodeEncodedString: (utf_encoded_string) ->
+    text = ""
+    pos = 1
+    
+    while pos < @utf_encoded_string.length - 1
+      first_char = parseInt(@utf_encoded_string.charCodeAt(pos)).toString(16)
+      second_char = parseInt(@utf_encoded_string.charCodeAt(pos+1)).toString(16)
+      pos = pos + 2
+      unicode_char_code = "0x#{Util.zeroFill first_char}#{Util.zeroFill second_char}"
+      unicode_char = String.fromCharCode(unicode_char_code)
+      text += unicode_char
+
+    console.log text
+
+    return text
+
 
   parseTextArray: () ->
     style_lengths_str = @textItem.EngineDict.StyleRun.RunLengthArray
