@@ -31,8 +31,6 @@ class TextParser
       unicode_char = String.fromCharCode(unicode_char_code)
       text += unicode_char
 
-    console.log text
-
     return text
 
 

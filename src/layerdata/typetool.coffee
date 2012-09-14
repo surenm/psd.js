@@ -6,7 +6,6 @@ Log = require '../log'
 class PSDTypeTool
   engineDataRegex: [
     # Null characters
-    {search: /\u0000/g, replace: ""}
     {search: /\\\)/g, replace: ""}
     
     # fix hashes 
@@ -39,8 +38,6 @@ class PSDTypeTool
     {search: /\,([\t\r\n]*)\}/g, replace: '$1}'}
     {search: /\,([\t\r\n]*)\]/g, replace: '$1]'}
         
-    # Dunno WTF this is
-    {search: /\(\u00FE\u00FF(.*)\)/g, replace: '"$1"'}
   ]
 
   constructor: (@layer, @length) ->
@@ -64,7 +61,6 @@ class PSDTypeTool
     ] = @file.readf(">6d")
 
     return @parseLegacy() if legacy
-
     # Below is code for PS >= 6
 
     textVersion = @file.readShortInt()
@@ -81,13 +77,17 @@ class PSDTypeTool
     # can get a general idea. Hopefully this can be improved in the
     # future.
     engineData = ""
+      
     for char in @data.text.EngineData
       engineData += String.fromCharCode(char)
-
+      
+    utf16_encoded_string = this.getTextContent(engineData)
+      
     # TODO: Fix what happens the string contains a '(' or ')'
     engineData = engineData.replace /\\\(/g, ""      
-    engineData = engineData.replace /\\\)/g, ""
+    engineData = engineData.replace /\\\)/g, ""      
     
+    # Get all string values in the engineData
     matches = engineData.match /\(([^\)]+)\)/g
     for match in matches
       # Replace new line characters with escaped new line
@@ -96,8 +96,6 @@ class PSDTypeTool
       # FIXME: Replace double quotes within text to single quotes
       replacement = replacement.replace /"/g, "'"
       engineData = engineData.replace match, replacement
-
-    matches = engineData.match /\(([^\)]+)\)/g
     
     for regex in @engineDataRegex
       engineData = engineData.replace regex.search, regex.replace
@@ -129,11 +127,19 @@ class PSDTypeTool
       @data.right
       @data.bottom
     ] = @file.readf ">4d"
-
-    @text = Parser.parseTextItem @data.text.EngineData
     
+    @text = Parser.parseTextItem @data.text.EngineData, utf16_encoded_string
     return @text
+    
+  getTextContent: (engineData) ->
+    texts = engineData.match /\/Text \(\u00FE\u00FF([^\)]*)\)/g
+    text = texts[0].match(/\([\s\S]*\)/g)[0]
 
+    text = text.replace /\(\u00FE\u00FF([\s\S]*)\)/g, '"$1"'
+    utf16_encoded_string = text
+    return utf16_encoded_string
+
+      
   parseLegacy: ->
     #
     # Font Information

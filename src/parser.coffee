@@ -132,8 +132,8 @@ class Parser
     shape.parse()
     return shape
   
-  @parseTextItem: (textItem) ->
-    text = new TextParser textItem
+  @parseTextItem: (textItem, utf16_encoded_str) ->
+    text = new TextParser textItem, utf16_encoded_str
     text.parse()
     return text
     
