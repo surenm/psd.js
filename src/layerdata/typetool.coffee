@@ -7,6 +7,7 @@ class PSDTypeTool
   engineDataRegex: [
     # Null characters
     {search: /\\\)/g, replace: ""}
+    {search: /\u0000/g, replace: ""}
     
     # fix hashes 
     {search: /<</g, replace: ' {'}
