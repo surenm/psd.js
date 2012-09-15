@@ -102,6 +102,11 @@ class Parser
   @parseEffects: (effects_object) ->
     layer_effects = Object.keys effects_object
     parsed_effects = {}
+    
+    # Disable effects if overall effects is switched off
+    if effects_object.masterFXSwitch == false
+      return parsed_effects
+
     for layer_effect in layer_effects
       if effects_object[layer_effect].enabled == false
         continue
