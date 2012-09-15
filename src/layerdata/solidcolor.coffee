@@ -11,7 +11,8 @@ class PSDSolidColor
     assert version is 16
 
     descriptor = (new PSDDescriptor(@file)).parse()
-    fill_color = Parser.parseColor descriptor.color
+    opacity = @layer.opacity
+    fill_color = Parser.parseColor descriptor.color, opacity
     return fill_color
 
 module.exports = PSDSolidColor
