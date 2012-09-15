@@ -435,6 +435,7 @@ class PSDLayer
     else if @adjustments.pathItems?
       # Does the layer has pathItems
       if @adjustments.pathItems.length == 1
+        data.type = LAYER_TYPES.SHAPE
         data.shape = @adjustments.pathItems[0]
       else
         data.type = LAYER_TYPES.NORMAL
@@ -455,9 +456,9 @@ class PSDLayer
     if @adjustments.effects?
       for effect in Object.keys(@adjustments.effects)
         styles[effect] = @adjustments.effects[effect]
-        
+
     data.styles = styles
 
-    data
+    return data
 
 module.exports = PSDLayer
