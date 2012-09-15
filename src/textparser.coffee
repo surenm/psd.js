@@ -69,8 +69,10 @@ class TextParser
       for key in Object.keys(@font_set[font_id])
         properties[key] = @font_set[font_id][key]
       
-      properties['font-size'] = "#{stylesheet_object.FontSize}px"
-      properties['color'] = this.parseTextColor stylesheet_object.FillColor
+      font_styles = this.parseStyleObject stylesheet_object
+      for key in Object.keys(font_styles)
+        properties[key] = font_styles[key]
+
       @style_array.push properties
   
   parseFontSet: (raw_font_set) ->
@@ -97,6 +99,38 @@ class TextParser
       fonts.push font_properties
     
     return fonts
+
+  parseStyleObject: (style_object) ->
+    styles = {}
+    
+    styles['color'] = this.parseTextColor style_object.FillColor
+    styles['font-size'] = "#{parseInt Math.round(style_object.FontSize)}px"
+
+    if style_object.FontCaps == 1
+      styles['font-variant'] = 'small-caps'
+    else if style_object.FontCaps == 2
+      styles['text-transform'] = 'uppercase'
+
+    if style_object.FauxItalic == true
+      styles['font-style'] = "italic"
+
+    if style_object.FauxBold == true
+      styles['font-style'] == "bold"
+
+    if style_object.Underline == true
+      styles['text-decoration'] = "underline"
+    else if style_object.Strikethrough == true
+      styles['text-decoration'] = "line-through"
+
+    if style_object.FontBaseline == 0
+      styles['vertical-align'] == "super"
+    else if style_object.FontBaseline == 2
+      styles['vertical-align'] == "bottom"
+
+    return styles
+
+
+
  
   parseTextColor: (color) ->
     color_arr_str = color.Values.match(/\[(.*)\]/g)
