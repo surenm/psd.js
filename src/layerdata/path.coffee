@@ -86,15 +86,20 @@ class PSDPath
   parse_point_record: (@file) ->
     decimal = parseInt(@file.read(1))
     fraction = parseInt(@file.read(3))
-    if decimal == 255
-      decimal = -1
-    y = Math.round ((decimal * 255 + fraction) * @image_height) / 255
+
+    if decimal < 128
+      y = Math.round ((decimal * 255 + fraction) * @image_height) / 255
+    else 
+      y = Math.round ((decimal - 255) * 255 + (fraction - 255)) * @image_height / 255
+
     
     decimal = parseInt(@file.read(1))
     fraction = parseInt(@file.read(3))
-    if decimal == 255
-      decimal = -1
-    x = Math.round ((decimal * 255 + fraction) * @image_width) / 255
+
+    if decimal < 128
+      x = Math.round ((decimal * 255 + fraction) * @image_width) / 255
+    else
+      x = Math.round ((decimal - 255) + (fraction - 255)) * @image_width / 255
 
     return {x: x, y: y}
 
