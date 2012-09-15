@@ -215,7 +215,7 @@ class PSDLayer
       @blendMode.pixelDataIrrelevant = (flags & (0x01 << 4)) > 0
 
     @blendingMode = @blendMode.blender
-    @opacity = @blendMode.opacity
+    @opacity = parseInt(@blendMode.opacityPercentage)/100
     @visible = @blendMode.visible
 
     Log.debug "Blending mode:", @blendMode
@@ -406,7 +406,7 @@ class PSDLayer
     data.height = @rows
     data.width  = @cols
     data.zindex = @idx
-    data.opacity = @blendMode.opacityPercentage
+    data.opacity = @opacity
     
     data.bounds = {'top': @top, 'bottom': @bottom, 'left': @left, 'right': @right}
 
