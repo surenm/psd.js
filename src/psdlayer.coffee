@@ -457,7 +457,10 @@ class PSDLayer
       for effect in Object.keys(@adjustments.effects)
         styles[effect] = @adjustments.effects[effect]
 
-    data.styles = styles
+    if data.type == LAYER_TYPES.NORMAL or (data.type == LAYER_TYPES.SHAPE and data.shape.type == "GENERIC")
+      data.styles = {}
+    else
+      data.styles = styles
 
     return data
 
