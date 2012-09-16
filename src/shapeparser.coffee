@@ -164,6 +164,15 @@ class ShapeParser
       height: @height
       points: @subPathItems.length
 
+  debug: (subPathItems) ->
+    console.log subPathItems.length
+    for path in subPathItems
+      for i in [0..2]
+        console.log "#{path[i].x}, #{path[i].y}"
+    console.log ""
+
+
+
   toJSON: () ->
     return @shape
 
