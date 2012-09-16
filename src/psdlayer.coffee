@@ -434,9 +434,14 @@ class PSDLayer
     
     else if @adjustments.pathItems?
       # Does the layer has pathItems
+      # TODO: Handle this is a better way
       if @adjustments.pathItems.length == 1
-        data.type = LAYER_TYPES.SHAPE
-        data.shape = @adjustments.pathItems[0]
+        if  @adjustments.pathItems[0].type != "GENERIC"
+          data.type = LAYER_TYPES.SHAPE
+          data.shape = @adjustments.pathItems[0]
+        else
+          data.type = LAYER_TYPES.NORMAL
+          data.shapes = @adjustments.pathItems
       else
         data.type = LAYER_TYPES.NORMAL
         data.shapes = @adjustments.pathItems
@@ -457,7 +462,7 @@ class PSDLayer
       for effect in Object.keys(@adjustments.effects)
         styles[effect] = @adjustments.effects[effect]
 
-    if data.type == LAYER_TYPES.NORMAL or (data.type == LAYER_TYPES.SHAPE and data.shape.type == "GENERIC")
+    if data.type == LAYER_TYPES.NORMAL
       data.styles = {}
     else
       data.styles = styles
