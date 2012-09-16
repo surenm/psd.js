@@ -84,22 +84,27 @@ class PSDPath
     return beizer_knot
 
   parse_point_record: (@file) ->
-    decimal = parseInt(@file.read(1))
-    fraction = parseInt(@file.read(3))
+    decimal_str = @file.read(1)
+    fraction_arr = @file.read(3)
+
+    decimal = parseInt decimal_str
+    fraction = (parseInt(fraction_arr[0])*255*255 + parseInt(fraction_arr[1])*255 + parseInt(fraction_arr[2]))/(255*255*255+255*255+255)
 
     if decimal < 128
-      y = Math.round ((decimal * 255 + fraction) * @image_height) / 255
-    else 
-      y = Math.round ((decimal - 255) * 255 + (fraction - 255)) * @image_height / 255
-
-    
-    decimal = parseInt(@file.read(1))
-    fraction = parseInt(@file.read(3))
-
-    if decimal < 128
-      x = Math.round ((decimal * 255 + fraction) * @image_width) / 255
+      y = Math.round ((decimal + fraction) * @image_height)
     else
-      x = Math.round ((decimal - 255) + (fraction - 255)) * @image_width / 255
+      y = Math.round ((decimal - 255 + fraction - 1) * @image_height)
+
+    decimal_str = @file.read(1)
+    fraction_arr = @file.read(3)
+
+    decimal = parseInt decimal_str
+    fraction = (parseInt(fraction_arr[0])*255*255 + parseInt(fraction_arr[1])*255 + parseInt(fraction_arr[2]))/(255*255*255+255*255+255)    
+    
+    if decimal < 128
+      x = Math.round ((decimal + fraction) * @image_width)
+    else
+      x = Math.round ((decimal - 255 + fraction - 1) * @image_width)
 
     return {x: x, y: y}
 
