@@ -59,9 +59,22 @@ class PSDPath
       record++
       
     shapes = []
+
     for pathItem in pathItems
       shapes.push Parser.parsePathItem(pathItem)
-    return shapes
+
+    shapes_hash = {}
+    if shapes.length > 0
+      for shape in shapes
+        bounds = shape.bounds
+        shape_key = "#{bounds.top}-#{bounds.bottom}-#{bounds.left}-#{bounds.right}-#{shape.type}"
+        shapes_hash[shape_key] = shape
+
+    unique_shapes = []
+    for shape_key in Object.keys(shapes_hash)
+      unique_shapes.push shapes_hash[shape_key]
+
+    return unique_shapes
     
   parse_subpath_record: (@file) ->
     num_subpath_records = @file.readShortInt()
