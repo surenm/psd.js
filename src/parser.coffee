@@ -124,11 +124,11 @@ class Parser
           parsed_effects.border = this.parseBorder effects_object['frameFX']
         when "solidFill"
           opacity = parseFloat(effects_object['solidFill'].opacity.value/100).toFixed(2)
-          parsed_effects.solid_fill = this.parseColor effects_object['solidFill'].color, opacity
+          parsed_effects.solid_overlay = this.parseColor effects_object['solidFill'].color, opacity
         when "gradientFill"
-          parsed_effects.gradient_fill = this.parseGradient effects_object['gradientFill']
+          parsed_effects.gradient_overlay = this.parseGradient effects_object['gradientFill']
         when "patternFill"
-          parsed_effects.pattern_fill = this.parsePattern effects_object['patternFill']
+          parsed_effects.pattern_overlay = this.parsePattern effects_object['patternFill']
 
     return parsed_effects
   

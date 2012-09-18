@@ -325,11 +325,11 @@ class PSDLayer
       Log.debug("Extra layer info: key = #{key}, length = #{length}")
       switch key
         when "SoCo"
-          @adjustments.solid_color = (new PSDSolidColor(@, length)).parse()
+          @adjustments.solid_fill = (new PSDSolidColor(@, length)).parse()
         when "GdFl"
-          @adjustments.gradient = (new PSDGradient(@, length)).parse()
+          @adjustments.gradient_overlay = (new PSDGradient(@, length)).parse()
         when "PtFl"
-          @adjustments.pattern = (new PSDPattern(@, length)).parse()
+          @adjustments.pattern_overlay = (new PSDPattern(@, length)).parse()
         when "tySh" # PS <= 5
           @adjustments.typeTool = (new PSDTypeTool(@, length)).parse(true)
         when "TySh" # PS >= 6
