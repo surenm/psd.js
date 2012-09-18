@@ -146,9 +146,6 @@ class PSDLayer
         @right = bounds.right
         @rows = @bottom - @top
         @cols = @right - @left
-      
-
-    @name = @legacyName unless @name?
 
     Log.debug "Layer #{layerIndex}:", @
 
@@ -310,6 +307,7 @@ class PSDLayer
     # Name length is padded in multiples of 4
     namelen = Util.pad4 @file.read(1)[0]
     @legacyName = Util.decodeMacroman(@file.read(namelen)).replace /\u0000/g, ''
+    @name = @legacyName unless @name?
 
   parseExtraData: ->
     while @file.tell() < @layerEnd
