@@ -102,8 +102,8 @@ class TextParser
 
   parseStyleObject: (style_object) ->
     styles = {}
-    
-    styles['color'] = this.parseTextColor style_object.FillColor
+        
+    styles['color'] = this.parseTextColor style_object.FillColor if style_object.FillColor?
     styles['font-size'] = "#{parseInt Math.round(style_object.FontSize)}px"
 
     if style_object.FontCaps == 1
