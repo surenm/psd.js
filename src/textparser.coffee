@@ -155,6 +155,19 @@ class TextParser
       color_string = "rgba(#{rhex}, #{ghex}, #{bhex}, #{opacity})"
   
     return color_string
+
+  @isSameStyled: (text_obj_a, text_obj_b) ->
+    a_keys = Object.keys(text_obj_a.styles).sort()
+    b_keys = Object.keys(text_obj_b.styles).sort()
+  
+    if not a_keys == b_keys
+      return false
+    
+    for key in a_keys
+      if text_obj_a.styles[key] != text_obj_b.styles[key]
+        return false
+
+    return true
   
   toJSON: () ->
     return @text_objects
