@@ -19,6 +19,19 @@ class TextParser
     
       @text_objects.push text_object
 
+    if @text_objects.length == 1 or @text_objects.length == 0
+      return
+
+    for pos in [@text_objects.length-1..1]
+      if TextParser.isSameStyled @text_objects[pos], @text_objects[pos - 1]
+        new_text_object = 
+          styles: @text_objects[pos].styles
+          text: @text_objects[pos-1].text + @text_objects[pos].text
+
+        @text_objects.splice pos-1, 2, new_text_object
+    
+
+
   parseUnicodeEncodedString: (utf_encoded_string) ->
     text = ""
     pos = 1
@@ -128,9 +141,6 @@ class TextParser
       styles['vertical-align'] == "bottom"
 
     return styles
-
-
-
  
   parseTextColor: (color) ->
     color_arr_str = color.Values.match(/\[(.*)\]/g)
