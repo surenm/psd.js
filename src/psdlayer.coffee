@@ -331,9 +331,9 @@ class PSDLayer
         when "PtFl"
           @adjustments.pattern_overlay = (new PSDPattern(@, length)).parse()
         when "tySh" # PS <= 5
-          @adjustments.typeTool = (new PSDTypeTool(@, length)).parse(true)
+          @adjustments.textItem = (new PSDTypeTool(@, length)).parse(true)
         when "TySh" # PS >= 6
-          @adjustments.typeTool = (new PSDTypeTool(@, length)).parse()
+          @adjustments.textItem = (new PSDTypeTool(@, length)).parse()
         when "lrFX" # PS 5.0
           legacyEffects = (new PSDEffectsInfo(@, length)).parseLegacy()
           @file.read(2) # why these 2 bytes?
@@ -425,9 +425,9 @@ class PSDLayer
       data.clipping = true
       
     
-    if @adjustments.typeTool?
+    if @adjustments.textItem?
       # Does the layer have text data
-      data.text = @adjustments.typeTool
+      data.text = @adjustments.textItem
       data.type = LAYER_TYPES.TEXT
     
     else if @adjustments.pathItems?
@@ -449,10 +449,10 @@ class PSDLayer
     # Add style effects
     styles = {}
 
-    # Move everything in styles but for effects, typeTool or pathItems. They belong elswhere
+    # Move everything in styles but for effects, textItem or pathItems. They belong elswhere
     if @adjustments?
       for style in Object.keys(@adjustments)
-        if style != "effects" and style != "typeTool" and style != "pathItems"
+        if style != "effects" and style != "textItem" and style != "pathItems"
           styles[style] = @adjustments[style]
 
     # effects directly belong to styles

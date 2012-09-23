@@ -11,27 +11,26 @@ class TextParser
     this.parseTextArray()
     this.parseStyleArray()
 
-    @text_objects = []
+    @text_chunks = []
     for pos in [0..@style_array.length-1]
-      text_object = 
+      text_chunk = 
         styles: @style_array[pos]
         text: @text_array[pos]
     
-      @text_objects.push text_object
+      @text_chunks.push text_chunk
 
-    if @text_objects.length == 1 or @text_objects.length == 0
+    if @text_chunks.length == 1 or @text_chunks.length == 0
       return
 
-    for pos in [@text_objects.length-1..1]
-      if TextParser.isSameStyled @text_objects[pos], @text_objects[pos - 1]
+    # merging happens in reverse order because otherwise you get into wierd index issues
+    for pos in [@text_chunks.length-1..1]
+      if TextParser.isSameStyled @text_chunks[pos], @text_chunks[pos - 1]
         new_text_object = 
-          styles: @text_objects[pos].styles
-          text: @text_objects[pos-1].text + @text_objects[pos].text
+          styles: @text_chunks[pos].styles
+          text: @text_chunks[pos-1].text + @text_chunks[pos].text
 
-        @text_objects.splice pos-1, 2, new_text_object
-    
-
-
+        @text_chunks.splice pos-1, 2, new_text_object
+  
   parseUnicodeEncodedString: (utf_encoded_string) ->
     text = ""
     pos = 1
@@ -45,7 +44,6 @@ class TextParser
       text += unicode_char
 
     return text
-
 
   parseTextArray: () ->
     style_lengths_str = @textItem.EngineDict.StyleRun.RunLengthArray
@@ -180,6 +178,9 @@ class TextParser
     return true
   
   toJSON: () ->
-    return @text_objects
+    textItem = 
+      full_text: @text
+      chunks: @text_chunks
+    return textItem
   
 module.exports = TextParser
