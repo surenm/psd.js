@@ -114,6 +114,8 @@ class TextParser
           font_properties['font-style'] = "italic"
         when 'Regular'
           font_properties['font-weight'] = "normal"
+        when 'Medium'
+          font_properties['font-weight'] = 600
 
       fonts.push font_properties
     
