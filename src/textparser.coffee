@@ -72,9 +72,17 @@ class TextParser
 
   parseStyleArray: () ->
     @style_array = []
+    font_id = null
     for style_sheet in @style_sheets
       stylesheet_object = style_sheet.StyleSheet.StyleSheetData
-      font_id = stylesheet_object.Font
+
+      new_font_id = stylesheet_object.Font 
+      if new_font_id?
+        font_id = new_font_id
+      else 
+        if not font_id?
+          font_id = 0 
+
       properties = {}
     
       for key in Object.keys(@font_set[font_id])
