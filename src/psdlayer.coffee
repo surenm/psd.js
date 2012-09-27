@@ -345,6 +345,10 @@ class PSDLayer
           @layerId = @file.readInt()
         when "lsct"
           @readLayerSectionDivider()
+        when "iOpa"
+          fillOpacityPercentage = (new PSDFillOpacity(@, length)).parse()
+          @opacity = parseInt (@opacity * fillOpacityPercentage)/100
+
         #when "brit"
         #  @adjustments.brightnessContrast = (new PSDBrightnessContrast(@, length)).parse()
         #when "levl"
