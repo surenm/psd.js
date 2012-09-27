@@ -1,10 +1,14 @@
 Util = require './util'
 
 class TextParser
-  constructor: (@textItem, @utf_encoded_string) ->
-    raw_font_set = @textItem.DocumentResources.FontSet
+  constructor: (@text_data, @utf_encoded_string) ->
+    @textItem = @text_data.text.EngineData
+
     @text = this.parseUnicodeEncodedString utf_encoded_string
+
+    raw_font_set = @textItem.DocumentResources.FontSet
     @font_set = this.parseFontSet raw_font_set
+
     @style_sheets = @textItem.EngineDict.StyleRun.RunArray
 
   parse: () ->

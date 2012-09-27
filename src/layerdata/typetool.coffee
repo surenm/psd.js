@@ -128,8 +128,8 @@ class PSDTypeTool
       @data.right
       @data.bottom
     ] = @file.readf ">4d"
-    
-    @text = Parser.parseTextItem @data.text.EngineData, utf16_encoded_string
+
+    @text = Parser.parseTextItem @data, utf16_encoded_string
     return @text
     
   getTextContent: (engineData) ->
