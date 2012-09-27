@@ -12,6 +12,7 @@ class TextParser
     @style_sheets = @textItem.EngineDict.StyleRun.RunArray
 
   parse: () ->
+    this.parseTransformVector()
     this.parseTextArray()
     this.parseStyleArray()
 
@@ -48,6 +49,12 @@ class TextParser
       text += unicode_char
 
     return text
+  
+  parseTransformVector: () ->
+    transformInfo = @text_data.transformInfo
+    @multiplication_factor = 1
+    if transformInfo.xx?
+      @multiplication_factor *= transformInfo.xx
 
   parseTextArray: () ->
     style_lengths_str = @textItem.EngineDict.StyleRun.RunLengthArray
@@ -135,8 +142,9 @@ class TextParser
     styles = {}
         
     styles['color'] = this.parseTextColor style_object.FillColor if style_object.FillColor?
-    styles['font-size'] = "#{parseInt Math.round(style_object.FontSize)}px"
-
+    font_size = parseFloat(style_object.FontSize) * @multiplication_factor
+    styles['font-size'] = "#{Math.round(font_size)}px"
+    
     if style_object.FontCaps == 1
       styles['font-variant'] = 'small-caps'
     else if style_object.FontCaps == 2
