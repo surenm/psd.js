@@ -1,5 +1,4 @@
 PSDDescriptor = require '../psddescriptor'
-Parser = require '../parser'
 assert = require '../psdassert'
 
 class PSDSolidColor
@@ -11,8 +10,6 @@ class PSDSolidColor
     assert version is 16
 
     descriptor = (new PSDDescriptor(@file)).parse()
-    opacity = @layer.opacity
-    fill_color = Parser.parseColor descriptor.color, opacity
-    return fill_color
+    return descriptor.color
 
 module.exports = PSDSolidColor
