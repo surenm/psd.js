@@ -471,9 +471,7 @@ class PSDLayer
     if @adjustments?
       for style in Object.keys(@adjustments)
         if style == "solid_fill"
-          console.log @opacity
           styles[style] = Parser.parseColor @adjustments[style], @opacity
-          console.log styles[style]
         else
           # TODO: find out how to handle these items
           styles[style] = @adjustments[style]
