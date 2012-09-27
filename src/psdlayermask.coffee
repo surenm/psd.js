@@ -166,13 +166,16 @@ class PSDLayerMask
     layers.reverse()
     layer_sets = {}
     layer_visibility_status = {}
+    layer_names = {}
     
+        
     current_layer_sets = [0] # 0th layer actually denotes the entire psd file
     
     for layer in layers
       layer_id = layer.layerId
 
       layer_visibility_status[layer_id] = layer.visible
+      layer_names[layer_id] = layer.name
 
       # if this is a layerset end, then remove the last layerset from current_layer_sets
       if layer.layerType == "bounding section divider"
