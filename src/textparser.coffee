@@ -103,18 +103,24 @@ class TextParser
       font_properties['font-family'] = parts[0]
       
       font_style = parts[1] if parts[1]?
-
+      
       switch font_style
         when "Bold"
           font_properties['font-weight'] = "bold"
-        when 'Italic'
+        when 'Italic', 'ItalicMT', 'ItalicLT', 'ItalicFF', 'ItalicEF'
           font_properties['font-style'] = "italic"
-        when 'BoldIt'
+        when 'BoldItalic', 'BoldItalicMT', 'BoldItalicLT', 'BoldItalicFF', 'BoldItalicEF' 
           font_properties['font-weight'] = "bold"
           font_properties['font-style'] = "italic"
-        when 'Regular'
+        when 'BoldIt', 'BoldItMT', 'BoldItLT', 'BoldItFF', 'BoldItEF' 
+          font_properties['font-weight'] = "bold"
+          font_properties['font-style'] = "italic"
+        when 'SemiBoldItalic', 'SemiBoldItalicMT', 'SemiBoldItalicLT', 'SemiBoldItalicFF', 'SemiBoldItalicEF' 
+          font_properties['font-weight'] = 600
+          font_properties['font-style'] = "italic"
+        when 'Regular', 'RegularMT', 'RegularLT', 'RegularFF', 'RegularEF'
           font_properties['font-weight'] = "normal"
-        when 'Medium'
+        when 'Medium', 'MediumMT', 'MediumLT', 'MediumFF', 'MediumFE'
           font_properties['font-weight'] = 600
 
       fonts.push font_properties
