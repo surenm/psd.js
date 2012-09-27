@@ -2,11 +2,13 @@ assert = require('./psdassert')
 Log = require('./log')
 Util = require('./util')
 
+Parser = require './parser'
 PSDBlackWhite = require('./layerdata/blackwhite')
 PSDBrightnessContrast= require('./layerdata/brightnesscontrast')
 PSDColorBalance = require('./layerdata/colorbalance')
 PSDCurves = require('./layerdata/curves')
 PSDExposure = require('./layerdata/exposure')
+PSDFillOpacity = require('./layerdata/fillopacity')
 PSDGradient = require('./layerdata/gradient')
 PSDHueSaturation = require('./layerdata/huesaturation')
 PSDInvert = require('./layerdata/invert')
@@ -102,7 +104,11 @@ class PSDLayer
     @image = null
     @mask = {}
     @blendingRanges = {}
+
     @adjustments = {}
+    @effects = {}
+    @path_items = {}
+    @text_item = {}
 
     # Defaults
     @layerType = "normal"
@@ -133,6 +139,8 @@ class PSDLayer
 
     @parseBlendingRanges()
     @parseLegacyLayerName()
+    
+    extra_data_start_pos = @file.tell()
     @parseExtraData()
     
     if @top == 0 and @bottom == 0 and @left == 0 and @right == 0
@@ -327,20 +335,20 @@ class PSDLayer
         when "SoCo"
           @adjustments.solid_fill = (new PSDSolidColor(@, length)).parse()
         when "GdFl"
-          @adjustments.gradient_overlay = (new PSDGradient(@, length)).parse()
+          @adjustments.gradient_fill = (new PSDGradient(@, length)).parse()
         when "PtFl"
-          @adjustments.pattern_overlay = (new PSDPattern(@, length)).parse()
+          @adjustments.pattern_fill = (new PSDPattern(@, length)).parse()
         when "tySh" # PS <= 5
-          @adjustments.textItem = (new PSDTypeTool(@, length)).parse(true)
+          @textItem = (new PSDTypeTool(@, length)).parse(true)
         when "TySh" # PS >= 6
-          @adjustments.textItem = (new PSDTypeTool(@, length)).parse()
+          @textItem = (new PSDTypeTool(@, length)).parse()
         when "lrFX" # PS 5.0
           legacyEffects = (new PSDEffectsInfo(@, length)).parseLegacy()
           @file.read(2) # why these 2 bytes?
         when "lfx2" # PS 6.0
-          @adjustments.effects = (new PSDEffectsInfo(@, length)).parse()
+          @effects = (new PSDEffectsInfo(@, length)).parse()
         when "vmsk"
-          @adjustments.pathItems = (new PSDPath(@, length)).parse()
+          @pathItems = (new PSDPath(@, length)).parse()
         when "lyid"
           @layerId = @file.readInt()
         when "lsct"
@@ -408,7 +416,13 @@ class PSDLayer
     data.height = @rows
     data.width  = @cols
     data.zindex = @idx
-    data.opacity = @opacity
+
+    # Adjust opacity if there is a fill opacity
+    if @fillOpacityPercentage?
+      data.opacity = parseInt (@opacity * @fillOpacityPercentage)/100
+    else 
+      data.opacity = @opacity
+    
     
     data.bounds = {'top': @top, 'bottom': @bottom, 'left': @left, 'right': @right}
 
@@ -429,40 +443,45 @@ class PSDLayer
       data.clipping = true
       
     
-    if @adjustments.textItem?
+    if @textItem?
       # Does the layer have text data
-      data.text = @adjustments.textItem
+      data.text = @textItem
       data.type = LAYER_TYPES.TEXT
     
-    else if @adjustments.pathItems?
+    else if @pathItems?
       # Does the layer has pathItems
       # TODO: Handle this is a better way
-      if @adjustments.pathItems.length == 1
-        if  @adjustments.pathItems[0].type != "GENERIC"
+      if @pathItems.length == 1
+        if @pathItems[0].type != "GENERIC"
           data.type = LAYER_TYPES.SHAPE
-          data.shape = @adjustments.pathItems[0]
+          data.shape = @pathItems[0]
         else
           data.type = LAYER_TYPES.NORMAL
-          data.shapes = @adjustments.pathItems
+          data.shapes = @pathItems
       else
         data.type = LAYER_TYPES.NORMAL
-        data.shapes = @adjustments.pathItems
+        data.shapes = @pathItems
     else
       data.type = LAYER_TYPES.NORMAL
   
     # Add style effects
     styles = {}
 
-    # Move everything in styles but for effects, textItem or pathItems. They belong elswhere
+    # Adjustments could be solid fill, gradient fill or pattern fill for now
     if @adjustments?
       for style in Object.keys(@adjustments)
-        if style != "effects" and style != "textItem" and style != "pathItems"
+        if style == "solid_fill"
+          console.log @opacity
+          styles[style] = Parser.parseColor @adjustments[style], @opacity
+          console.log styles[style]
+        else
+          # TODO: find out how to handle these items
           styles[style] = @adjustments[style]
 
     # effects directly belong to styles
-    if @adjustments.effects?
-      for effect in Object.keys(@adjustments.effects)
-        styles[effect] = @adjustments.effects[effect]
+    if @effects?
+      for effect in Object.keys(@effects)
+        styles[effect] = @effects[effect]
 
     if data.type == LAYER_TYPES.NORMAL
       data.styles = {}
