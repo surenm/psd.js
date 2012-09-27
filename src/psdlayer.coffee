@@ -146,8 +146,8 @@ class PSDLayer
     if @top == 0 and @bottom == 0 and @left == 0 and @right == 0
       # this happens sometimes with layers that has shapes
       # TODO: return a superbound of bounds of all the pathItems
-      if @adjustments.pathItems?
-        bounds = @adjustments.pathItems[0].bounds
+      if @pathItems?
+        bounds = @pathItems[0].bounds
         @top = bounds.top
         @bottom = bounds.bottom
         @left = bounds.left
@@ -426,13 +426,6 @@ class PSDLayer
     
     data.bounds = {'top': @top, 'bottom': @bottom, 'left': @left, 'right': @right}
 
-    # calculate bounds
-    if @top == 0 and @bottom == 0 and @left == 0 and @right == 0
-      # this happens sometimes with layers that has shapes
-      # TODO: return a superbound of bounds of all the pathItems
-      if @adjustments.pathItems?
-        data.bounds = @adjustments.pathItems[0].bounds
-    
     # Calculate layer type
     data.type = LAYER_TYPES.NORMAL
     
