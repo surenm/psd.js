@@ -5,6 +5,7 @@ class TextParser
     @textItem = @text_data.text.EngineData
 
     @text = this.parseUnicodeEncodedString utf_encoded_string
+    console.log @text
 
     raw_font_set = @textItem.DocumentResources.FontSet
     @font_set = this.parseFontSet raw_font_set
@@ -44,7 +45,13 @@ class TextParser
       first_char = parseInt(@utf_encoded_string.charCodeAt(pos)).toString(16)
       second_char = parseInt(@utf_encoded_string.charCodeAt(pos+1)).toString(16)
       pos = pos + 2
+      
+      if second_char == "5c"
+        second_char = parseInt(@utf_encoded_string.charCodeAt(pos)).toString(16)
+        pos = pos + 1
+
       unicode_char_code = "0x#{Util.zeroFill first_char}#{Util.zeroFill second_char}"
+    
       unicode_char = String.fromCharCode(unicode_char_code)
       text += unicode_char
 

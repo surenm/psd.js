@@ -133,10 +133,10 @@ class PSDTypeTool
     return @text
     
   getTextContent: (engineData) ->
-    texts = engineData.match /\/Text \(\u00FE\u00FF([^\)]*)\)/g
+    texts = engineData.match /\/Text \(\u00FE\u00FF([\s\S]*?)[^\\]\)/g
     text = texts[0].match(/\([\s\S]*\)/g)[0]
-
-    text = text.replace /\(\u00FE\u00FF([\s\S]*)\)/g, '"$1"'
+    text = text.replace /\(\u00FE\u00FF([\s\S]*)[^\\]\)/g, '"$1"'
+    
     utf16_encoded_string = text
     return utf16_encoded_string
 
