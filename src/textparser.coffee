@@ -5,7 +5,6 @@ class TextParser
     @textItem = @text_data.text.EngineData
 
     @text = this.parseUnicodeEncodedString utf_encoded_string
-    console.log @text
 
     raw_font_set = @textItem.DocumentResources.FontSet
     @font_set = this.parseFontSet raw_font_set
@@ -55,6 +54,7 @@ class TextParser
       unicode_char = String.fromCharCode(unicode_char_code)
       text += unicode_char
 
+    text = text.substring 0, text.length - 1
     return text
   
   parseTransformVector: () ->
