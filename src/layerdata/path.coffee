@@ -73,6 +73,9 @@ class PSDPath
     unique_shapes = []
     for shape_key in Object.keys(shapes_hash)
       unique_shapes.push shapes_hash[shape_key]
+    
+    if unique_shapes.length == 0
+      unique_shapes = null
 
     return unique_shapes
     
