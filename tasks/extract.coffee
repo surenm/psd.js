@@ -38,9 +38,8 @@ fs.writeFileSync design_file, JSON.stringify(psd)
 psd.toFileSync png_file
 
 # Save individual layer assets
-#for layer in psd.layers
-#  continue unless layer.image
+for layer in psd.layers
+  continue unless layer.image
   
-#  image_name = layer.name.replace /[^0-9a-zA-Z]/g, '_'
-#  image_file_name = path.join images_directory, "#{image_name}_#{layer.layerId}.png"
-#  layer.image.toFileSync image_file_name
+  image_file_name = path.join images_directory, "#{layer.layerId}.png"
+  layer.image.toFileSync image_file_name
