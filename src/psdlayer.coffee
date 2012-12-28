@@ -423,7 +423,8 @@ class PSDLayer
     data.height     = @rows
     data.width      = @cols
     data.zindex     = @idx
-    
+    data.layer_idx  = @idx + 1
+
     # Adjust opacity if there is a fill opacity
     if @fillOpacityPercentage?
       data.opacity = parseInt (@opacity * @fillOpacityPercentage)/100
