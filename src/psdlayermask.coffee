@@ -77,6 +77,12 @@ class PSDLayerMask
         layer.parse(i)
         @layers.push layer
         layers_copy.push layer
+
+      if @layers[0].name == "Background"
+        @layers.splice 0, 1
+        layers_copy.splice 0, 1
+        for i in [0..@layers.length-1]
+          @layers[i].idx = @layers[i].idx - 1
       
       for layer in @layers
         if layer.isFolder or layer.isHidden
