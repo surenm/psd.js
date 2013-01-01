@@ -212,7 +212,7 @@ class PSDLayerMask
     layers_after_pruning = []
     for layer in layers
       layer_id = layer.layerId
-      if layer_visibility_status[layer_id] == 1 and layer.layerType != "open folder"
+      if layer_visibility_status[layer_id] == 1 and layer.layerType != "open folder" and layer.layerType != "closed folder"
         layers_after_pruning.push layer
     
     console.log "#{layers_after_pruning.length} Layers are visible"
